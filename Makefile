@@ -1,6 +1,6 @@
 NAME = ircserv
 INC = inc/
-SRC = main.cpp
+SRC = src/main.cpp
 
 BUILD = .build
 OBJ = $(SRC:%.cpp=$(BUILD)/%.o)
@@ -9,10 +9,10 @@ DEP = $(OBJ:%.o=%.d)
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address
 
-all:
+all: $(NAME)
 
-$(BUILD)/%.o: %cpp Makefile
-	mkdir -p $(BUILD)
+$(BUILD)/%.o: %.cpp Makefile
+	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -I $(INC) -MMD -MP -c $< -o $@
 	@echo "Created $@"
 
@@ -33,3 +33,4 @@ fclean: clean
 re: fclean all
 
 .PHONY : all, clean, fclean, re
+.SILENT:
