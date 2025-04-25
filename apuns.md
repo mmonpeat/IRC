@@ -1,7 +1,7 @@
 #Bon diaaa
 
 ### Architecture
-
+~~~
 class   Server
 {
     public:
@@ -15,6 +15,7 @@ class   Server
     private:
         int     server_port;
         int     server_pass;
+        int     server_socket_fd;
         vector  clients;
         vector  channels;
 
@@ -28,6 +29,7 @@ class   Client
 
     private:
         int     password;
+        int     fd;
         string  nick;
         string  user;
         string  real_name;
@@ -44,7 +46,7 @@ class   Channel
         vector      operators;
         vector      clients;        //if a client becomes an operator, it's removed from clients and added to operators.
 };
-
+~~~
 Numerical_replies.h //in which all num replies are defined
 
 ### Subject Requirements vs IRC protocols
