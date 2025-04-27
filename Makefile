@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+         #
+#    By: kate <kate@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/25 18:01:42 by kkoval            #+#    #+#              #
-#    Updated: 2025/04/25 18:53:31 by kkoval           ###   ########.fr        #
+#    Updated: 2025/04/28 01:32:44 by kate             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = irc
-SRC = main.cpp Server.cpp
+SRC = main.cpp Server.cpp Client.cpp
 F_OBJ = obj/
 OBJ = $(addprefix $(F_OBJ), $(SRC:.cpp=.o))
 DEP = $(addprefix $(F_OBJ), $(SRC:.cpp=.d))

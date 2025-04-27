@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kate <kate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 17:07:50 by kkoval            #+#    #+#             */
-/*   Updated: 2025/04/25 19:30:55 by kkoval           ###   ########.fr       */
+/*   Updated: 2025/04/28 01:31:59 by kate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,11 @@
 
 void	set_server_parameters(Server *server, char **av)
 {
-	int port = atoi(port.c_str());
+	std::string	port_av = av[1];
+	int port = atoi(port_av.c_str());
 	std::string	password = av[2];
 	
-	server->setServerPort();
+	server->setServerPort(port);
 	server->setServerPass(password);
 }
 
@@ -72,6 +73,8 @@ int	main(int ac, char **av)
 	if (check_args(ac, av) == EXIT_FAILURE)
 		return EXIT_FAILURE;
 	set_server_parameters(&server, av);
+	//std::cout << server._server_port << std::endl;
+	//std::cout << server._server_pass << std::endl;
 	//socket
 	//hearing loop
 	std::cout << "args are good" << std::endl;

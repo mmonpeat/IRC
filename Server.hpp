@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kate <kate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 18:10:26 by kkoval            #+#    #+#             */
-/*   Updated: 2025/04/25 19:14:21 by kkoval           ###   ########.fr       */
+/*   Updated: 2025/04/28 01:32:21 by kate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 #define SERVER_HPP
 
 #include <iostream>
-//#include "Client.hpp" incluir cliente una vez este
+#include <vector>
+#include "Client.hpp"
 
 class   Server
 {
@@ -22,24 +23,24 @@ class   Server
 		Server( void );
 		~Server( void );
 		
-		//----------Setters
+		//          Setters
 		void	setServerPort( int port );
 		void	setServerPass( std::string password );
 		
-		//----------Getters
-		//getServerPort();
-		//getServerPass();
+		//          Getters
+		
 
-		//----------Functions
-		//bool	checkPassword()  !!what is the arg?
+		//          Functions
+		bool	validPassword( std::string client_pass ) const ;
         //checkNick(client);
         //checkPowers(client, channel);
+
     private:
-        int			_server_port;
-        std::string	_server_pass;
-        int			_server_socket_fd;
-        //std::vector	clients;
-        //std::vector	channels;
+        int			        _server_port;
+        std::string	        _server_pass;
+        //int			        _server_socket_fd;
+        std::vector<Client> clients;
+        //std::vector<Chanel>   channels;
         //ft_lookup() //looks for clients in struct;
 };
 

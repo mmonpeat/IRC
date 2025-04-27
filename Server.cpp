@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kate <kate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 18:10:45 by kkoval            #+#    #+#             */
-/*   Updated: 2025/04/25 19:10:22 by kkoval           ###   ########.fr       */
+/*   Updated: 2025/04/28 00:46:23 by kate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,3 +45,8 @@ void	Server::setServerPass( std::string password ) {
 
 //------------------------------ Functions --------------------------------------
 
+bool	Server::validPassword( std::string client_pass ) const {
+	if (client_pass == this->_server_pass)
+		return true;
+	return false;
+}
