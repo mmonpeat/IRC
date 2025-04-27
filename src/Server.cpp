@@ -8,7 +8,7 @@ Server::Server(int port, int pass): serverPort(port), serverPass(pass)
 		std::cerr << "ERROR: socket" << std::endl; //throw error
 		exit(EXIT_FAILURE);
 	}
-	sockaddr_in addr;
+	sockaddr_in addr;// amb .hpp ?
 	memset(&addr, 0, sizeof(addr)); //all 0
 				
 	addr.sin_family = AF_INET;
@@ -21,7 +21,7 @@ Server::Server(int port, int pass): serverPort(port), serverPass(pass)
 		std::cerr << "Failed to bind socket" << std::endl; // throw error
 		exit(EXIT_FAILURE);
 	}
-	if (listen(serverSocketFd, SOMAXCONN) == -1)//ERROR
+	if (listen(serverSocketFd, SOMAXCONN) == -1)//Escolta el maxim possible i ERROR  
     	{
 		close(serverSocketFd);
 		std::cerr << "Failed to listen on socket" << std::endl; //throw error
@@ -41,4 +41,9 @@ Server::~Server()
 void Server::start()
 {
 	std::cout << "comencar a acceptar, send, recv, fer poll..." << std::endl;
+	fcntl(serverSocketFd, F_SETFL, O_NONBLOCK);//socket non-blocking
+	
+	//map<int, Client> clients ??
+	pollfd serverPollFd;
+
 }

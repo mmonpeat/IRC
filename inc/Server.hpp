@@ -5,6 +5,8 @@
 #include <cstdlib> //EXIT_SUCCESS i EXIT_FALIURE, constants
 #include <cstring> //memset...
 #include <string>
+#include <vector>
+#include <map>
 #include <unistd.h> //socket, close
 #include <sys/socket.h> //bind, listen, accept, send, recv
 #include <netdb.h> //getaddrinfo, freeaddrinfo
@@ -18,6 +20,11 @@ class Server
 		int	serverPass;
 		int	serverSocketFd;
 	
+		std::map<int, Client> clients;
+		std::vector<Channel> channels;
+		std::vector<struct pollfd> pollFds
+
+		//ft_lookup()
 	public:
 		Server(int port, int pass);
 		~Server();
