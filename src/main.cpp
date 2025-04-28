@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 	std::cout << "IRC starts" << std::endl;
 	
 	int port = 8080;
-	int pass = 123456789;
+	std::string pass = "123456789";
 	Server server(port, pass);
 	server.start();
 

@@ -1,8 +1,11 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "Server.hpp"
-#include "Channel.hpp"
+#include <string>
+#include <vector>
+
+class Server;
+class Channel;
 
 class Client
 {
@@ -14,6 +17,7 @@ class Client
 		std::string	real_name;
 	public:
 		Client();
+		Client(int fd);
 		~Client();
 };
 
