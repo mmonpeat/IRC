@@ -6,7 +6,7 @@
 /*   By: kate <kate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 18:10:45 by kkoval            #+#    #+#             */
-/*   Updated: 2025/04/28 00:46:23 by kate             ###   ########.fr       */
+/*   Updated: 2025/04/28 02:19:25 by kate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,17 @@ void	Server::setServerPass( std::string password ) {
 	return;
 }
 
+void    Server::setServerSocket( int fd ) {
+	this->_socket_fd = fd;
+	return;
+}
+
 
 //------------------------------ Getters ----------------------------------------
 
- 
+int		Server::getServerPort( void ) const {
+	return ( this->_server_port );
+}
 
 //------------------------------ Functions --------------------------------------
 

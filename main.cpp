@@ -6,7 +6,7 @@
 /*   By: kate <kate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 17:07:50 by kkoval            #+#    #+#             */
-/*   Updated: 2025/04/28 01:31:59 by kate             ###   ########.fr       */
+/*   Updated: 2025/04/28 03:06:05 by kate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,17 @@ int		check_args(int ac, char **av)
 int	main(int ac, char **av)
 {
 	Server	server;
+	int		server_socket;
 	
 	if (check_args(ac, av) == EXIT_FAILURE)
 		return EXIT_FAILURE;
 	set_server_parameters(&server, av);
-	//std::cout << server._server_port << std::endl;
-	//std::cout << server._server_pass << std::endl;
-	//socket
-	//hearing loop
-	std::cout << "args are good" << std::endl;
+	server_socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (server_socket = -1)
+		return EXIT_FAILURE;
+	//bind socket to port
+	
+	//listening loop
+	close(server_socket); // socket needs to be closed 
 	return EXIT_SUCCESS;
 }
