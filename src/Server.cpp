@@ -48,6 +48,7 @@ void Server::start()
 	
 	while(true)
 	{
+		std::cout << "Dins while" << std::endl;
 		int pollCount = poll(pollFds.data(), pollFds.size(), -1); // wait forever
 		if (pollCount == -1)
 		{
@@ -57,12 +58,15 @@ void Server::start()
 
 		for (size_t i = 0; i < pollFds.size(); ++i)
 		{
+			std::cout << "dins for" << std::endl;
 			if (pollFds[i].revents & POLLIN)
 			{
 				if (pollFds[i].fd == serverSocketFd)
 				{
+					std::cout << "loop handle new connection" << std::endl;
 					handleNewConnection();
 				} else {
+					std::cout << "loop handle client data" << std::endl;
 					handleClientData(pollFds[i].fd);
 				}
 			}
