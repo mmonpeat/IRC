@@ -1,13 +1,10 @@
 #include "Server.hpp"
 
-Server::Server(int port, const std::string &pass): serverPort(port), serverPass(pass)
+Server::Server(int port, const std::string &pass): serverPort(port), serverPass(pass), serverSocketFd(-1)
 {
 	serverSocketFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocketFd == -1) //ERROR = -1, .hpp
-	{
-		std::cerr << "ERROR: socket" << std::endl; //throw error
-		exit(EXIT_FAILURE);
-	}
+		throw Server::specificException("ERROR: the socket does not work :(" );
 	sockaddr_in addr;// amb .hpp ?
 	memset(&addr, 0, sizeof(addr)); //all 0
 				
@@ -18,14 +15,12 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 	if (bind(serverSocketFd, (struct sockaddr *)&addr, sizeof(addr)) == -1)//ERROR
 	{
 		close(serverSocketFd);
-		std::cerr << "Failed to bind socket" << std::endl; // throw error
-		exit(EXIT_FAILURE);
+		throw Server::specificException("ERROR: Failed to bind socket" );
 	}
 	if (listen(serverSocketFd, SOMAXCONN) == -1)//Escolta el maxim possible i ERROR  
     	{
 		close(serverSocketFd);
-		std::cerr << "Failed to listen on socket" << std::endl; //throw error
-		exit(EXIT_FAILURE);
+		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
 	std::cout << "[Server] Listening on port" << std::endl;
 	
@@ -134,7 +129,7 @@ void Server::removeClient(int clientFd)
 }
 
 
-
+Server::specificException::specificException(const std::string &msg): std::range_error(msg) {}
 
 
 

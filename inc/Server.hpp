@@ -6,6 +6,7 @@
 #include <cstdlib> //EXIT_SUCCESS i EXIT_FALIURE, constants
 #include <cstring> //memset...
 #include <string>
+#include <stdexcept>
 #include <vector>
 #include <map>
 #include <unistd.h> //socket, close
@@ -16,9 +17,6 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
-
-//class Client;
-//class Channel;
 
 class Server
 {
@@ -43,6 +41,13 @@ class Server
 		//void	getServerPass();
 		
 		void	start();
+		
+		/* Exeptions Classes */
+		class specificException: public std::range_error
+		{	
+			public:
+				specificException(const std::string &msg);
+		};
 };
 
 #endif

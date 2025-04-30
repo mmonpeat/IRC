@@ -10,7 +10,7 @@ class Channel;
 class Client
 {
 	private:
-		int		password;
+		//int		password;
 		int		fd;
 		std::string	nick;
 		std::string	user;
@@ -19,6 +19,8 @@ class Client
 		Client();
 		Client(int fd);
 		~Client();
+
+		int get_fd() const { return fd; }
 };
 
 #endif
