@@ -22,8 +22,6 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 		close(serverSocketFd);
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
-	std::cout << "[Server] Listening on port" << std::endl;
-	
 }
 
 Server::~Server()
@@ -48,7 +46,10 @@ void Server::start()
 	
 	while(true)
 	{
-		std::cout << "Dins while" << std::endl;
+		
+		std::cout << "fer accept aqui" << std::endl;
+		handleNewConnection();
+		std::cout << "[Server] Listening on port: " << std::endl;
 		int pollCount = poll(pollFds.data(), pollFds.size(), -1); // wait forever
 		if (pollCount == -1)
 		{
@@ -64,7 +65,6 @@ void Server::start()
 				if (pollFds[i].fd == serverSocketFd)
 				{
 					std::cout << "loop handle new connection" << std::endl;
-					handleNewConnection();
 				} else {
 					std::cout << "loop handle client data" << std::endl;
 					handleClientData(pollFds[i].fd);
