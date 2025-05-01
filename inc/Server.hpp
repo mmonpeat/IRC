@@ -30,7 +30,7 @@ class Server
 		std::vector<struct pollfd> 	pollFds;
 
 		//ft_lookup()
-		void 	handleNewConnection();
+		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
 	public:
@@ -39,7 +39,10 @@ class Server
 
 		//void	getServerPort();
 		//void	getServerPass();
-		
+		void	init();
+		void	initializeSocket();
+		void	setupAddress(sockaddr_in &addr);
+		void	bindAndListen(sockaddr_in &addr);
 		void	start();
 		
 		/* Exeptions Classes */

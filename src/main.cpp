@@ -8,12 +8,11 @@ int main(int argc, char **argv)
 	
 	std::cout << "IRC starts" << std::endl;
 	
-	int port = 6697;
-	std::string pass = "123456789";
+	int port = 6698;
+	std::string pass = "1234";
 	try
 	{
 		Server server(port, pass);
-		server.start();
 	} catch(const Server::specificException &e) {
 		std::cerr << "Server exception caught: " << e.what() << std::endl;
 		return (EXIT_FAILURE);
@@ -22,3 +21,4 @@ int main(int argc, char **argv)
 
 	return (EXIT_SUCCESS);
 }
+
