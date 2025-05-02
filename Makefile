@@ -1,56 +1,36 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: kate <kate@student.42.fr>                  +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/04/25 18:01:42 by kkoval            #+#    #+#              #
-#    Updated: 2025/04/28 01:32:44 by kate             ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+NAME = ircserv
+INC = inc/
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp
 
-NAME = irc
-SRC = main.cpp Server.cpp Client.cpp
-F_OBJ = obj/
-OBJ = $(addprefix $(F_OBJ), $(SRC:.cpp=.o))
-DEP = $(addprefix $(F_OBJ), $(SRC:.cpp=.d))
+BUILD = .build
+OBJ = $(SRC:%.cpp=$(BUILD)/%.o)
+DEP = $(OBJ:%.o=%.d)
+
 CC = c++
-C_FLAGS = -Wall -Wextra -Werror -MMD -std=c++98 -g #-fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address
 
-# color codes
-BLACK    =   \033[0;39m
-BLUE     =   \033[34m
-GREEN    =   \033[32m
-RED      =   \033[31m
+all: $(NAME)
 
-all: dir $(NAME)
+$(BUILD)/%.o: %.cpp Makefile
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -I $(INC) -MMD -MP -c $< -o $@
+	@echo "Created $@"
 
--include ${DEP}
+$(NAME) : $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	@echo "Created $(NAME)"
 
-dir:
-	@mkdir -p $(F_OBJ)
-
-#compile object files
-$(F_OBJ)%.o: %.cpp Makefile
-	@echo "Compiling $< "
-	@$(CC) $(C_FLAGS) -I ./inc -c $< -o $@
-
-$(NAME):: $(OBJ)
-	@$(CC) $(C_FLAGS) $(^) -o $(NAME)
-	@echo "$(GREEN)Everything has been compilated.$(BLACK)"
-
-$(NAME)::
-	@echo "$(GREEN)No actions needed.$(BLACK)"
+-include $(DEP)
 
 clean:
-	$(RM) $(OBJ) $(DEP)
-	$(RM) -R obj
+	rm -rf $(BUILD)
+	@echo "deleted build"
 
 fclean: clean
-	$(RM) $(NAME)
-	@echo "$(RED)Everything has been cleaned.$(BLACK)"
+	rm -rf $(NAME)
+	@echo "$(NAME) deleted"
 
-re: clean fclean
+re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY : all, clean, fclean, re
+.SILENT:
