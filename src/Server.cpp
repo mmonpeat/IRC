@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/02 13:25:20 by kkoval            #+#    #+#             */
+/*   Updated: 2025/05/02 13:35:18 by kkoval           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 
 Server::Server(int port, const std::string &pass): serverPort(port), serverPass(pass), serverSocketFd(-1)
@@ -9,6 +21,8 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 Server::~Server()
 {
 	close(serverSocketFd);
+	// delete all clients if allocated
+	// delete all channels if allocated
 	std::cout << "[Server] Socket closed" << std::endl;
 
 }
@@ -176,6 +190,16 @@ void Server::removeClient(int clientFd)
 	std::cout << "Close client with: fd=" << clientFd << std::endl;
 	clients.erase(clientFd);
 	close(clientFd);
+}
+
+int		Server::getServerPort( void ) const {
+	return (this->serverPort);
+}
+
+bool	Server::validPassword( std::string client_pass ) const {
+	if (client_pass == this->serverPass)
+		return true;
+	return false;
 }
 
 

@@ -21,9 +21,11 @@
 class Server
 {
 	private:
-		int		serverPort;
+		int			serverPort;
 		std::string	serverPass;
-		int		serverSocketFd;
+		int			serverSocketFd;
+		
+		
 	
 		std::map<int, Client>		clients;
 		std::vector<Channel>		channels;
@@ -33,12 +35,13 @@ class Server
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
+
 	public:
 		Server(int port, const std::string &pass);
 		~Server();
 
-		//void	getServerPort();
-		//void	getServerPass();
+		int		getServerPort() const;
+		bool	validPassword( std::string client_pass ) const;
 		void	init();
 		void	initializeSocket();
 		void	setupAddress(sockaddr_in &addr);
