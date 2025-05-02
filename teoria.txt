@@ -425,9 +425,41 @@ irssi
 (o si és a una IP diferent, poses la IP del teu servidor)
 
 
+Why poll() → accept()?
 
+poll():
 
+    Es un multiplexor: revisa múltiples sockets (por ejemplo, el del servidor y los de cada cliente).
+    Se bloquea o espera hasta que uno de ellos tenga un evento (conexión entrante, datos disponibles, etc.).
+    Detecta que el serverSocketFd tiene una conexión pendiente (evento POLLIN).
 
+accept():
+
+    Se llama sólo cuando poll() detecta que serverSocketFd está listo para leer (es decir, que hay una conexión pendiente).
+    Devuelve un nuevo socket para ese cliente.
+    Este nuevo socket lo usas para leer/escribir con ese cliente.
+
+lo que pasa en un servidor:
+    Tienes un socket principal (serverSocketFd) que escucha nuevas conexiones (con listen()).
+    Y múltiples sockets de clientes ya conectados (uno por cada usuario).
+
+Sin usar poll():
+
+    Si usaras solo accept(), el servidor se bloquearía esperando una nueva conexión, ignorando a los clientes ya conectados.
+    Si usaras recv() en un cliente, el servidor se bloquearía esperando datos de ese cliente, ignorando nuevas conexiones.
+    Solución: Necesitamos monitorear todos los sockets (el del servidor y los de los clientes) sin bloquear el flujo. Ahí entra poll() (o select()/epoll()).
+
+con poll():
+
+poll() detecta actividad:
+
+        Monitorea todos los sockets registrados (incluido serverSocketFd).
+        Si hay una nueva conexión entrante en serverSocketFd, poll() marca ese socket con un evento POLLIN (datos disponibles para leer).
+
+accept() se ejecuta solo cuando hay una conexión pendiente:
+
+        Si poll() indica que serverSocketFd está listo, sabes que hay al menos una conexión esperando ser aceptada.
+        Entonces llamas a accept(), que no se bloquea (porque poll() ya te aseguró que hay una conexión pendiente).
 
 
 
