@@ -6,7 +6,7 @@
 /*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 13:25:20 by kkoval            #+#    #+#             */
-/*   Updated: 2025/05/02 13:35:18 by kkoval           ###   ########.fr       */
+/*   Updated: 2025/05/02 17:15:53 by kkoval           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,7 @@ void Server::handleClientData(int clientFd)
 			// 	send(clientFd, welcomeMsg.c_str(), welcomeMsg.size(), 0);
 			// }
 			std::cout << "Mensaje de fd=" << clientFd << ": " << message << std::endl;
+			std::cout << this->serverSocketFd << std::endl;
 		}
 }
 
