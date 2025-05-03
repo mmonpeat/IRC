@@ -23,7 +23,6 @@ class Channel;
 class Client
 {
 	private:
-		//int		password;
 		int			fd;
 		std::string	_nick;
 		std::string	_user;
