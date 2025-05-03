@@ -16,10 +16,11 @@ class   Server
         int     server_port;
         int     server_pass;
         int     server_socket_fd;
-        vector  clients;
+        map     clients;
         vector  channels;
+	vector  pollFds
 
-        ft_lookup() //looks for clients in struct;
+        ft_lookup() //looks for clients in struct; (potser sobra amb el map o no ns)
 };
 
 class   Client
@@ -59,3 +60,5 @@ USER
 
 After registration:
 JOIN
+
+millor map<int, Client> per identificar per fd i així més rapid

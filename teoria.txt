@@ -1,0 +1,475 @@
+IRC (Internet Relay Chat)
+
+El servidor escolta connexions TCP en el port i password concret que passem per la terminal.
+TCP(Transmission Control Protocol) es a dir, protocol de xarxa. Amb sockets TCP(SOCK_STREAM) les dades viatgen com si fos un "flux"(stream).
+
+
+Per aquest projecte amb 42:
+- argv, port i password
+- NO IRC client
+- NO  server-to-server
+- Cada usuari: nickname, username i password
+
+Que és un socket?
+És "l'extrem d'una connexió" cada maquina que es vol conectar, al servidor i enviar o rebre dades, ha de tenir un socket.
+
+FUNCIONS
+1. socket <unistd.h> o <sys/socket.h>
+
+  	int sockfd = socket(domain, type, protocol); //socket(AF_INET, SOCK_STREAM, 0);
+  	
+	domain -> domini, tipus d'adreca per comunicar
+		AF_INET: IPv4, adreces com 127.0.0.1, 192.168.1.5, etc.
+		AF_INET6: IPv6 (adreces com ::1)
+		AF_UNIX: sockets locals (fitxers al sistema)
+	type -> tipus de comunicació
+		SOCK_STREAM: connexió orientada, necessites conctar-te abans d'enviar dades
+		SOCK_DGRAM: comunicació sense connexió, fa servir UDP
+		SOCK_RAW: accés brut a IP(poc comú, baix nivell)
+	protocol -> habitualment 0
+		En la gran majoria de casos, posem 0 i el sistema operatiu tria el protocol per defecte:
+			- Si has posat AF_INET + SOCK_STREAM → tria automàticament TCP
+			- Si has posat AF_INET + SOCK_DGRAM → tria automàticament UDP
+	
+	Gestiones amb: bind, listen, accept, connect, send, recv, etc...
+   1.1 Tanca amb close(sockfd); <unistd.h>
+   
+2. setsockopt <sys/socket.h>
+Permet modificar el comportament del socket. Exemple: activar que el socket pugui reutilitzar un port (molt útil per evitar errors tipus “address already in use”).
+
+int opt = 1;
+setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+	SO_REUSEADDR permet reutilitzar l’adreça (evita errors quan reinicies el servidor).
+	Tmb pots usar SO_KEEPALIVE, SO_LINGER, SO_RCVBUF, etc.
+	
+	SOL_SOCKET ???????????
+
+3. getsockname <sys/socket.h>   NOOOOOO
+Obté la informació de l’adreça del socket local. Aquesta funció et diu a quina IP i port està associat el socket.
+Útil si deixem que el sistema trii port automaticament (usant port 0 o bind()) i vols saber quin port ha escollit.
+
+struct sockaddr_in addr;
+socklen_t len = sizeof(addr);
+getsockname(sockfd, (struct sockaddr*)&addr, &len);
+std::cout << "Port local: " << ntohs(addr.sin_port) << "\n";
+
+
+4. getprotobyname <netdb.h> NOOOOOO
+Busca un protocol pel seu nom.
+
+Retorna un protoent amb informació del protocol (tcp, udp, etc.). Sovint no cal, perquè amb 0 al socket() el sistema ja tria el protocol correcte. Però si vols ser explícit:
+
+struct protoent *proto = getprotobyname("tcp");
+int protocol_number = proto->p_proto;
+
+5. gethostbyname <netdb.h> OBSOLETA Millor usar getaddrinfo
+Tradueix un nom de domini a IP (ex: "google.com" → 142.250.190.78)
+
+6. getaddrinfo <netdb.h>
+Resol noms i serveis a adreces IP i ports.
+És la versió moderna i segura per fer DNS lookup i preparar connexions. És flexible i funciona tant amb IPv4 com IPv6.
+
+struct addrinfo hints = {}, *res;
+hints.ai_family = AF_INET;
+hints.ai_socktype = SOCK_STREAM;
+
+int err = getaddrinfo("example.com", "80", &hints, &res);
+// res ara conté una llista d'adreces IP i ports disponibles
+
+freeaddrinfo(res); // No oblidis alliberar-ho!
+
+7. freeaddrinfo <netdb.h>
+Allibera la memoria de getaddrinfo
+
+8. bind <sys/socket.h>
+Associa(lliga) el socket a una IP/port local
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+
+Exemple:
+struct sockaddr_in serv_addr;
+serv_addr.sin_family = AF_INET;
+serv_addr.sin_port = htons(8080); // port 8080
+serv_addr.sin_addr.s_addr = INADDR_ANY; // qualsevol IP local
+
+bind(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+
+9. connect <sys/socket.h> NOOOOOO
+Connecta el socket a un host(adreca) remot. S'utilitza en la part client per establir connexió amb un servidor.
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+
+10. listen <sys/socket.h>
+Indica que vols rebre connexions (servidor). Converteix el socket en mode passiu: espera connexions entrants.
+Indiques quantes connexions poden estar en cua d’espera (amb backlog).
+
+int listen(int sockfd, int backlog);
+listen(sockfd, SOMAXCONN); // "Deixa'm escoltar el màxim de connexions que puguis aguantar."
+SOMAXCONN és una constant que diu "el màxim nombre de connexions pendents" que la teva listen() pot acceptar.
+Exemple pràctic:
+Si arriben 300 connexions gairebé al mateix temps:
+	Si el sistema té SOMAXCONN = 128, les primeres 128 entraran a la cua.
+	Les altres 172 probablement seran rebutjades.
+
+
+11. accept <sys/socket.h>
+Accepta una connexió entrant d'un client. Retorna un nou file descriptor per parlar amb aquell client.
+El sockfd original continua escoltant (pots fer més accept() després).
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+Exemple:
+struct sockaddr_in client_addr;
+socklen_t client_len = sizeof(client_addr);
+
+int clientfd = accept(sockfd, (struct sockaddr*)&client_addr, &client_len);
+
+
+12. htons <arpa/inet.h> Host TO Network Short, host → network
+Converteix un número de 16 bits (tipus short) de l’ordre de bytes del sistema (host order) a l’ordre de xarxa (network order).
+S’utilitza sobretot per a ports.
+
+uint16_t htons(uint16_t hostshort);
+
+Exemple:
+
+uint16_t port = 8080;
+uint16_t net_port = htons(port); // ara el pots posar a sockaddr_in
+
+
+13. htonl <arpa/inet.h> Host TO Network Long, host → network
+Converteix un número de 32 bits (tipus long) a l’ordre de xarxa.
+S’utilitza amb IPs en format enter, o altres valors de 4 bytes.
+
+uint32_t htonl(uint32_t hostlong);
+
+Exemple:
+
+uint32_t val = 123456789;
+uint32_t net_val = htonl(val);
+
+14. ntohs <arpa/inet.h> Network TO Host Short, network → host
+De l’ordre de xarxa a l’ordre local del sistema. Fa la conversió inversa de htons().
+S’utilitza per llegir ports rebuts per la xarxa.
+
+uint16_t ntohs(uint16_t netshort);
+
+Exemple:
+uint16_t port = ntohs(sockaddr.sin_port); // convertir el port rebut
+
+15. ntohl <arpa/inet.h> Network TO Host Long, network → host
+Serveix per llegir IPs o altres valors de 32 bits que t'arriben de la xarxa i convertir-los a un número de 32 bits. Fa la conversió inversa de htonl().
+
+uint32_t ntohl(uint32_t netlong);
+
+16. inet_addr <arpa/inet.h> NOOO
+Converteix una adreça IP (ex: "127.0.0.1") escrita com a string a un número en format de xarxa (in_addr_t).
+És antiga i pot tenir problemes. Avui dia s’aconsella inet_pton() en lloc d'inet_addr().
+
+in_addr_t inet_addr(const char *cp);
+
+Exemple:
+struct sockaddr_in addr;
+addr.sin_addr.s_addr = inet_addr("192.168.1.1");
+
+	16.1 inet_pton
+
+17. inet_ntoa <arpa/inet.h> NOOOOOO
+Fa la conversió inversa: d’una adreça IP en format in_addr (número) a una string (ex: "127.0.0.1").
+NO ÉS THREAD-SAFE
+
+18. send <sys/socket.h>
+Envia dades per un socket (des del programa cap a la xarxa).
+És com escriure (write) però específica per sockets.
+
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+
+Exemple:
+send(sockfd, "Hola món", strlen("Hola món"), 0);
+
+19. recv <sys/socket.h>
+Rep dades d'un socket (des de la xarxa cap al programa).
+És com llegir (read) però pensat per sockets.
+
+ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+
+Exemple:
+char buffer[1024];
+recv(sockfd, buffer, sizeof(buffer), 0);
+
+20. signal <signal.h>
+Associa una funció (handler) que s’executarà automàticament quan arribi un senyal (com SIGINT, SIGTERM...).
+Útil per capturar Ctrl+C (SIGINT) i tancar el servidor de forma neta.
+
+typedef void (*sighandler_t)(int);
+sighandler_t signal(int signum, sighandler_t handler);
+
+Exemple:
+void handler(int sig) { std::cout << "Tancant!\n"; exit(0); }
+signal(SIGINT, handler);
+
+21. sigaction <signal.h>
+És una versió més moderna i segura de signal().
+Et dona més control: pots definir com gestionar el senyal, bloquejar altres senyals, etc.
+Molt usada per capturar SIGPIPE quan el socket es trenca.
+
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+
+Exemple:
+struct sigaction sa;
+sa.sa_handler = handler;
+sigemptyset(&sa.sa_mask);
+sa.sa_flags = 0;
+sigaction(SIGINT, &sa, NULL);
+
+22. lseek <unistd.h>
+Mou el cursor de lectura/escriptura dins d'un fitxer (o socket/file descriptor).
+Pots saltar cap endavant, enrere, o veure on estàs dins el fitxer.
+
+Paràmetres:
+    fd: file descriptor (obert amb open(), socket(), etc).
+    
+    offset: nombre de bytes que vols moure.
+
+    whence: des d'on comptes l'offset:
+
+        SEEK_SET: des de l'inici del fitxer
+
+        SEEK_CUR: des de la posició actual
+
+        SEEK_END: des del final
+        
+    off_t lseek(int fd, off_t offset, int whence);
+    
+Exemple:
+off_t pos = lseek(fd, 0, SEEK_END); // Saltar al final per saber mida del fitxer/fd
+
+23. fstat <sys/stat.h>
+és útil per veure si un fd és un socket (S_ISSOCK()).
+Obté informació sobre un file descriptor: si és un fitxer, socket, mida, permisos, etc.
+No necessites el nom del fitxer, només el fd obert.
+Important per saber si estàs treballant amb un socket, un arxiu, un FIFO, etc.
+
+int fstat(int fd, struct stat *statbuf);
+
+Exemple:
+struct stat sb;
+fstat(fd, &sb);
+if (S_ISREG(sb.st_mode)) {
+    std::cout << "És un fitxer regular.\n";
+}
+
+
+
+
+
+24. fcntl <fcntl.h>
+és brutal per sockets asíncrons: així pots gestionar diversos clients sense bloquejar.
+Manipula un file descriptor: pots
+
+    Canviar opcions (O_NONBLOCK, etc.)
+
+    Bloquejar/unbloquejar
+
+    Copiar descriptor (F_DUPFD)
+
+Molt usada per posar sockets en mode no bloquejant (O_NONBLOCK), que és habitual a servidors que no volen quedar-se penjats esperant.
+
+int fcntl(int fd, int cmd, ... /* arg */ ); 
+
+Exemple:
+fcntl(fd, F_SETFL, O_NONBLOCK); // Posa el fd en mode non-blocking
+//cmd = F_SETFL, F_SETFL vol dir "set file status flags", és a dir: canvia el mode del fd.
+O_NONBLOCK diu "posa aquest file descriptor en mode no bloquejant".
+
+Aquest socket (o arxiu) ja no es quedarà bloquejat esperant dades, sinó que si no hi ha res per llegir o escriure, la funció (recv, send, etc.) tornarà de seguida en comptes de quedar-se parada.
+
+
+
+
+
+25. poll <poll.h>
+Espera (o comprova) diversos file descriptors (sockets, fitxers, etc.) alhora per veure si:
+
+        Hi ha dades per llegir (POLLIN),
+
+        Es pot escriure (POLLOUT),
+
+        Hi ha errors (POLLERR), etc.
+
+No bloqueja cada connexió individualment → mira tots de cop.
+És essencial per servidors que han d'escoltar molts sockets a la vegada sense crear fils nous (thread).
+
+Escala millor que select() quan tens molts clients.
+No necessita copiar tot l'array cada cop (com select), més eficient.
+No té límit de fd petits (com select que limita a 1024).
+
+int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+
+Paràmetres:
+
+    fds: array de pollfd, cada pollfd indica un fd i què vols mirar (POLLIN, etc.).
+
+    nfds: número d'elements de l'array fds.
+
+    timeout:
+
+        Quant de temps esperar (en mil·lisegons),
+
+        0 = no esperar (mode polling actiu),
+
+        -1 = esperar indefinidament.
+        
+Exemple:
+int main() {
+    struct pollfd fds[1];
+    fds[0].fd = STDIN_FILENO; // Entrada estàndard (teclat)
+    fds[0].events = POLLIN;   // Volem saber si es pot llegir
+
+    int ret = poll(fds, 1, 5000); // Esperar fins 5 segons
+
+    if (ret > 0) {
+        if (fds[0].revents & POLLIN) {
+            std::cout << "Hi ha dades per llegir!\n";
+        }
+    } else if (ret == 0) {
+        std::cout << "Timeout, ningú ha escrit res.\n";
+    } else {
+        std::perror("poll");
+    }
+}
+
+FUNCIONS ÚTILS
+
+1. socket <unistd.h> o <sys/socket.h>
+2. close(sockfd); <unistd.h>
+3. setsockopt <sys/socket.h> (ns)
+4. getaddrinfo <netdb.h>
+5. freeaddrinfo <netdb.h>
+6. bind <sys/socket.h>
+7. listen <sys/socket.h>
+8. accept <sys/socket.h>
+9. htons <arpa/inet.h>
+10. htohs <arpa/inet.h>
+11. ntohs <arpa/inet.h>
+12. ntohl <arpa/inet.h>
+13. inet_pton
+14. send <sys/socket.h>
+15. recv <sys/socket.h>
+16. sigaction <signal.h>
+17. fstat <sys/stat.h> (ns)
+18. fcntl <fcntl.h>
+19. poll <poll.h>
+
+sockaddr_in addr;
+
+	1. addr.sin_family = AF_INET; → Indiques que el socket serà per IPs normals (IPv4).
+    		sin_family diu quina família d'adreces usaràs.
+    		AF_INET vol dir "Internet IPv4" (adreces com 192.168.0.1)
+    	2. addr.sin_addr.s_addr = INADDR_ANY; → Permets que qualsevol IP que tingui el teu servidor pugui acceptar connexions.
+    		sin_addr.s_addr diu a quina IP local vols "escoltar".
+		INADDR_ANY vol dir "accepta connexions a qualsevol IP" del teu servidor.
+		    (localhost 127.0.0.1, IP pública, IP privada...)
+	3. addr.sin_port = htons(port); → Assignes el port (com 6667), assegurant que el format sigui correcte per la xarxa.
+		sin_port indica el número de port on escoltaràs (ex: 6667 per IRC).
+		htons(port) fa "host to network short":
+			Canvia l'ordre dels bytes si cal, perquè a la xarxa tot es transmet amb un format "network byte order" (big-endian).
+			Això ho necessites perquè els ports són de 16 bits (short) i han d'anar en el format correcte.
+
+Estructuras poll:
+
+    pollfd: Es una estructura que contiene:
+
+        fd: El descriptor de archivo (socket) a monitorizar.
+
+        events: Eventos que queremos monitorizar (ej. POLLIN = datos disponibles para leer).
+
+        revents: Eventos que han ocurrido (se actualiza tras llamar a poll()).
+
+    pollFds: Un vector que guarda todos los pollfd (tanto el socket del servidor como los de los clientes).
+    
+
+
+ORDRE
+
+int sockfd = socket(AF_INET, SOCK_STREAM, 0);  // crea socket
+setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, ...); // opcional
+bind(sockfd, ...);        // lligar a IP/port
+memset per addr és una struct sockaddr_in //oplir 0 per evitar errors
+listen(sockfd, SOMAXCONN); // posar a escoltar
+int clientfd = accept(sockfd, ...); // acceptar connexions
+send()
+rev()
+fcntl
+poll
+
+
+
+COMPROVAR SI EL CODI FUNCIONA:
+https://irssi.org/New-users/
+
+FACIL
+
+irssi -c 127.0.0.1 -p 6697 -n MiNick
+
+1. Compiles i arranques el teu servidor IRC del projecte (normalment et diran quin port escoltar, exemple: 6667).
+
+./ircserver 6667 password
+
+2. En un altre terminal (nova finestra), obres irssi:
+
+irssi
+
+3. Dins d'irssi, et connectes manualment al teu servidor local:
+
+/connect 127.0.0.1 6667 password
+
+(o si és a una IP diferent, poses la IP del teu servidor)
+
+
+Why poll() → accept()?
+
+poll():
+
+    Es un multiplexor: revisa múltiples sockets (por ejemplo, el del servidor y los de cada cliente).
+    Se bloquea o espera hasta que uno de ellos tenga un evento (conexión entrante, datos disponibles, etc.).
+    Detecta que el serverSocketFd tiene una conexión pendiente (evento POLLIN).
+
+accept():
+
+    Se llama sólo cuando poll() detecta que serverSocketFd está listo para leer (es decir, que hay una conexión pendiente).
+    Devuelve un nuevo socket para ese cliente.
+    Este nuevo socket lo usas para leer/escribir con ese cliente.
+
+lo que pasa en un servidor:
+    Tienes un socket principal (serverSocketFd) que escucha nuevas conexiones (con listen()).
+    Y múltiples sockets de clientes ya conectados (uno por cada usuario).
+
+Sin usar poll():
+
+    Si usaras solo accept(), el servidor se bloquearía esperando una nueva conexión, ignorando a los clientes ya conectados.
+    Si usaras recv() en un cliente, el servidor se bloquearía esperando datos de ese cliente, ignorando nuevas conexiones.
+    Solución: Necesitamos monitorear todos los sockets (el del servidor y los de los clientes) sin bloquear el flujo. Ahí entra poll() (o select()/epoll()).
+
+con poll():
+
+poll() detecta actividad:
+
+        Monitorea todos los sockets registrados (incluido serverSocketFd).
+        Si hay una nueva conexión entrante en serverSocketFd, poll() marca ese socket con un evento POLLIN (datos disponibles para leer).
+
+accept() se ejecuta solo cuando hay una conexión pendiente:
+
+        Si poll() indica que serverSocketFd está listo, sabes que hay al menos una conexión esperando ser aceptada.
+        Entonces llamas a accept(), que no se bloquea (porque poll() ya te aseguró que hay una conexión pendiente).
+
+
+
+
+
+
+
+
+
+
+
+
+
