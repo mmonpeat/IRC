@@ -6,7 +6,7 @@
 /*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 13:25:20 by kkoval            #+#    #+#             */
-/*   Updated: 2025/05/02 17:15:53 by kkoval           ###   ########.fr       */
+/*   Updated: 2025/05/05 20:02:39 by kkoval           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,14 @@ void Server::handleClientData(int clientFd)
 			// }
 			std::cout << "Mensaje de fd=" << clientFd << ": " << message << std::endl;
 			std::cout << this->serverSocketFd << std::endl;
+			//encontrar /r/n
+			std::cout << "msg is :" << findEndOfMsg(message) << std::endl;
+			//check if registered if not wait for handshake
+			// if (clients.empty() || findClient(clientFd) == false)
+			// 	registerClient();
+			// else
+			// 	handleMsg();
+			
 		}
 }
 
@@ -201,6 +209,15 @@ bool	Server::validPassword( std::string client_pass ) const {
 	if (client_pass == this->serverPass)
 		return true;
 	return false;
+}
+
+//------------------------------- Msg Functions -------------------------------
+
+// maybe not right but working for now
+std::string	Server::findEndOfMsg(std::string &buffer) {
+	std::string::size_type	pos = buffer.find_last_of("\r\n");
+	std::string	msg = buffer.substr(0, pos);
+	return (msg);
 }
 
 

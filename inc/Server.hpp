@@ -47,6 +47,9 @@ class Server
 		void	setupAddress(sockaddr_in &addr);
 		void	bindAndListen(sockaddr_in &addr);
 		void	start();
+
+		//parser msg functions
+		std::string	findEndOfMsg(std::string &msg);
 		
 		/* Exeptions Classes */
 		class specificException: public std::range_error
