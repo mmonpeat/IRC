@@ -27,7 +27,7 @@ class Client
 		std::string	_nick;
 		std::string	_username;	// USER params
 		std::string	_hostname;	// USER params
-		std::string	_servername;	// USER params
+		//std::string	_servername;	// USER params, maybe this one we can skip?
 		std::string	_real_name;	// USER params
 
 	public:
