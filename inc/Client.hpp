@@ -25,8 +25,10 @@ class Client
 	private:
 		int			fd;
 		std::string	_nick;
-		std::string	_user;
-		std::string	_real_name;
+		std::string	_username;	// USER params
+		std::string	_hostname;	// USER params
+		std::string	_servername;	// USER params
+		std::string	_real_name;	// USER params
 
 	public:
 		Client(void);
