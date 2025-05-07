@@ -153,6 +153,10 @@ void Server::acceptNewConnection()
 	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
+void	Server::handleMsg(std::string msg)
+{
+	std::cout << "Msg is : " << msg << std::endl;
+}
 
 void Server::handleClientData(int clientFd)
 {
@@ -163,15 +167,15 @@ void Server::handleClientData(int clientFd)
         	removeClient(clientFd);  // Desconexión o error
 	} else {
      		buffer[bytesRead] = '\0';
-			std::string message(buffer);
-
+			std::string received(buffer);
+			std::string	msg  = received.substr(0, received.find("\r\n"));
+			handleMsg(msg);
 			// // Respuesta mínima para el handshake de Irssi
 			// if (message.find("NICK") != std::string::npos || message.find("USER") != std::string::npos) {
 			// 	std::string welcomeMsg = ":MyServerIRC 001 client :Welcome to MyServerIRC!\r\n";
 			// 	send(clientFd, welcomeMsg.c_str(), welcomeMsg.size(), 0);
 			// }
-			std::cout << "Mensaje de fd=" << clientFd << ": " << message << std::endl;
-			std::cout << this->serverSocketFd << std::endl;
+			std::cout << "Mensaje de fd=" << clientFd << ": " << received << std::endl;
 		}
 }
 
