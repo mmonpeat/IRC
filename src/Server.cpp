@@ -6,7 +6,7 @@
 /*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 13:25:20 by kkoval            #+#    #+#             */
-/*   Updated: 2025/05/02 17:15:53 by kkoval           ###   ########.fr       */
+/*   Updated: 2025/05/09 15:11:43 by amagnell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,6 @@ void	Server::handleMsg(std::string msg)
 {
 	std::cout << "Msg is : " << msg << std::endl;
 }
-
 void Server::handleClientData(int clientFd)
 {
 	char buffer[512];
@@ -167,15 +166,21 @@ void Server::handleClientData(int clientFd)
         	removeClient(clientFd);  // Desconexión o error
 	} else {
      		buffer[bytesRead] = '\0';
-			std::string received(buffer);
-			std::string	msg  = received.substr(0, received.find("\r\n"));
-			handleMsg(msg);
+			std::string	received(buffer);
+			std::string	del = "\r\n";
+			std::string::size_type	pos = received.find(del);
+			while (pos != std::string::npos)
+			{
+				handleMsg(received.substr(0, pos));
+				received.erase(0, pos + del.length());
+				pos = received.find(del);
+			}
 			// // Respuesta mínima para el handshake de Irssi
 			// if (message.find("NICK") != std::string::npos || message.find("USER") != std::string::npos) {
 			// 	std::string welcomeMsg = ":MyServerIRC 001 client :Welcome to MyServerIRC!\r\n";
 			// 	send(clientFd, welcomeMsg.c_str(), welcomeMsg.size(), 0);
 			// }
-			std::cout << "Mensaje de fd=" << clientFd << ": " << received << std::endl;
+			std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
 
