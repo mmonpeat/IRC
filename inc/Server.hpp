@@ -35,6 +35,7 @@ class Server
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
+		void	handleMsg(std::string msg);
 
 	public:
 		Server(int port, const std::string &pass);

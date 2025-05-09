@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/02 13:25:20 by kkoval            #+#    #+#             */
-/*   Updated: 2025/05/05 20:02:39 by kkoval           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
 
 Server::Server(int port, const std::string &pass): serverPort(port), serverPass(pass), serverSocketFd(-1)
@@ -153,7 +141,10 @@ void Server::acceptNewConnection()
 	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
-
+void	Server::handleMsg(std::string msg)
+{
+	std::cout << "Msg is : " << msg << std::endl;
+}
 void Server::handleClientData(int clientFd)
 {
 	char buffer[512];
@@ -163,23 +154,21 @@ void Server::handleClientData(int clientFd)
         	removeClient(clientFd);  // Desconexión o error
 	} else {
      		buffer[bytesRead] = '\0';
-			std::string message(buffer);
-
+			std::string	received(buffer);
+			std::string	del = "\r\n";
+			std::string::size_type	pos = received.find(del);
+			while (pos != std::string::npos)
+			{
+				handleMsg(received.substr(0, pos));
+				received.erase(0, pos + del.length());
+				pos = received.find(del);
+			}
 			// // Respuesta mínima para el handshake de Irssi
 			// if (message.find("NICK") != std::string::npos || message.find("USER") != std::string::npos) {
 			// 	std::string welcomeMsg = ":MyServerIRC 001 client :Welcome to MyServerIRC!\r\n";
 			// 	send(clientFd, welcomeMsg.c_str(), welcomeMsg.size(), 0);
 			// }
-			std::cout << "Mensaje de fd=" << clientFd << ": " << message << std::endl;
-			std::cout << this->serverSocketFd << std::endl;
-			//encontrar /r/n
-			std::cout << "msg is :" << findEndOfMsg(message) << std::endl;
-			//check if registered if not wait for handshake
-			// if (clients.empty() || findClient(clientFd) == false)
-			// 	registerClient();
-			// else
-			// 	handleMsg();
-			
+			std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
 

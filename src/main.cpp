@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/02 12:54:45 by kkoval            #+#    #+#             */
-/*   Updated: 2025/05/02 13:40:14 by kkoval           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 //- 6667 (the default for IRC) to handle incoming clients connections.
 //- 0-1023 (privileged ports that usually requiere root and admin privileges)
 //- 1024-49151 would be acceptable to avoid conflicts with system-level services
