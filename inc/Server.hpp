@@ -27,7 +27,7 @@ class Server
 		
 		
 	
-		std::map<int, Client>		clients;
+		std::map<int, Client*>		clients;
 		std::vector<Channel>		channels;
 		std::vector<struct pollfd> 	pollFds;
 
@@ -35,7 +35,7 @@ class Server
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
-		void	handleMsg(std::string msg);
+		
 
 	public:
 		Server(int port, const std::string &pass);
@@ -50,8 +50,14 @@ class Server
 		void	start();
 
 		//parser msg functions
-		std::string	findEndOfMsg(std::string &msg);
+		void	handleMsg(std::string msg, int clientFd);
 		
+		//
+		
+		bool	clientIsRegistered(int clientFd);
+		Client*	createClient(int clientFd);
+		void	addClient(int clientFd);
+
 		/* Exeptions Classes */
 		class specificException: public std::range_error
 		{	
