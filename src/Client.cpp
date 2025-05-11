@@ -2,12 +2,11 @@
 
 //------------------------------ Constructor / Destructors------------------------
 
-Client::Client ( void ): fd(-1) {
-	std::cout << "Client constructor called" << std::endl; // mute later
+Client::Client(int fd): _fd(fd) {
+	std::cout << "Client constructor called" << std::endl;
+	auth = false; // hasta que el cliente tenga todos los campos registrados
 	return;
-}
-
-Client::Client(int fd): fd(fd) {}
+	}
 
 Client::~Client ( void ) {
 	std::cout << "Client destructor called" << std::endl; // mute later
@@ -18,15 +17,30 @@ Client::~Client ( void ) {
 
 //------------------------------ Setters -----------------------------------------
 
-// Maybe not actually needed, maybe full constructor could be used
-
-void	Client::setNick( std::string nick ) {
+void		Client::setNick( std::string nick ) {
 	this->_nick = nick;
 	return;
 }
-void	Client::setName( std::string name ) {
-	this->_real_name = name;
+
+void 		Client::setUserName(std::string user_name) {
+	this->_username = user_name;
 	return;
+}
+
+void		Client::setHostName(std::string host_name) {
+	this->_hostname = host_name;
+	return;
+}
+
+void		Client::setRealName( std::string real_name ) {
+	this->_real_name = real_name;
+	return;
+}
+
+//------------------------------ Getters -----------------------------------------
+
+std::string	Client::getUserName(void) const {
+	return (this->_username);
 }
 
 //------------------------------ Functions -----------------------------------------

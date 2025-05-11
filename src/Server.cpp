@@ -108,6 +108,8 @@ void Server::start()
 					std::cout << "loop handle new connection" << std::endl;
 				} else {
 					std::cout << "loop handle client data" << std::endl;
+					if (clientIsRegistered(pollFds[i].fd) == false)
+						addClient(pollFds[i].fd);
 					handleClientData(pollFds[i].fd);
 				}
 			}
@@ -141,14 +143,19 @@ void Server::acceptNewConnection()
 	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
-void	Server::handleMsg(std::string msg)
+void	Server::handleMsg(std::string msg, int clientFd)
 {
 	std::cout << "Msg is : " << msg << std::endl;
+	std::cout << "fd is : " << clientFd << std::endl;
+
+
 }
 void Server::handleClientData(int clientFd)
-{
+{	
+	
 	char buffer[512];
     int bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+	
 
     if (bytesRead <= 0) {
         	removeClient(clientFd);  // Desconexión o error
@@ -159,15 +166,10 @@ void Server::handleClientData(int clientFd)
 			std::string::size_type	pos = received.find(del);
 			while (pos != std::string::npos)
 			{
-				handleMsg(received.substr(0, pos));
+				handleMsg(received.substr(0, pos), clientFd);
 				received.erase(0, pos + del.length());
 				pos = received.find(del);
 			}
-			// // Respuesta mínima para el handshake de Irssi
-			// if (message.find("NICK") != std::string::npos || message.find("USER") != std::string::npos) {
-			// 	std::string welcomeMsg = ":MyServerIRC 001 client :Welcome to MyServerIRC!\r\n";
-			// 	send(clientFd, welcomeMsg.c_str(), welcomeMsg.size(), 0);
-			// }
 			std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
@@ -200,6 +202,37 @@ bool	Server::validPassword( std::string client_pass ) const {
 	return false;
 }
 
+//------------------------------- Client Functions -------------------------------
+
+bool Server::clientIsRegistered(int clientFd) {
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+	if (it != clients.end()) {
+		// Found the client
+		std::cout << "Client with fd " << clientFd << " found: ";
+		std::cout << it->second->getUserName() << std::endl; // use -> because it's a pointer
+		return true;
+	} else {
+		std::cout << "No client found for fd: " << clientFd << std::endl;
+		return false;
+	}
+}
+
+
+Client*	Server::createClient(int clientFd) {
+	Client *new_client = new Client(clientFd);
+	return (new_client);
+}
+
+void	Server::addClient(int clientFd) {
+	
+	if (clients.size() >= 10) {
+		std::cout << "Server full :(  " << std::endl;
+		// habra que eliminar este fd y cerrar la conexion
+	}
+	Client *new_client = createClient(clientFd);
+	clients.insert(std::make_pair(clientFd, new_client));
+	return;
+}
 
 Server::specificException::specificException(const std::string &msg): std::range_error(msg) {}
 
