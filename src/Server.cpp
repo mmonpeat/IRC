@@ -143,13 +143,6 @@ void Server::acceptNewConnection()
 	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
-void	Server::handleMsg(std::string msg, int clientFd)
-{
-	std::cout << "Msg is : " << msg << std::endl;
-	std::cout << "fd is : " << clientFd << std::endl;
-
-
-}
 void Server::handleClientData(int clientFd)
 {	
 	
@@ -202,6 +195,47 @@ bool	Server::validPassword( std::string client_pass ) const {
 	return false;
 }
 
+//------------------------------- Utils ------------------------------------------
+bool	Server::isClientAuth(int clientFd)
+{
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+
+	return (it->second->getAuth());
+}
+
+//------------------------------- Msg Functions ----------------------------------
+
+int	Server::handleMsg(std::string msg, int clientFd)
+{
+	std::cout << "Msg is : " << msg << std::endl;
+	std::cout << "fd is : " << clientFd << std::endl;
+	if (isClientAuth(clientFd) == false)//client is not authorized
+	{
+		std::cout << "Handshake goes here" << std::endl;
+		if (checkCommand(msg) == -1)
+			return (-1); //unknown command num reply?
+	}
+	std::cout << "After handshake" << std::endl;
+	//parse command
+	return (0);
+}
+
+int	Server::checkCommand(std::string msg)
+{
+	std::string	command[3] = 
+	{
+		"PASS", "NICK", "USER"
+	};
+	for (int i = 0; i < 3; i++)
+	{
+		std::string::size_type	pos;
+		pos = msg.find(command[i]);
+		if (pos == 0)
+			return (i);
+	}
+	return (-1);
+}
+
 //------------------------------- Client Functions -------------------------------
 
 bool Server::clientIsRegistered(int clientFd) {
@@ -209,7 +243,7 @@ bool Server::clientIsRegistered(int clientFd) {
 	if (it != clients.end()) {
 		// Found the client
 		std::cout << "Client with fd " << clientFd << " found: ";
-		std::cout << it->second->getUserName() << std::endl; // use -> because it's a pointer
+		std::cout << it->second->getNick() << std::endl;
 		return true;
 	} else {
 		std::cout << "No client found for fd: " << clientFd << std::endl;
@@ -229,9 +263,44 @@ void	Server::addClient(int clientFd) {
 		std::cout << "Server full :(  " << std::endl;
 		// habra que eliminar este fd y cerrar la conexion
 	}
+	
 	Client *new_client = createClient(clientFd);
 	clients.insert(std::make_pair(clientFd, new_client));
 	return;
+}
+
+char foldChar(char c) {
+    if (c >= 'A' && c <= 'Z')
+        return c + 32;
+    if (c == '[') return '{';
+    if (c == ']') return '}';
+    if (c == '\\') return '|';
+    if (c == '^') return '~';
+    return c;
+}
+
+bool	Server::equalNicks(std::string new_nick, std::string client) const {
+	if (new_nick == client)
+		return true;
+	if (new_nick.size() != client.size())
+		return false;
+	for (size_t i = 0; i < client.size(); i++) {
+		if (foldChar(new_nick[i]) != foldChar(client[i]))
+			return false;
+	}
+	return true;
+}
+
+bool	Server::isNickUnique(std::string nickToCheck) const {
+    for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        Client* client = it->second;
+        if (client && client->getAuth()) {
+			if (equalNicks(client->getNick(), nickToCheck))
+				return false;
+		}
+	}
+    return true;
 }
 
 Server::specificException::specificException(const std::string &msg): std::range_error(msg) {}
