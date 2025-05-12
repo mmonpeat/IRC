@@ -143,18 +143,6 @@ void Server::acceptNewConnection()
 	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
-void	Server::handleMsg(std::string msg, int clientFd)
-{
-	std::cout << "Msg is : " << msg << std::endl;
-	std::cout << "fd is : " << clientFd << std::endl;
-	if (isAuth(clientFd) == false)//client is not authorized
-	{
-		std::cout << "Handshake goes here" << std::endl;
-	}
-	std::cout << "After handshake" << std::endl;
-	//parse command
-}
-
 void Server::handleClientData(int clientFd)
 {	
 	
@@ -205,6 +193,28 @@ bool	Server::validPassword( std::string client_pass ) const {
 	if (client_pass == this->serverPass)
 		return true;
 	return false;
+}
+
+//------------------------------- Utils ------------------------------------------
+bool	Server::isClientAuth(int clientFd)
+{
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+
+	return (it->second->getAuth());
+}
+
+//------------------------------- Msg Functions ----------------------------------
+
+void	Server::handleMsg(std::string msg, int clientFd)
+{
+	std::cout << "Msg is : " << msg << std::endl;
+	std::cout << "fd is : " << clientFd << std::endl;
+	if (isClientAuth(clientFd) == false)//client is not authorized
+	{
+		std::cout << "Handshake goes here" << std::endl;
+	}
+	std::cout << "After handshake" << std::endl;
+	//parse command
 }
 
 //------------------------------- Client Functions -------------------------------

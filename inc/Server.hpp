@@ -36,6 +36,8 @@ class Server
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
 		
+		//utils
+		bool	isClientAuth(int clientFd); //checks if client has finished handshake
 
 	public:
 		Server(int port, const std::string &pass);
