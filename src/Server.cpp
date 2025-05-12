@@ -147,9 +147,14 @@ void	Server::handleMsg(std::string msg, int clientFd)
 {
 	std::cout << "Msg is : " << msg << std::endl;
 	std::cout << "fd is : " << clientFd << std::endl;
-
-
+	if (isAuth(clientFd) == false)//client is not authorized
+	{
+		std::cout << "Handshake goes here" << std::endl;
+	}
+	std::cout << "After handshake" << std::endl;
+	//parse command
 }
+
 void Server::handleClientData(int clientFd)
 {	
 	
