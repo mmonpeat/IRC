@@ -39,8 +39,14 @@ void		Client::setRealName( std::string real_name ) {
 
 //------------------------------ Getters -----------------------------------------
 
-std::string	Client::getUserName(void) const {
-	return (this->_username);
+std::string	Client::getNick(void) const {
+	return (this->_nick);
 }
+
+int			Client::getFd(void) const {
+	return (this->_fd);
+}
+
+
 
 //------------------------------ Functions -----------------------------------------

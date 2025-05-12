@@ -52,11 +52,16 @@ class Server
 		//parser msg functions
 		void	handleMsg(std::string msg, int clientFd);
 		
-		//
-		
+		//handeling client
 		bool	clientIsRegistered(int clientFd);
 		Client*	createClient(int clientFd);
 		void	addClient(int clientFd);
+
+		bool	equalNicks(std::string new_nick, std::string client) const;
+		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE
+
+		//bool	nickExist(std::string nick) const;
+		//bool	accebtableNick(std::string nick) const;
 
 		/* Exeptions Classes */
 		class specificException: public std::range_error

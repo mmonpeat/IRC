@@ -209,7 +209,7 @@ bool Server::clientIsRegistered(int clientFd) {
 	if (it != clients.end()) {
 		// Found the client
 		std::cout << "Client with fd " << clientFd << " found: ";
-		std::cout << it->second->getUserName() << std::endl; // use -> because it's a pointer
+		std::cout << it->second->getNick() << std::endl;
 		return true;
 	} else {
 		std::cout << "No client found for fd: " << clientFd << std::endl;
@@ -229,9 +229,44 @@ void	Server::addClient(int clientFd) {
 		std::cout << "Server full :(  " << std::endl;
 		// habra que eliminar este fd y cerrar la conexion
 	}
+	
 	Client *new_client = createClient(clientFd);
 	clients.insert(std::make_pair(clientFd, new_client));
 	return;
+}
+
+char foldChar(char c) {
+    if (c >= 'A' && c <= 'Z')
+        return c + 32;
+    if (c == '[') return '{';
+    if (c == ']') return '}';
+    if (c == '\\') return '|';
+    if (c == '^') return '~';
+    return c;
+}
+
+bool	Server::equalNicks(std::string new_nick, std::string client) const {
+	if (new_nick == client)
+		return true;
+	if (new_nick.size() != client.size())
+		return false;
+	for (size_t i = 0; i < client.size(); i++) {
+		if (foldChar(new_nick[i]) != foldChar(client[i]))
+			return false;
+	}
+	return true;
+}
+
+bool	Server::isNickUnique(std::string nickToCheck) const {
+    for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        Client* client = it->second;
+        if (client && client->auth) {
+			if (equalNicks(client->getNick(), nickToCheck))
+				return false;
+		}
+	}
+    return true;
 }
 
 Server::specificException::specificException(const std::string &msg): std::range_error(msg) {}
