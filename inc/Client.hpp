@@ -17,6 +17,7 @@ class Client
 		std::string	_hostname;	// USER params
 		std::string	_real_name;	// USER params
 		bool		_auth;
+		bool		_pass;
 
 	public:
 		Client(int fd);

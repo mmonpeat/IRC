@@ -209,11 +209,15 @@ int	Server::handleMsg(std::string msg, int clientFd)
 {
 	std::cout << "Msg is : " << msg << std::endl;
 	std::cout << "fd is : " << clientFd << std::endl;
+	int	command = -2;
+
 	if (isClientAuth(clientFd) == false)//client is not authorized
 	{
 		std::cout << "Handshake goes here" << std::endl;
-		if (checkCommand(msg) == -1)
+		command = checkCommand(msg);
+		if (command == -1)
 			return (-1); //unknown command num reply?
+		ServerHandshake(msg, clientFd, command);
 	}
 	std::cout << "After handshake" << std::endl;
 	//parse command
@@ -235,6 +239,13 @@ int	Server::checkCommand(std::string msg)
 	}
 	return (-1);
 }
+
+void	ServerHandshake(std::string msg, int clientFd, int command)
+{
+	
+}
+
+void
 
 //------------------------------- Client Functions -------------------------------
 
