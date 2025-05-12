@@ -52,8 +52,9 @@ class Server
 		void	start();
 
 		//parser msg functions
-		void	handleMsg(std::string msg, int clientFd);
-		
+		int		handleMsg(std::string msg, int clientFd);
+		int		checkCommand(std::string msg);
+	
 		//handeling client
 		bool	clientIsRegistered(int clientFd);
 		Client*	createClient(int clientFd);

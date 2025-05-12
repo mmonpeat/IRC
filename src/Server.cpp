@@ -213,10 +213,11 @@ int	Server::handleMsg(std::string msg, int clientFd)
 	{
 		std::cout << "Handshake goes here" << std::endl;
 		if (checkCommand(msg) == -1)
-			return () //unknown command num reply?
+			return (-1); //unknown command num reply?
 	}
 	std::cout << "After handshake" << std::endl;
 	//parse command
+	return (0);
 }
 
 int	Server::checkCommand(std::string msg)
@@ -228,12 +229,11 @@ int	Server::checkCommand(std::string msg)
 	for (int i = 0; i < 3; i++)
 	{
 		std::string::size_type	pos;
-		pos = msg.find(command[i])
+		pos = msg.find(command[i]);
 		if (pos == 0)
 			return (i);
 	}
-	if (i == 3)
-		return (-1);
+	return (-1);
 }
 
 //------------------------------- Client Functions -------------------------------
