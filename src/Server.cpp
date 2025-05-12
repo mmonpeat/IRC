@@ -205,16 +205,35 @@ bool	Server::isClientAuth(int clientFd)
 
 //------------------------------- Msg Functions ----------------------------------
 
-void	Server::handleMsg(std::string msg, int clientFd)
+int	Server::handleMsg(std::string msg, int clientFd)
 {
 	std::cout << "Msg is : " << msg << std::endl;
 	std::cout << "fd is : " << clientFd << std::endl;
 	if (isClientAuth(clientFd) == false)//client is not authorized
 	{
 		std::cout << "Handshake goes here" << std::endl;
+		if (checkCommand(msg) == -1)
+			return () //unknown command num reply?
 	}
 	std::cout << "After handshake" << std::endl;
 	//parse command
+}
+
+int	Server::checkCommand(std::string msg)
+{
+	std::string	command[3] = 
+	{
+		"PASS", "NICK", "USER"
+	};
+	for (int i = 0; i < 3; i++)
+	{
+		std::string::size_type	pos;
+		pos = msg.find(command[i])
+		if (pos == 0)
+			return (i);
+	}
+	if (i == 3)
+		return (-1);
 }
 
 //------------------------------- Client Functions -------------------------------
