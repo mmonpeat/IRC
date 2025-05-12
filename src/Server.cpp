@@ -261,7 +261,7 @@ bool	Server::isNickUnique(std::string nickToCheck) const {
     for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
     {
         Client* client = it->second;
-        if (client && client->auth) {
+        if (client && client->getAuth()) {
 			if (equalNicks(client->getNick(), nickToCheck))
 				return false;
 		}

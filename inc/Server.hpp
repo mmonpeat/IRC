@@ -60,9 +60,6 @@ class Server
 		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE
 
-		//bool	nickExist(std::string nick) const;
-		//bool	accebtableNick(std::string nick) const;
-
 		/* Exeptions Classes */
 		class specificException: public std::range_error
 		{	

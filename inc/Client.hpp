@@ -16,12 +16,12 @@ class Client
 		std::string	_username;	// USER params
 		std::string	_hostname;	// USER params
 		std::string	_real_name;	// USER params
+		bool		_auth;
 
 	public:
 		Client(int fd);
 		~Client(void);
 
-		bool		auth;
 
 		void		setNick(std::string nick);
 		void 		setUserName(std::string user_name);
@@ -30,6 +30,7 @@ class Client
 
 		std::string	getNick(void) const;
 		int			getFd(void) const;
+		bool		getAuth(void) const;
 
 };
 

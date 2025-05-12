@@ -4,7 +4,7 @@
 
 Client::Client(int fd): _fd(fd) {
 	std::cout << "Client constructor called" << std::endl;
-	auth = false; // hasta que el cliente tenga todos los campos registrados
+	_auth = false; // hasta que el cliente tenga todos los campos registrados
 	return;
 	}
 
@@ -45,6 +45,10 @@ std::string	Client::getNick(void) const {
 
 int			Client::getFd(void) const {
 	return (this->_fd);
+}
+
+bool		Client::getAuth(void) const {
+	return (this->_auth);
 }
 
 
