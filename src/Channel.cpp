@@ -12,3 +12,14 @@ Channel::~Channel(void) {
     std::cout << "Channel " << this->_name << " destructor has been called" << std::endl;
     return;
 }
+
+
+//---------------------------------- Functions -------------------------------------------
+
+void	Channel::changeTopic(std::string new_topic, std::string nick) {
+    if (this->_operators)
+	    this->_topic = new_topic;
+	// hay que escribir en el fds correctos habra que cambiar!!!!
+	std::cout << "Operarator's nick goes here" << " has changed the topic to: " << new_topic << std::endl;
+	return;
+}

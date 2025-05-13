@@ -15,7 +15,7 @@ class Channel
 		std::string					_topic;
 		std::vector<std::string>	_client_nicks;
 		std::vector<Client*> 		_operators;
-		std::vector<Client*> 		_clients;//if a client becomes an operator, it's removed from clients and added to operators.
+		std::vector<Client*> 		_clients;
 	public:
 		Channel(std::string name, Client *client); //just an idea, as only clients can create channels
 		~Channel(void);
@@ -24,12 +24,14 @@ class Channel
 		//void	removeClient()
 
 		//functions
-		// 1. bool isChannelEmpty(void) const; cada vez que alguien se desconecte o este 
-		//kickeado mirar cuanta gente queda, en caso que zero eliminar el channel
+		// 1. bool isChannelEmpty(void) const; llamar cada vez que alguien haga quit
 
-		//2. void changeTopic(std::string topic); tiene que cambiar el topic
-
-		//3. 
+	
+		// Channel functions for ops
+		bool	hasPerms();
+		void	changeTopic(std::string topic, std::string nick);
+		//void	kickUser();
+		//void	changeMode();
 };
 
 
