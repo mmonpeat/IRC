@@ -197,12 +197,12 @@ bool	Server::validPassword( std::string client_pass ) const {
 
 //------------------------------- Msg Functions ----------------------------------
 
-int	Server::handleMsg(std::string msg, Client &client)
+int	Server::handleMsg(std::string msg, Client *client)
 {
 	std::cout << "Msg is : " << msg << std::endl;
 	int	command = -2;
 
-	if (client.getAuth() == false)//client is not authorized
+	if (client->getAuth() == false)//client is not authorized
 	{
 		std::cout << "Handshake goes here" << std::endl;
 		command = checkCommand(msg);
@@ -231,20 +231,20 @@ int	Server::checkCommand(std::string msg)
 	return (-1);
 }
 
-void	ServerHandshake(std::string msg, Client &client, int command)
+void	Server::ServerHandshake(std::string msg, Client *client, int command)
 {
 	(void)msg;
 	switch(command)
 	{
 		case 0:
-			if (client.getPass() == false)
+			if (client->getPass() == false)
 			{
 				std::cout << "do PASS command" << std::endl;
 				break ;
 			}
 			// intentional fallthrough
 		case 1:
-			if (client.getNick().empty())
+			if (client->getNick().empty())
 			{ 
 				std::cout << "do NICK command" << std::endl;
 				break ;
@@ -291,7 +291,7 @@ void	Server::addClient(int clientFd) {
 	return;
 }
 
-Client&	Server::getClient(int clientFd)
+Client*	Server::getClient(int clientFd)
 {
 	std::map<int, Client*>::iterator it = clients.find(clientFd);
 	return (it->second);
