@@ -35,10 +35,7 @@ class Server
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
-		
-		//utils
-		bool	isClientAuth(int clientFd); //checks if client has finished handshake
-
+	
 	public:
 		Server(int port, const std::string &pass);
 		~Server();
@@ -52,13 +49,15 @@ class Server
 		void	start();
 
 		//parser msg functions
-		int		handleMsg(std::string msg, int clientFd);
+		int		handleMsg(std::string msg, Client& client);
 		int		checkCommand(std::string msg);
+		void	ServerHandshake(std::string msg, Client& client, int command);
 	
-		//handeling client
+		//handling client
 		bool	clientIsRegistered(int clientFd);
 		Client*	createClient(int clientFd);
 		void	addClient(int clientFd);
+		Client&	getClient(int clientFd);
 
 		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE

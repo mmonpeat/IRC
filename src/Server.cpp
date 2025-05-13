@@ -159,7 +159,7 @@ void Server::handleClientData(int clientFd)
 			std::string::size_type	pos = received.find(del);
 			while (pos != std::string::npos)
 			{
-				handleMsg(received.substr(0, pos), clientFd);
+				handleMsg(received.substr(0, pos), getClient(clientFd));
 				received.erase(0, pos + del.length());
 				pos = received.find(del);
 			}
@@ -174,7 +174,7 @@ void Server::removeClient(int clientFd)
 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
 		it != pollFds.end(); ++it) 
 	{
-		if (it->fd == clientFd) 
+		if (it->fd == clientFd)
 	{
 				pollFds.erase(it);
 				break;
@@ -195,36 +195,20 @@ bool	Server::validPassword( std::string client_pass ) const {
 	return false;
 }
 
-//------------------------------- Utils ------------------------------------------
-bool	Server::isClientAuth(int clientFd)
-{
-	std::map<int, Client*>::iterator it = clients.find(clientFd);
-
-	return (it->second->getAuth());
-}
-
-bool	Server::isClientPass(int clientFd)
-{
-	std::map<int, Client*>::iterator it = clients.find(clientFd);
-
-	return (it->second->getPass());
-}
-
 //------------------------------- Msg Functions ----------------------------------
 
-int	Server::handleMsg(std::string msg, int clientFd)
+int	Server::handleMsg(std::string msg, Client &client)
 {
 	std::cout << "Msg is : " << msg << std::endl;
-	std::cout << "fd is : " << clientFd << std::endl;
 	int	command = -2;
 
-	if (isClientAuth(clientFd) == false)//client is not authorized
+	if (client.getAuth() == false)//client is not authorized
 	{
 		std::cout << "Handshake goes here" << std::endl;
 		command = checkCommand(msg);
 		if (command == -1)
 			return (-1); //unknown command num reply?
-		ServerHandshake(msg, clientFd, command);
+		ServerHandshake(msg, client, command);
 	}
 	std::cout << "After handshake" << std::endl;
 	//parse command
@@ -247,16 +231,25 @@ int	Server::checkCommand(std::string msg)
 	return (-1);
 }
 
-void	ServerHandshake(std::string msg, int clientFd, int command)
+void	ServerHandshake(std::string msg, Client &client, int command)
 {
+	(void)msg;
 	switch(command)
 	{
 		case 0:
-			if (isClientPass(clientFd) == false)
+			if (client.getPass() == false)
+			{
 				std::cout << "do PASS command" << std::endl;
+				break ;
+			}
+			// intentional fallthrough
 		case 1:
-			if () //nick doesnt exist
+			if (client.getNick().empty())
+			{ 
 				std::cout << "do NICK command" << std::endl;
+				break ;
+			}
+			//intentional fallthrough
 		case 2:
 			std::cout << "do USER command" << std::endl;
 			break ;
@@ -264,8 +257,6 @@ void	ServerHandshake(std::string msg, int clientFd, int command)
 			std::cout << "Handshake default case, something went wrong" << std::endl;
 	}
 }
-
-void
 
 //------------------------------- Client Functions -------------------------------
 
@@ -298,6 +289,12 @@ void	Server::addClient(int clientFd) {
 	Client *new_client = createClient(clientFd);
 	clients.insert(std::make_pair(clientFd, new_client));
 	return;
+}
+
+Client&	Server::getClient(int clientFd)
+{
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+	return (it->second);
 }
 
 char foldChar(char c) {
