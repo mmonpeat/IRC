@@ -203,6 +203,13 @@ bool	Server::isClientAuth(int clientFd)
 	return (it->second->getAuth());
 }
 
+bool	Server::isClientPass(int clientFd)
+{
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+
+	return (it->second->getPass());
+}
+
 //------------------------------- Msg Functions ----------------------------------
 
 int	Server::handleMsg(std::string msg, int clientFd)
@@ -242,7 +249,20 @@ int	Server::checkCommand(std::string msg)
 
 void	ServerHandshake(std::string msg, int clientFd, int command)
 {
-	
+	switch(command)
+	{
+		case 0:
+			if (isClientPass(clientFd) == false)
+				std::cout << "do PASS command" << std::endl;
+		case 1:
+			if () //nick doesnt exist
+				std::cout << "do NICK command" << std::endl;
+		case 2:
+			std::cout << "do USER command" << std::endl;
+			break ;
+		default:
+			std::cout << "Handshake default case, something went wrong" << std::endl;
+	}
 }
 
 void
