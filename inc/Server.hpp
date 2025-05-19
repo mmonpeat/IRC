@@ -49,7 +49,7 @@ class Server
 		void	start();
 
 		//parser msg functions
-		int		handleMsg(std::string msg, Client* client);
+		void	handleMsg(std::string msg, Client* client);
 		int		checkCommand(std::string msg);
 		void	ServerHandshake(std::string msg, Client* client, int command);
 

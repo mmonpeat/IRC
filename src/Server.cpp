@@ -197,22 +197,24 @@ bool	Server::validPassword( std::string client_pass ) const {
 
 //------------------------------- Msg Functions ----------------------------------
 
-int	Server::handleMsg(std::string msg, Client *client)
+void	Server::handleMsg(std::string msg, Client *client)
 {
 	std::cout << "Msg is : " << msg << std::endl;
+	if (msg.empty())
+		return ;
 	int	command = 0;
 	
 	command = checkCommand(msg);	
 	if (command == -1)
 	{
 		std::cout << "Unknown command" << std::endl;
-		return (-1); //unknown command num reply?
+		return ; //unknown command num reply?
 	}
 	if (client->getAuth() == false)//client is not authorized
 	{
 		if (command > 2)
 		{
-			std::cout << "Client needs to be registerred first" << std::endl;
+			std::cout << "Client needs to be registered first" << std::endl;
 		}
 		ServerHandshake(msg, client, command);
 	}
@@ -220,7 +222,7 @@ int	Server::handleMsg(std::string msg, Client *client)
 	{
 		std::cout << "After handshake" << std::endl;
 	}
-	return (0);
+	return ;
 }
 
 int	Server::checkCommand(std::string msg)
@@ -241,25 +243,20 @@ int	Server::checkCommand(std::string msg)
 
 void	Server::ServerHandshake(std::string msg, Client *client, int command)
 {
-	(void)msg;
 	switch(command)
 	{
 		case 0:
-			if (client->getPass() == false)
-			{
-				std::cout << "do PASS command" << std::endl;
-				break ;
-			}
-			// intentional fallthrough
+			pass(msg, client);
+			break ;
 		case 1:
-			if (client->getNick().empty() && client->getPass() == true)
+			if (client->getPass() == true)
 			{ 
 				std::cout << "do NICK command" << std::endl;
-				break ;
 			}
-			//intentional fallthrough
+			break ;
 		case 2:
-			std::cout << "do USER command" << std::endl;
+			if (client->getPass() == true && client->getNick().empty() == false)
+				std::cout << "do USER command" << std::endl;
 			break ;
 		default:
 			std::cout << "Handshake default case, something went wrong" << std::endl;
@@ -270,7 +267,13 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 
 void	Server::pass(std::string msg, Client *client)
 {
-	
+	std::cout << "do PASS command" << std::endl;
+	if (client->getPass() == true)
+	{
+		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
+		return ;
+	}
+	getparams(msg);
 }
 
 //------------------------------- Client Functions -------------------------------
