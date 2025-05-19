@@ -273,7 +273,7 @@ void	Server::pass(std::string msg, Client *client)
 		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
 		return ;
 	}
-	getparams(msg);
+	splitparams(msg);
 }
 
 //------------------------------- Client Functions -------------------------------
