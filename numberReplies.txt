@@ -1,0 +1,63 @@
+RFC 1459(The RFC protocol describes how data is passed to the RFC interface and back.)
+GIT:
+https://gist.github.com/proxypoke/2264878
+
+
+DOCUMENTATION:
+https://datatracker.ietf.org/doc/html/rfc1459#section-6
+
+ERRORS
+ Numeric replies for channel
+        403 - trying to change topic and not being an operator when mode is resctricted
+
+ERRORS ISSUES
+
+https://github.com/mmonpeat/IRC/issues/25
+MODE:
+i:
+t:
+k:
+o:
+l:
+       ERR_NEEDMOREPARAMS              RPL_CHANNELMODEIS
+       ERR_CHANOPRIVSNEEDED            ERR_NOSUCHNICK
+       ERR_NOTONCHANNEL                ERR_KEYSET
+       RPL_BANLIST                     RPL_ENDOFBANLIST
+       ERR_UNKNOWNMODE                 ERR_NOSUCHCHANNEL
+
+       ERR_USERSDONTMATCH              RPL_UMODEIS
+       ERR_UMODEUNKNOWNFLAG
+
+https://github.com/mmonpeat/IRC/issues/24
+TOPIC:
+       ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+       RPL_NOTOPIC                     RPL_TOPIC
+       ERR_CHANOPRIVSNEEDED
+
+https://github.com/mmonpeat/IRC/issues/23
+INVITE:
+       ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+       ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+       ERR_CHANOPRIVSNEEDED
+       RPL_INVITING                    RPL_AWAY
+
+https://github.com/mmonpeat/IRC/issues/22
+KICK:
+
+       ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+       ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+       ERR_NOTONCHANNEL
+
+PRIVMSG send and receive private messages using your reference client
+PRIVMSG is used to send private messages between users.
+is the nickname of the receiver of the message. can also
+be a list of names or channels separated with commas.
+       ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
+       ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
+       ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
+       ERR_NOSUCHNICK
+       RPL_AWAY
+
+
+
+
