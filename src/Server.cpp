@@ -200,18 +200,26 @@ bool	Server::validPassword( std::string client_pass ) const {
 int	Server::handleMsg(std::string msg, Client *client)
 {
 	std::cout << "Msg is : " << msg << std::endl;
-	int	command = -2;
-
+	int	command = 0;
+	
+	command = checkCommand(msg);	
+	if (command == -1)
+	{
+		std::cout << "Unknown command" << std::endl;
+		return (-1); //unknown command num reply?
+	}
 	if (client->getAuth() == false)//client is not authorized
 	{
-		std::cout << "Handshake goes here" << std::endl;
-		command = checkCommand(msg);
-		if (command == -1)
-			return (-1); //unknown command num reply?
+		if (command > 2)
+		{
+			std::cout << "Client needs to be registerred first" << std::endl;
+		}
 		ServerHandshake(msg, client, command);
 	}
-	std::cout << "After handshake" << std::endl;
-	//parse command
+	else
+	{
+		std::cout << "After handshake" << std::endl;
+	}
 	return (0);
 }
 
@@ -244,7 +252,7 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 			}
 			// intentional fallthrough
 		case 1:
-			if (client->getNick().empty())
+			if (client->getNick().empty() && client->getPass() == true)
 			{ 
 				std::cout << "do NICK command" << std::endl;
 				break ;
@@ -256,6 +264,13 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 		default:
 			std::cout << "Handshake default case, something went wrong" << std::endl;
 	}
+}
+
+//------------------------------- Command Functions ------------------------------
+
+void	Server::pass(std::string msg, Client *client)
+{
+	
 }
 
 //------------------------------- Client Functions -------------------------------

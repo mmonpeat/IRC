@@ -52,6 +52,9 @@ class Server
 		int		handleMsg(std::string msg, Client* client);
 		int		checkCommand(std::string msg);
 		void	ServerHandshake(std::string msg, Client* client, int command);
+
+		//command functions
+		void	pass(std::string msg, Client* client);		
 	
 		//handling client
 		bool	clientIsRegistered(int clientFd);
