@@ -467,8 +467,7 @@ ERRORS
  Numeric replies for channel
 	403 - trying to change topic and not being an operator when mode is resctricted
  
- <script src="https://gist.github.com/proxypoke/2264878.js"></script>
-
+https://gist.github.com/proxypoke/2264878
 
 
 
