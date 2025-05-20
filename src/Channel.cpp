@@ -44,10 +44,34 @@ Channel::~Channel(void) {
 //---------------------------------- Class Functions -----------------------------------------
 
 void	Channel::removeClient(Client* client) {
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == client->getNick())
+			_clients.erase(it);
+			break;
+	}
+	//check in channel is empty first, check if it is also an op
+	std::string	message = "deleted";
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		send((*it)->getFd(), message.c_str(), message.size(), 0);
+	}
+	
+	
+}
+void	Channel::removeOperator(Client *op) {
 
 }
 
 void	Channel::addClient(Client *client) {
+	this->_clients.push_back(client);
+	std::string	message = client->getNick() + " (" + client->getRealName() + ") has joined \r\n";
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		send((*it)->getFd(), message.c_str(), message.size(), 0);
+	}
+	return;
+}
+
+void	Channel::addOperator(Client *new_op) {
 
 }
 
@@ -57,8 +81,16 @@ bool	Channel::isClient(Client *client) {
 
 bool	Channel::isChannelEmpty(void) const {
 
-	return true;
 }
+
+void	Channel::displayTopic(void) const {
+	//check if it is empty maybe
+	 for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
+		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
+	 }
+	 return;
+}
+
 //---------------------------------- OPs Functions -------------------------------------------
 
 bool    Channel::isOperator(std::string nick) const {

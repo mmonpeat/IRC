@@ -43,6 +43,10 @@ std::string	Client::getNick(void) const {
 	return (this->_nick);
 }
 
+std::string	Client::getRealName(void) const {
+	return (this->_real_name);
+}
+
 int			Client::getFd(void) const {
 	return (this->_fd);
 }

@@ -35,6 +35,8 @@ class Channel
 		void	removeOperator(Client *op);
 		bool	isClient(Client* client);
 		bool	isChannelEmpty(void) const; //llamar cada vez que alguien haga quit
+
+		void	displayTopic(void) const;
 		
 
 		// Channel functions for ops

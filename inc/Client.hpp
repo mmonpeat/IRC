@@ -29,6 +29,7 @@ class Client
 		void		setRealName(std::string real_name);
 
 		std::string	getNick(void) const;
+		std::string	getRealName(void) const;
 		int			getFd(void) const;
 		bool		getAuth(void) const;
 
