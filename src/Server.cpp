@@ -259,8 +259,28 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 				std::cout << "do USER command" << std::endl;
 			break ;
 		default:
-			std::cout << "Handshake default case, something went wrong" << std::endl;
+			std::cerr << "Handshake default case, something went wrong" << std::endl;
 	}
+}
+
+std::string*	Server::returnParams(std::string msg)
+{
+	int	n = 0;
+	int	i = 0;
+	//fuuuck there can be more than one space
+	n = std::count(msg.begin(), msg.end(), " ") + 1;
+	std::string	params[n];
+
+	std::string::sizetype	pos = msg.find(" ");
+	while (post != std::string::pos)
+	{
+		params[i] = msg.substr(0, pos)
+	}
+
+	// check if last param has preceding :
+	msg.find_first_of(" :")
+	// split by spaces accordingly
+	return (params) ;
 }
 
 //------------------------------- Command Functions ------------------------------
@@ -273,11 +293,11 @@ void	Server::pass(std::string msg, Client *client)
 		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
 		return ;
 	}
-	splitparams(msg);
+	parseParams(msg);
 }
 
 //------------------------------- Client Functions -------------------------------
-
+  
 bool Server::clientIsRegistered(int clientFd) {
 	std::map<int, Client*>::iterator it = clients.find(clientFd);
 	if (it != clients.end()) {
