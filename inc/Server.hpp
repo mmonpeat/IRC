@@ -14,6 +14,7 @@
 #include <netdb.h> //getaddrinfo, freeaddrinfo
 #include <fcntl.h> //fcntl
 #include <poll.h> //poll
+#include <algorithm>
 
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -49,10 +50,11 @@ class Server
 		void	start();
 
 		//parser msg functions
-		void	handleMsg(std::string msg, Client* client);
-		int		checkCommand(std::string msg);
-		void	ServerHandshake(std::string msg, Client* client, int command);
-
+		void			handleMsg(std::string msg, Client* client);
+		int				checkCommand(std::string msg);
+		void			ServerHandshake(std::string msg, Client* client, int command);
+		std::string*	returnParams(std::string msg);
+		
 		//command functions
 		void	pass(std::string msg, Client* client);		
 	
