@@ -1,20 +1,193 @@
 RFC 1459(The RFC protocol describes how data is passed to the RFC interface and back.)
-GIT:
-https://gist.github.com/proxypoke/2264878
-
 
 DOCUMENTATION:
 https://datatracker.ietf.org/doc/html/rfc1459#section-6
 
 
-ERRORS ISSUES
+ERRORS ISSUES:
 
+USER, NICK, PASS: Client servidor
+PRIVMSG, JOIN: Missatges privats i per channels 
+MODE(si), TOPIC, INVITE, KICK: nomes Channels
+
+----------------------------------- CLIENT -> SERVIDOR ---------------------------------
+USER:
+       ERR_NEEDMOREPARAMS   Si           ERR_ALREADYREGISTRED  Si
+
+       461     ERR_NEEDMOREPARAMS
+                     "<command> :Not enough parameters"
+
+                     - Returned by the server by numerous commands to
+                     indicate to the client that it didn't supply enough
+                     parameters.
+
+       462     ERR_ALREADYREGISTRED
+                     ":You may not reregister"
+
+                     - Returned by the server to any link which tries to
+                     change part of the registered details (such as
+                     password or user details from second USER message).
+
+
+NICK:
+       ERR_NONICKNAMEGIVEN   Si                                ERR_ERRONEUSNICKNAME  Si
+       ERR_NICKNAMEINUSE     Si                                ERR_NICKCOLLISION  Si
+       ERR_UNAVAILRESOURCE   No esta en la documentació        ERR_RESTRICTED  No esta en la documentació
+
+       431     ERR_NONICKNAMEGIVEN
+                     ":No nickname given"
+
+                     - Returned when a nickname parameter expected for a
+                     command and isn't found.
+       
+       433     ERR_NICKNAMEINUSE
+                     "<nick> :Nickname is already in use"
+
+                     - Returned when a NICK message is processed that results
+                     in an attempt to change to a currently existing
+                     nickname.
+
+       432     ERR_ERRONEUSNICKNAME
+                     "<nick> :Erroneus nickname"
+
+                     - Returned after receiving a NICK message which contains
+                     characters which do not fall in the defined set.  See
+                     section x.x.x for details on valid nicknames.
+
+       436     ERR_NICKCOLLISION
+                     "<nick> :Nickname collision KILL"
+
+                     - Returned by a server to a client when it detects a
+                     nickname collision (registered of a NICK that
+                     already exists by another server).
+
+       
+PASS:
+       ERR_NEEDMOREPARAMS   Si         ERR_ALREADYREGISTRED  Si
+
+       461     ERR_NEEDMOREPARAMS
+                     "<command> :Not enough parameters"
+
+                     - Returned by the server by numerous commands to
+                     indicate to the client that it didn't supply enough
+                     parameters.
+
+       462     ERR_ALREADYREGISTRED
+                     ":You may not reregister"
+
+                     - Returned by the server to any link which tries to
+                     change part of the registered details (such as
+                     password or user details from second USER message).
+
+------------------------------------------ MESSAGES --------------------------------------
+
+PRIVMSG send and receive private messages using your reference client
+PRIVMSG is used to send private messages between users.
+is the nickname of the receiver of the message. can also
+be a list of names or channels separated with commas.
+       ERR_NORECIPIENT   Si            ERR_NOTEXTTOSEND  Si
+       ERR_CANNOTSENDTOCHAN  Si        ERR_NOTOPLEVEL  Si
+       ERR_WILDTOPLEVEL Si             ERR_TOOMANYTARGETS  Si
+       ERR_NOSUCHNICK  Si
+       RPL_AWAY  Si
+
+       411     ERR_NORECIPIENT
+                     ":No recipient given (<command>)"
+
+       404     ERR_CANNOTSENDTOCHAN
+                     "<channel name> :Cannot send to channel"
+
+                     - Sent to a user who is either (a) not on a channel
+                     which is mode +n or (b) not a chanop (or mode +v) on
+                     a channel which has mode +m set and is trying to send
+                     a PRIVMSG message to that channel.
+
+       414     ERR_WILDTOPLEVEL
+                     "<mask> :Wildcard in toplevel domain"
+
+                     - 412 - 414 are returned by PRIVMSG to indicate that
+                     the message wasn't delivered for some reason.
+                     ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that
+                     are returned when an invalid use of
+                     "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
+
+       401     ERR_NOSUCHNICK
+                     "<nickname> :No such nick/channel"
+
+                     - Used to indicate the nickname parameter supplied to a
+                     command is currently unused.
+       
+       301     RPL_AWAY
+                     "<nick> :<away message>"
+
+       412     ERR_NOTEXTTOSEND
+                     ":No text to send"
+
+       413     ERR_NOTOPLEVEL
+                     "<mask> :No toplevel domain specified"
+
+       407     ERR_TOOMANYTARGETS
+                     "<target> :Duplicate recipients. No message \ delivered"
+
+                     - Returned to a client which is attempting to send a
+                     PRIVMSG/NOTICE using the user@host destination format
+                     and for a user@host which has several occurrences.
+
+JOIN:
+       ERR_NEEDMOREPARAMS   Si         ERR_BANNEDFROMCHAN  Si
+       ERR_INVITEONLYCHAN   Si         ERR_BADCHANNELKEY  Si
+       ERR_CHANNELISFULL  Si           ERR_BADCHANMASK  Si
+       ERR_NOSUCHCHANNEL   Si          ERR_TOOMANYCHANNELS  Si
+       RPL_TOPIC   Si
+
+       461     ERR_NEEDMOREPARAMS
+                     "<command> :Not enough parameters"
+
+                     - Returned by the server by numerous commands to
+                     indicate to the client that it didn't supply enough
+                     parameters.
+       
+       473     ERR_INVITEONLYCHAN
+                     "<channel> :Cannot join channel (+i)"
+
+       471     ERR_CHANNELISFULL
+                     "<channel> :Cannot join channel (+l)"
+       
+       403     ERR_NOSUCHCHANNEL
+                     "<channel name> :No such channel"
+
+                     - Used to indicate the given channel name is invalid.
+       
+       332     RPL_TOPIC
+                     "<channel> :<topic>"
+
+                     - When sending a TOPIC message to determine the
+                     channel topic, one of two replies is sent.  If
+                     the topic is set, RPL_TOPIC is sent back else
+                     RPL_NOTOPIC.
+       
+       474     ERR_BANNEDFROMCHAN
+                     "<channel> :Cannot join channel (+b)"
+
+       475     ERR_BADCHANNELKEY
+                     "<channel> :Cannot join channel (+k)"
+
+       476     ERR_BADCHANMASK
+
+       405     ERR_TOOMANYCHANNELS
+                     "<channel name> :You have joined too many \ channels"
+
+                     - Sent to a user when they have joined the maximum
+                     number of allowed channels and they try to join
+                     another channel.
+
+------------------------------------------ CHANNEL --------------------------------------
 
 MODE:
        ERR_NEEDMOREPARAMS  Si          RPL_CHANNELMODEIS  Si
        ERR_CHANOPRIVSNEEDED  Si        ERR_NOSUCHNICK  Si
        ERR_NOTONCHANNEL    Si          ERR_KEYSET  Si
-       RPL_BANLIST(no neccessitem)    RPL_ENDOFBANLIST(no neccessitem)
+       RPL_BANLIST(no neccessitem)     RPL_ENDOFBANLIST(no neccessitem)
        ERR_UNKNOWNMODE Si              ERR_NOSUCHCHANNEL  Si
 
        ERR_USERSDONTMATCH   Si         RPL_UMODEIS  Si
@@ -120,35 +293,35 @@ TOPIC:
        461     ERR_NEEDMOREPARAMS
                      "<command> :Not enough parameters"
 
-              - Returned by the server by numerous commands to
-              indicate to the client that it didn't supply enough
-              parameters.
+                     - Returned by the server by numerous commands to
+                     indicate to the client that it didn't supply enough
+                     parameters.
        
        331     RPL_NOTOPIC
-                        "<channel> :No topic is set"
+                     "<channel> :No topic is set"
 
        482     ERR_CHANOPRIVSNEEDED
-                        "<channel> :You're not channel operator"
+                     "<channel> :You're not channel operator"
 
-                - Any command requiring 'chanop' privileges (such as
-                  MODE messages) must return this error if the client
-                  making the attempt is not a chanop on the specified
-                  channel.
+                     - Any command requiring 'chanop' privileges (such as
+                     MODE messages) must return this error if the client
+                     making the attempt is not a chanop on the specified
+                     channel.
 
        442     ERR_NOTONCHANNEL
-                        "<channel> :You're not on that channel"
+                     "<channel> :You're not on that channel"
 
-                - Returned by the server whenever a client tries to
-                  perform a channel effecting command for which the
-                  client isn't a member.
+                     - Returned by the server whenever a client tries to
+                     perform a channel effecting command for which the
+                     client isn't a member.
 
        332     RPL_TOPIC
-                        "<channel> :<topic>"
+                     "<channel> :<topic>"
 
-                - When sending a TOPIC message to determine the
-                  channel topic, one of two replies is sent.  If
-                  the topic is set, RPL_TOPIC is sent back else
-                  RPL_NOTOPIC.
+                     - When sending a TOPIC message to determine the
+                     channel topic, one of two replies is sent.  If
+                     the topic is set, RPL_TOPIC is sent back else
+                     RPL_NOTOPIC.
 
 INVITE:
        ERR_NEEDMOREPARAMS   Si         ERR_NOSUCHNICK  Si
@@ -159,47 +332,47 @@ INVITE:
        461     ERR_NEEDMOREPARAMS
                      "<command> :Not enough parameters"
 
-              - Returned by the server by numerous commands to
-              indicate to the client that it didn't supply enough
-              parameters.
+                     - Returned by the server by numerous commands to
+                     indicate to the client that it didn't supply enough
+                     parameters.
        
 
        442     ERR_NOTONCHANNEL
-                        "<channel> :You're not on that channel"
+                     "<channel> :You're not on that channel"
 
-                - Returned by the server whenever a client tries to
-                  perform a channel effecting command for which the
-                  client isn't a member.
+                     - Returned by the server whenever a client tries to
+                     perform a channel effecting command for which the
+                     client isn't a member.
 
        482     ERR_CHANOPRIVSNEEDED
-                        "<channel> :You're not channel operator"
+                     "<channel> :You're not channel operator"
 
-                - Any command requiring 'chanop' privileges (such as
-                  MODE messages) must return this error if the client
-                  making the attempt is not a chanop on the specified
-                  channel.
+                     - Any command requiring 'chanop' privileges (such as
+                     MODE messages) must return this error if the client
+                     making the attempt is not a chanop on the specified
+                     channel.
 
        341     RPL_INVITING
-                        "<channel> <nick>"
+                     "<channel> <nick>"
 
-                - Returned by the server to indicate that the
-                  attempted INVITE message was successful and is
-                  being passed onto the end client.
+                     - Returned by the server to indicate that the
+                     attempted INVITE message was successful and is
+                     being passed onto the end client.
 
        401     ERR_NOSUCHNICK
-                        "<nickname> :No such nick/channel"
+                     "<nickname> :No such nick/channel"
 
-                - Used to indicate the nickname parameter supplied to a
-                  command is currently unused.
+                     - Used to indicate the nickname parameter supplied to a
+                     command is currently unused.
        
        443     ERR_USERONCHANNEL
-                        "<user> <channel> :is already on channel"
+                     "<user> <channel> :is already on channel"
 
-                - Returned when a client tries to invite a user to a
-                  channel they are already on.
+                     - Returned when a client tries to invite a user to a
+                     channel they are already on.
        
        301     RPL_AWAY
-                        "<nick> :<away message>"
+                     "<nick> :<away message>"
 
 KICK:
 
@@ -210,199 +383,29 @@ KICK:
        461     ERR_NEEDMOREPARAMS
                      "<command> :Not enough parameters"
 
-              - Returned by the server by numerous commands to
-              indicate to the client that it didn't supply enough
-              parameters.
+                     - Returned by the server by numerous commands to
+                     indicate to the client that it didn't supply enough
+                     parameters.
 
        476     ERR_BADCHANMASK
 
        442     ERR_NOTONCHANNEL
-                        "<channel> :You're not on that channel"
+                     "<channel> :You're not on that channel"
 
-                - Returned by the server whenever a client tries to
-                  perform a channel effecting command for which the
-                  client isn't a member.
+                     - Returned by the server whenever a client tries to
+                     perform a channel effecting command for which the
+                     client isn't a member.
        
        403     ERR_NOSUCHCHANNEL
-                        "<channel name> :No such channel"
+                     "<channel name> :No such channel"
 
-                - Used to indicate the given channel name is invalid.
+                     - Used to indicate the given channel name is invalid.
 
        482     ERR_CHANOPRIVSNEEDED
-                        "<channel> :You're not channel operator"
+                     "<channel> :You're not channel operator"
 
-                - Any command requiring 'chanop' privileges (such as
-                  MODE messages) must return this error if the client
-                  making the attempt is not a chanop on the specified
-                  channel.
+                     - Any command requiring 'chanop' privileges (such as
+                     MODE messages) must return this error if the client
+                     making the attempt is not a chanop on the specified
+                     channel.
 
-PRIVMSG send and receive private messages using your reference client
-PRIVMSG is used to send private messages between users.
-is the nickname of the receiver of the message. can also
-be a list of names or channels separated with commas.
-       ERR_NORECIPIENT   Si            ERR_NOTEXTTOSEND  Si
-       ERR_CANNOTSENDTOCHAN  Si        ERR_NOTOPLEVEL  Si
-       ERR_WILDTOPLEVEL Si             ERR_TOOMANYTARGETS  Si
-       ERR_NOSUCHNICK  Si
-       RPL_AWAY  Si
-
-       411     ERR_NORECIPIENT
-                        ":No recipient given (<command>)"
-
-       404     ERR_CANNOTSENDTOCHAN
-                        "<channel name> :Cannot send to channel"
-
-                - Sent to a user who is either (a) not on a channel
-                  which is mode +n or (b) not a chanop (or mode +v) on
-                  a channel which has mode +m set and is trying to send
-                  a PRIVMSG message to that channel.
-
-       414     ERR_WILDTOPLEVEL
-                        "<mask> :Wildcard in toplevel domain"
-
-                - 412 - 414 are returned by PRIVMSG to indicate that
-                  the message wasn't delivered for some reason.
-                  ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that
-                  are returned when an invalid use of
-                  "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
-
-       401     ERR_NOSUCHNICK
-                        "<nickname> :No such nick/channel"
-
-                - Used to indicate the nickname parameter supplied to a
-                  command is currently unused.
-       
-       301     RPL_AWAY
-                        "<nick> :<away message>"
-
-       412     ERR_NOTEXTTOSEND
-                        ":No text to send"
-
-       413     ERR_NOTOPLEVEL
-                        "<mask> :No toplevel domain specified"
-
-       407     ERR_TOOMANYTARGETS
-                        "<target> :Duplicate recipients. No message \
-                         delivered"
-
-                - Returned to a client which is attempting to send a
-                  PRIVMSG/NOTICE using the user@host destination format
-                  and for a user@host which has several occurrences.
-
-JOIN:
-       ERR_NEEDMOREPARAMS   Si         ERR_BANNEDFROMCHAN  Si
-       ERR_INVITEONLYCHAN   Si         ERR_BADCHANNELKEY  Si
-       ERR_CHANNELISFULL  Si           ERR_BADCHANMASK  Si
-       ERR_NOSUCHCHANNEL   Si          ERR_TOOMANYCHANNELS  Si
-       RPL_TOPIC   Si
-
-       461     ERR_NEEDMOREPARAMS
-                            "<command> :Not enough parameters"
-
-                     - Returned by the server by numerous commands to
-                     indicate to the client that it didn't supply enough
-                     parameters.
-       
-       473     ERR_INVITEONLYCHAN
-                        "<channel> :Cannot join channel (+i)"
-
-       471     ERR_CHANNELISFULL
-                        "<channel> :Cannot join channel (+l)"
-       
-       403     ERR_NOSUCHCHANNEL
-                        "<channel name> :No such channel"
-
-                - Used to indicate the given channel name is invalid.
-       
-       332     RPL_TOPIC
-                        "<channel> :<topic>"
-
-                - When sending a TOPIC message to determine the
-                  channel topic, one of two replies is sent.  If
-                  the topic is set, RPL_TOPIC is sent back else
-                  RPL_NOTOPIC.
-       
-       474     ERR_BANNEDFROMCHAN
-                        "<channel> :Cannot join channel (+b)"
-
-       475     ERR_BADCHANNELKEY
-                        "<channel> :Cannot join channel (+k)"
-
-       476     ERR_BADCHANMASK
-
-       405     ERR_TOOMANYCHANNELS
-                        "<channel name> :You have joined too many \
-                         channels"
-                - Sent to a user when they have joined the maximum
-                  number of allowed channels and they try to join
-                  another channel.
-
-
-
-USER:
-       ERR_NEEDMOREPARAMS   Si           ERR_ALREADYREGISTRED  Si
-
-       461     ERR_NEEDMOREPARAMS
-                            "<command> :Not enough parameters"
-
-                     - Returned by the server by numerous commands to
-                     indicate to the client that it didn't supply enough
-                     parameters.
-
-       462     ERR_ALREADYREGISTRED
-                        ":You may not reregister"
-
-                - Returned by the server to any link which tries to
-                  change part of the registered details (such as
-                  password or user details from second USER message).
-
-
-NICK:
-       ERR_NONICKNAMEGIVEN   Si                                ERR_ERRONEUSNICKNAME  Si
-       ERR_NICKNAMEINUSE     Si                                ERR_NICKCOLLISION  Si
-       ERR_UNAVAILRESOURCE   No esta en la documentació        ERR_RESTRICTED  No esta en la documentació
-
-       431     ERR_NONICKNAMEGIVEN
-                        ":No nickname given"
-
-                - Returned when a nickname parameter expected for a
-                  command and isn't found.
-       
-       433     ERR_NICKNAMEINUSE
-                        "<nick> :Nickname is already in use"
-
-                - Returned when a NICK message is processed that results
-                  in an attempt to change to a currently existing
-                  nickname.
-
-       432     ERR_ERRONEUSNICKNAME
-                        "<nick> :Erroneus nickname"
-
-                - Returned after receiving a NICK message which contains
-                  characters which do not fall in the defined set.  See
-                  section x.x.x for details on valid nicknames.
-
-       436     ERR_NICKCOLLISION
-                        "<nick> :Nickname collision KILL"
-
-                - Returned by a server to a client when it detects a
-                  nickname collision (registered of a NICK that
-                  already exists by another server).
-
-       
-PASS:
-       ERR_NEEDMOREPARAMS   Si         ERR_ALREADYREGISTRED  Si
-
-       461     ERR_NEEDMOREPARAMS
-                            "<command> :Not enough parameters"
-
-                     - Returned by the server by numerous commands to
-                     indicate to the client that it didn't supply enough
-                     parameters.
-
-       462     ERR_ALREADYREGISTRED
-                        ":You may not reregister"
-
-                - Returned by the server to any link which tries to
-                  change part of the registered details (such as
-                  password or user details from second USER message).
