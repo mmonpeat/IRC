@@ -276,7 +276,8 @@ JOIN:
 
                      - Sent to a user when they have joined the maximum
                      number of allowed channels and they try to join
-                     another channel. (debemos establecer el maximo, mi propuesta 10)
+                     another channel. (debemos establecer el maximo, mi propuesta 5 o menos
+                     as'i podemos motrar que el error no peta de forma mas facil).
 
 ------------------------------------------ CHANNEL --------------------------------------
 
@@ -458,13 +459,15 @@ INVITE:
                      - Returned by the server to indicate that the
                      attempted INVITE message was successful and is
                      being passed onto the end client.
+                     (Lo devuelve el servidor para indicar que el mensaje INVITE 
+                     fue exitoso y se está enviando al cliente final.)
 
        401     ERR_NOSUCHNICK
                      "<nickname> :No such nick/channel"
 
                      - Used to indicate the nickname parameter supplied to a
                      command is currently unused.
-                     (sireve para el mode +o, si el nick no existe)
+                     (sireve para el mode +o, si el nick/channel no existe)
 
        443     ERR_USERONCHANNEL
                      "<user> <channel> :is already on channel"
@@ -489,7 +492,10 @@ KICK:
                      parameters.
 
        476     ERR_BADCHANMASK
+                     "<channel> :Bad Channel Mask"
 
+                     - En el apartado Join estan explicadas lea normas de escritura para el IRC.
+                     
        442     ERR_NOTONCHANNEL
                      "<channel> :You're not on that channel"
 
