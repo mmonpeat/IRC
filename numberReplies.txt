@@ -6,8 +6,8 @@ https://datatracker.ietf.org/doc/html/rfc1459#section-6
 
 ERRORS ISSUES:
 
-USER(si), NICK, PASS: Client servidor
-PRIVMSG, JOIN: Missatges privats i per channels 
+USER(si), NICK(si), PASS(si): Client servidor
+PRIVMSG(si), JOIN(si): Missatges privats i per channels 
 MODE(si), TOPIC, INVITE, KICK: nomes Channels
 
 ----------------------------------- CLIENT -> SERVIDOR ---------------------------------
@@ -33,7 +33,9 @@ USER:
 NICK:
        ERR_NONICKNAMEGIVEN   Si                                ERR_ERRONEUSNICKNAME  Si
        ERR_NICKNAMEINUSE     Si                                ERR_NICKCOLLISION  Si
-       ERR_UNAVAILRESOURCE   No esta en la documentació        ERR_RESTRICTED  No esta en la documentació
+       ERR_UNAVAILRESOURCE   No esta en la documentació RFC 1459, pero serviria per: El nick o canal no es pot usar temporalment
+       ERR_RESTRICTED  No esta en la documentació RFC 1459, serviria per: La teva connexió té restriccions
+       Aquest errors no crrec que siguin necessars.
 
        431     ERR_NONICKNAMEGIVEN
                      ":No nickname given"
@@ -53,7 +55,9 @@ NICK:
 
                      - Returned after receiving a NICK message which contains
                      characters which do not fall in the defined set.  See
-                     section x.x.x for details on valid nicknames.
+                     section x.x.x for details on valid nicknames. (no es que el nick ja 
+                     existeixi sono que al crear el nick posses parameres no permesos:
+                     (-, _, [ ] \ ` { } i ^), no m'es llarg de 9 o 16 caracters, el primer caracter lletra).
 
        436     ERR_NICKCOLLISION
                      "<nick> :Nickname collision KILL"
@@ -94,6 +98,10 @@ be a list of names or channels separated with commas.
 
        411     ERR_NORECIPIENT
                      ":No recipient given (<command>)"
+                     
+                     - Seria quan falta a qui s'envia el missatge (un nick o un canal). 
+                     Exemple:      PRIVMSG :Hola
+                                   :server 411 user :No recipient given (PRIVMSG)
 
        404     ERR_CANNOTSENDTOCHAN
                      "<channel name> :Cannot send to channel"
@@ -102,6 +110,8 @@ be a list of names or channels separated with commas.
                      which is mode +n or (b) not a chanop (or mode +v) on
                      a channel which has mode +m set and is trying to send
                      a PRIVMSG message to that channel.
+                     (només poden enviar missatges els membres del canal i l’usuari no hi ha fet JOIN.
+                     es el mode +n, pero no l'hem de gestionar com a comanda en MODE, pero si gestionem l'error).
 
        414     ERR_WILDTOPLEVEL
                      "<mask> :Wildcard in toplevel domain"
@@ -112,30 +122,58 @@ be a list of names or channels separated with commas.
                      are returned when an invalid use of
                      "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
 
+                     (Només un dels dos s'envia segons quin error es trobi primer.)
+                     
+                     1. 413 ERR_NOTOPLEVEL (l'error s’envia quan es fa servir un destinatari amb un mask 
+                     no vàlid en una comanda com PRIVMSG o NOTICE, especialment amb $-targets 
+                     o # host-masks, i no s’ha especificat un domini vàlid de nivell superior.)
+                     
+                     2. 414 ERR_WILDTOPLEVEL (l'error s’envia si l’usuari posa un comodí (*) 
+                     al nivell superior del domini).
+                     Exemple:      PRIVMSG $*.com :Hola
+                                   :server 414 user *.com :Wildcard in toplevel domain
+
        401     ERR_NOSUCHNICK
                      "<nickname> :No such nick/channel"
 
                      - Used to indicate the nickname parameter supplied to a
                      command is currently unused.
+                     (sireve para el mode +o, si el nick no existe)
        
        301     RPL_AWAY
                      "<nick> :<away message>"
 
+                     - L'error aparei quan envias un PRIVMSG a un usuario que que no esta 
+                     conectado en ese momento, i no respondra imediatament. Un exemple seria:
+                     PRIVMSG usuari123 :Hola<3 (ho envia l' usuari maria)
+                     :server 301 maria usuari123 :Estic fora(away), torno després (el servidor enviaria)
+       
        412     ERR_NOTEXTTOSEND
                      ":No text to send"
+                     
+                     - Falta el missatge (Exemple: PRIVMSG user123)
 
        413     ERR_NOTOPLEVEL
                      "<mask> :No toplevel domain specified"
 
+                     - (l'error s’envia quan es fa servir un destinatari amb un mask 
+                     no vàlid en una comanda com PRIVMSG o NOTICE, especialment amb $-targets 
+                     o # host-masks, i no s’ha especificat un domini vàlid de nivell superior.)
+                     Exemple:     PRIVMSG $myserver. :Hola
+                                  :server 413 user myserver. :No toplevel domain specified 
+
        407     ERR_TOOMANYTARGETS
-                     "<target> :Duplicate recipients. No message \ delivered"
+                     "<target> :Duplicate recipients. No message delivered"
 
                      - Returned to a client which is attempting to send a
                      PRIVMSG/NOTICE using the user@host destination format
                      and for a user@host which has several occurrences.
-
+                     (El error debe salir cuando intentas enviar el mensage 2 veces al mismo usuario).
+                     (si se puede enviar un mensaje por privado a diferentes usuarios a la vez, 
+                     pero tmb saltara l' error si intentes enviar-lo a mes de 5 usuaris, 
+                     <target> sera el user6).
 JOIN:
-       ERR_NEEDMOREPARAMS   Si         ERR_BANNEDFROMCHAN  Si
+       ERR_NEEDMOREPARAMS   Si         ERR_BANNEDFROMCHAN (no necessitem)
        ERR_INVITEONLYCHAN   Si         ERR_BADCHANNELKEY  Si
        ERR_CHANNELISFULL  Si           ERR_BADCHANMASK  Si
        ERR_NOSUCHCHANNEL   Si          ERR_TOOMANYCHANNELS  Si
@@ -151,14 +189,22 @@ JOIN:
        473     ERR_INVITEONLYCHAN
                      "<channel> :Cannot join channel (+i)"
 
+                     - Quan un usuari intenta fer JOIN a un canal que té el mode +i 
+                     (només per invitació) i no ha estat invitat amb la comanda INVITE.
        471     ERR_CHANNELISFULL
                      "<channel> :Cannot join channel (+l)"
-       
+                     
+                     - Quan un canal té un límit d’usuaris (+l) i ja està ple,
+                     i un altre usuari intenta unir-se amb JOIN, llavors salta l'error.
+
        403     ERR_NOSUCHCHANNEL
                      "<channel name> :No such channel"
 
                      - Used to indicate the given channel name is invalid.
-       
+                     (Se usa para indicar que el nombre del canal dado no es válido.
+                     Pero quina seria la rao de no valid? si no existeix el creem).
+                     No ho pillo del tot.
+
        332     RPL_TOPIC
                      "<channel> :<topic>"
 
@@ -167,20 +213,70 @@ JOIN:
                      the topic is set, RPL_TOPIC is sent back else
                      RPL_NOTOPIC.
        
-       474     ERR_BANNEDFROMCHAN
+       474     ERR_BANNEDFROMCHAN (no neccessitem, pq no tenim llista de baneados)
                      "<channel> :Cannot join channel (+b)"
 
        475     ERR_BADCHANNELKEY
                      "<channel> :Cannot join channel (+k)"
 
+                     - Dona error al intentar eliminar o crear la pass del channel.
+                     Mode:
+                     Tenim l' error 467 ERR_KEYSET,si se intenta poner pass(+k) 
+                     en un canal que ya tiene. "<channel> :Channel key already set"
+
        476     ERR_BADCHANMASK
+                     "<channel> :Bad Channel Mask"
+
+                     - Cuando el nombre del canal nno es valido segun las normas del prottocolo IRC.
+                     Normas del protocolo:
+                     Channels names are strings (beginning with a '&', '#', '+' or '!'
+                     character) of length up to fifty (50) characters.  Apart from the
+                     requirement that the first character is either '&', '#', '+' or '!',
+                     the only restriction on a channel name is that it SHALL NOT contain
+                     any spaces (' '), a control G (^G or ASCII 7), a comma (',').  Space
+                     is used as parameter separator and command is used as a list item
+                     separator by the protocol).  A colon (':') can also be used as a
+                     delimiter for the channel mask.  Channel names are case insensitive.
+                     See the protocol grammar rules (section 2.3.1) for the exact syntax
+                     of a channel name.
+
+                     1. Ha de començar per un d’aquests caràcters:
+                            # – canals globals (els més comuns)
+                            & – canals locals (dins d’un mateix servidor)
+                            + – canals temporals o amb modes especials
+                            ! – canals amb nom segur (safe channels, usats en netsplits)
+
+                     2. Longitud màxima: Fins a 50 caràcters en total(incloent el primer símbol #, &, etc.)
+
+                     3. Caràcters prohibits dins el nom:
+                            Espai ( )
+                            Coma (,)
+                            Control-G (ASCII 7 / ^G / \a)
+                            NUL (\0)
+                            CR (Carriage Return \r)
+                            LF (Line Feed \n)
+                            Dos punts (:) — pot ser usat només després del nom en cas de canal 
+                            amb màscara (#canal:mask), però no dins el nom principal.
+                     
+                     4. Altres detalls tècnics:
+                            Case-insensitive: #Test és el mateix que #test.
+                            El chanstring (la part després de #, &, etc.) ha de contenir 
+                            només els caràcters següents (veure definició de chanstring):
+                                   Caràcters permesos al chanstring(és a dir, la part del nom sense #)
+                                   Codi ASCII de:
+                                          %x01-07, %x08-09, %x0B-0C, %x0E-1F
+                                          %x21-2B (de ! fins +)
+                                          %x2D-39 (de - a 9)
+                                          %x3B-FF (de ; fins a caràcters estès ASCII)
+                                   No s’hi permeten: (espai), , (coma), : (dos punts), \n, \r, ^G, \0.
+
 
        405     ERR_TOOMANYCHANNELS
-                     "<channel name> :You have joined too many \ channels"
+                     "<channel name> :You have joined too many channels"
 
                      - Sent to a user when they have joined the maximum
                      number of allowed channels and they try to join
-                     another channel.
+                     another channel. (debemos establecer el maximo, mi propuesta 10)
 
 ------------------------------------------ CHANNEL --------------------------------------
 
@@ -247,6 +343,9 @@ MODE:
                      "<channel> :Channel key already set"
 
                      - si se intenta poner pass(+k) en un canal que ya tiene.
+                     Join:
+                     Tmb tenim l'error 475 ERR_BADCHANNELKEY, que dona error al intentar 
+                     eliminar o crear la pass del channel. "<channel> :Cannot join channel (+k)"
 
        368     RPL_ENDOFBANLIST(no neccessitem)
                      "<channel> :End of channel ban list"
@@ -365,7 +464,8 @@ INVITE:
 
                      - Used to indicate the nickname parameter supplied to a
                      command is currently unused.
-       
+                     (sireve para el mode +o, si el nick no existe)
+
        443     ERR_USERONCHANNEL
                      "<user> <channel> :is already on channel"
 
