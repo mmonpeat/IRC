@@ -6,9 +6,9 @@ https://datatracker.ietf.org/doc/html/rfc1459#section-6
 
 ERRORS ISSUES:
 
-USER(si), NICK(si), PASS(si): Client servidor
-PRIVMSG(si), JOIN(si): Missatges privats i per channels 
-MODE(si), TOPIC, INVITE, KICK: nomes Channels
+USER, NICK, PASS: Client servidor
+PRIVMSG, JOIN: Missatges privats i per channels 
+MODE, TOPIC, INVITE, KICK: nomes Channels
 
 ----------------------------------- CLIENT -> SERVIDOR ---------------------------------
 USER:
@@ -219,7 +219,7 @@ JOIN:
        475     ERR_BADCHANNELKEY
                      "<channel> :Cannot join channel (+k)"
 
-                     - Dona error al intentar eliminar o crear la pass del channel.
+                     - Dona error al intentar entrar al channel amb un pass errorni.
                      Mode:
                      Tenim l' error 467 ERR_KEYSET,si se intenta poner pass(+k) 
                      en un canal que ya tiene. "<channel> :Channel key already set"
@@ -277,8 +277,12 @@ JOIN:
                      - Sent to a user when they have joined the maximum
                      number of allowed channels and they try to join
                      another channel. (debemos establecer el maximo, mi propuesta 5 o menos
-                     as'i podemos motrar que el error no peta de forma mas facil).
-
+                     asi podemos motrar que el error no peta de forma mas facil, 
+                     PERO LA DOCUMENTACIO DIU 10 CHANNELS).
+                     pero: The current server allows any registered local user to join upto 10
+                            different channels.  There is no limit imposed on non-local users so
+                            that the server remains (reasonably) consistant with all others on a
+                            channel membership basis.
 ------------------------------------------ CHANNEL --------------------------------------
 
 MODE:

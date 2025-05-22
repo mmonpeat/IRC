@@ -3,3 +3,5 @@
 Channel::Channel() {}
 
 Channel::~Channel() {}
+
+Channel::
