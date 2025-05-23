@@ -265,22 +265,38 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 
 std::string*	Server::returnParams(std::string msg)
 {
-	int	n = 0;
-	int	i = 0;
-	//fuuuck there can be more than one space
-	n = std::count(msg.begin(), msg.end(), " ") + 1;
-	std::string	params[n];
+	//int	i = 0;
+	int	n = countParams(msg);
+	//std::string	params[n];
 
-	std::string::sizetype	pos = msg.find(" ");
-	while (post != std::string::pos)
-	{
-		params[i] = msg.substr(0, pos)
-	}
+	std::cout << "n is " << n << std::endl;
+	//std::string::size_type	pos = msg.find(" ");
+	//while (pos != std::string::pos)
+	//{
+	//	params[i] = msg.substr(0, pos)
+	//}
 
 	// check if last param has preceding :
-	msg.find_first_of(" :")
+	//msg.find_first_of(" :");
 	// split by spaces accordingly
-	return (params) ;
+	return (NULL) ;
+}
+
+int	Server::countParams(std::string msg)
+{
+	int	n = 1;
+	unsigned long	i = 0;
+	//int	len = msg.length();
+	while (i < msg.size())
+	{
+		while (msg[i++] == ' ')
+		{
+			if (msg[i] != ' ')
+				n++;
+		}
+	}
+	std::cout << "i is " << i << std::endl;
+	return (n);
 }
 
 //------------------------------- Command Functions ------------------------------
@@ -293,7 +309,7 @@ void	Server::pass(std::string msg, Client *client)
 		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
 		return ;
 	}
-	parseParams(msg);
+	returnParams(msg);
 }
 
 //------------------------------- Client Functions -------------------------------
