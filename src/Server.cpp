@@ -284,15 +284,18 @@ std::string*	Server::returnParams(std::string msg)
 
 int	Server::countParams(std::string msg)
 {
-	int	n = 1;
+	int				n = 1;
 	unsigned long	i = 0;
-	//int	len = msg.length();
+	bool			last = false;
+	
 	while (i < msg.size())
 	{
 		while (msg[i++] == ' ')
 		{
-			if (msg[i] != ' ')
+			if (msg[i] != ' ' && !last)
 				n++;
+			if (msg[i] == ':')
+				last = true;
 		}
 	}
 	std::cout << "i is " << i << std::endl;
