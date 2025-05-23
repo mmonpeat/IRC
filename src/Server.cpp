@@ -263,14 +263,16 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 	}
 }
 
+//Returns an allocated array, delete after use
 std::string*	Server::returnParams(std::string msg)
 {
-	int			i = 0;
-	int			n = countParams(msg);
-	std::string	params[n];
+	unsigned long	i = 0;
+	unsigned long	n = countParams(msg);
+	std::string	*params;
 
+	params = new std::string[n];
 	std::string::size_type	pos = msg.find(' ');
-	while (pos != std::string::npos)
+	while (i < n)
 	{
 		if (msg[0] == ':')
 		{
@@ -278,6 +280,7 @@ std::string*	Server::returnParams(std::string msg)
 			break ;
 		}
 		params[i++] = msg.substr(0, pos);
+		std::cout << "param " << i << " is " << params[i] << std::endl;
 		msg.erase(0, pos + 1);
 		pos = msg.find(' ');
 	}
@@ -314,6 +317,7 @@ void	Server::pass(std::string msg, Client *client)
 		return ;
 	}
 	std::string *params = returnParams(msg);
+	(void)params;
 }
 
 //------------------------------- Client Functions -------------------------------
