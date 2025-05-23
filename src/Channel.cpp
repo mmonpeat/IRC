@@ -39,7 +39,7 @@ Channel::~Channel(void) {
     std::cout << "Channel " << this->_name << " destructor has been called" << std::endl;
     return;
 }
-
+ 
 
 //---------------------------------- Class Functions -----------------------------------------
 
@@ -54,9 +54,8 @@ void	Channel::removeClient(Client* client) {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		send((*it)->getFd(), message.c_str(), message.size(), 0);
 	}
-	
-	
 }
+
 void	Channel::removeOperator(Client *op) {
 
 }
@@ -72,7 +71,13 @@ void	Channel::addClient(Client *client) {
 }
 
 void	Channel::addOperator(Client *new_op) {
-
+	this->_operators.push_back(new_op);
+	std::string	message = new_op->getNick() + " (" + new_op->getRealName() + ") has become operator \r\n"; //falta decir en que grup
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		send((*it)->getFd(), message.c_str(), message.size(), 0);
+	}
+	return;
 }
 
 bool	Channel::isClient(Client *client) {
@@ -80,7 +85,9 @@ bool	Channel::isClient(Client *client) {
 }
 
 bool	Channel::isChannelEmpty(void) const {
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 
+	}
 }
 
 void	Channel::displayTopic(void) const {
