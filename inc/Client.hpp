@@ -28,6 +28,7 @@ class Client
 		void 		setUserName(std::string user_name);
 		void		setHostName(std::string host_name);
 		void		setRealName(std::string real_name);
+		void		setPass(bool status);
 
 		std::string	getNick(void) const;
 		int			getFd(void) const;

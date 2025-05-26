@@ -38,6 +38,9 @@ void		Client::setRealName( std::string real_name ) {
 	return;
 }
 
+void		Client::setPass(bool status){
+	this->_pass = status;
+}
 //------------------------------ Getters -----------------------------------------
 
 std::string	Client::getNick(void) const {
