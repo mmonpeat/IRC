@@ -59,18 +59,19 @@ int countClientChannels(Client& client, const std::vector<Channel>& channelsExis
 			}
 		}
 	}
-
-	return (0);
+	return (count);
 }
 // MAX_CHANNELS_PER_CLIENT = 10
-int ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, std::vector<std::string> newListChannels)
+std::vector<std::string> ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, \
+	std::vector<std::string> newListChannels)
 {
 	const int MAX_CHANNELS_PER_CLIENT = 5;
 
 	int currentCount = countClientChannels(client, channelsExistents);
-	std::cout << "\nValors de en quants canals esta el client:" << currentCount << "\n";
+	std::cout << "\nValors de en quants canals esta el client "<< client.getNick() << ":" << currentCount << "\n";
 	int slotsLeft = MAX_CHANNELS_PER_CLIENT - currentCount;
 	std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
+	
 	if (slotsLeft <= 0)
 	{
 		for (size_t i = 0; i < newListChannels.size(); ++i)
@@ -80,7 +81,7 @@ int ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents,
 			          << " :You have joined too many channels" << std::endl;
 		}
 		newListChannels.clear();
-		return (-1);
+		return (newListChannels);
 	}
 
 	if ((int)newListChannels.size() > slotsLeft)
@@ -94,7 +95,7 @@ int ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents,
 		newListChannels.resize(slotsLeft); // es queden només els que caben
 	}
 
-	return 0;
+	return (newListChannels);
 }
 
 //ClientLimitChannels - countName of Channels //numeros iteracions delvector newListChannels
@@ -104,20 +105,17 @@ int ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents,
 int Channel::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels)
 {
 	std::vector<std::string> newListChannels = checkChannelNameRules(CheckChannels);
-	std::cout << "\nValors validssss:\n";
+	std::cout << "\nChannels que segueixen les normes amb el nom:\n";
     for (size_t i = 0; i < newListChannels.size(); ++i) {
         std::cout << newListChannels.at(i) << std::endl;
     }
 
-	ClientLimitChannels(client, channelsExistents, newListChannels);
+	newListChannels = ClientLimitChannels(client, channelsExistents, newListChannels);
 
-
-	(void)channelsExistents;
-	//si es unique o no pel creas o t'uneixes
-
-    // Mostrar la mida del vector
-    std::cout << "Mida del vector: " << newListChannels.size() << std::endl;
-
+    std::cout << "channels que hem d'afegit pq hi ha espai per el client: " << newListChannels.size() << std::endl;
+	 for (size_t i = 0; i < newListChannels.size(); ++i) {
+        std::cout << newListChannels.at(i) << std::endl;
+    }
 
     newListChannels.clear();
     return (0);

@@ -90,30 +90,29 @@ int main(int argc, char **argv)
 	Client client(1);
 	client.setNick("prova");
 
-	// Crear 2 canals on el client ja hi és
-	Channel ch1;
-	ch1.setName("&Canal1");
-	ch1.addClientNick("prova"); // Simula que el client hi és
-
-	Channel ch2;
-	ch2.setName("&Canal2");
-	ch2.addClientNick("prova");
-
+	Channel ch1("&Canal1", &client);
+	Channel ch2("&Canal2", &client);
+	ch1.addClient(&client);
+	ch2.addClient(&client);
 	channelsExistents.push_back(ch1);
 	channelsExistents.push_back(ch2);
+	std::cout << "Client està ja en 2 canals.\n";
 
-    std::vector<std::string>    CheckChannels;// argument vector  dun split names channels(pot ser 1 o més)
+	std::string joinCommand = "&Canal3,&Canal4,&Canal5,&Canal6,&Canal7";
+	std::vector<std::string> requestedChannels = parseJoinChannels(joinCommand);
 
-	//PROVA DE FILTRE DE NOM CHANNEL
+	Channel fakeJoin("&fake", &client); // només per usar el .join()
+	fakeJoin.join(client, channelsExistents, requestedChannels);
+
+	return (EXIT_SUCCESS);
+}
+
+/*
+//PROVA DE FILTRE DE NOM CHANNEL
     CheckChannels.push_back("&HelloWorld");
 	CheckChannels.push_back("#CanalInalid");
 	CheckChannels.push_back("&Canal Inalid");
 	CheckChannels.push_back("CanalInalid");
 	CheckChannels.push_back("&Canal,Invalid");
 	CheckChannels.push_back("&TooLong" + std::string(45, 'x'));
-
-	.join(client, channelsExistents, CheckChannels);
-
-	return (EXIT_SUCCESS);
-}
-
+*/
