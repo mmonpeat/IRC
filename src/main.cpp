@@ -53,19 +53,41 @@ int		check_args(int ac, char **av)
 
 int main(int argc, char **argv)
 {
-	if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
-	int	port = set_port(argv[1]);
-	std::string password = argv[2];
-	std::cout << port << " y password: " << password << std::endl;
-	std::cout << "IRC starts" << std::endl;
-	try
-	{
-		Server server(port, password);
-	} catch(const Server::specificException &e) {
-		std::cerr << "Server exception caught: " << e.what() << std::endl;
-		return (EXIT_FAILURE);
-	}
-	std::cout << "despres start" << std::endl;
+	// if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
+	// int	port = set_port(argv[1]);
+	// std::string password = argv[2];
+	// std::cout << port << " y password: " << password << std::endl;
+	// std::cout << "IRC starts" << std::endl;
+	// try
+	// {
+	// 	Server server(port, password);
+	// } catch(const Server::specificException &e) {
+	// 	std::cerr << "Server exception caught: " << e.what() << std::endl;
+	// 	return (EXIT_FAILURE);
+	// }
+	// std::cout << "despres start" << std::endl;
+
+	(void)argc;
+	(void)argv;
+	
+	//coses que ja rebre per arguments al join quan tot funcioni
+    std::vector<Channel>		channelsExistents;
+    std::vector<std::string>    CheckChannels;// argument vector  dun split names channels(pot ser 1 o més)
+
+	//pero els afejeixo pq no els rebo encara
+    CheckChannels.push_back("&HelloWorld");
+	CheckChannels.push_back("#CanalInalid");
+	CheckChannels.push_back("&Canal Inalid");
+	CheckChannels.push_back("CanalInalid");
+	CheckChannels.push_back("&Canal,Invalid");
+	CheckChannels.push_back("&TooLong" + std::string(45, 'x'));
+
+	Client client(1);
+	client.setNick("prova");
+
+	Channel fuck;
+
+	fuck.join(client, channelsExistents, CheckChannels);
 
 	return (EXIT_SUCCESS);
 }

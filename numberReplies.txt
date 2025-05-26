@@ -202,7 +202,7 @@ JOIN:
 
                      - Used to indicate the given channel name is invalid.
                      (Se usa para indicar que el nombre del canal dado no es válido.
-                     Pero quina seria la rao de no valid? si no existeix el creem).
+                     Pero quina seria la rao de no valid? si tenim lérror ERR_BADCHANMASK).
                      No ho pillo del tot.
 
        332     RPL_TOPIC
