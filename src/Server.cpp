@@ -322,9 +322,8 @@ void	Server::pass(std::string msg, Client *client)
 	if (params[1].empty())
 	{
 		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
-		return ;
 	}
-	if (this->serverPass.compare(params[1]) == 0)
+	else if(this->serverPass.compare(params[1]) == 0)
 	{
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
@@ -337,7 +336,7 @@ void	Server::pass(std::string msg, Client *client)
 		std::cout << params[1] << "\n";
 		std::cout << "Wrong password" << std::endl;
 	}
-	//check if extra parameters are given?
+	delete[] params;
 	return ;
 }
 
