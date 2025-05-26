@@ -159,11 +159,11 @@ void Server::handleClientData(int clientFd)
 			std::string::size_type	pos = received.find(del);
 			while (pos != std::string::npos)
 			{
-				handleMsg(received.substr(0, pos), clientFd);
+				handleMsg(received.substr(0, pos), getClient(clientFd));
 				received.erase(0, pos + del.length());
 				pos = received.find(del);
 			}
-			std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
+			//std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
 
@@ -174,7 +174,7 @@ void Server::removeClient(int clientFd)
 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
 		it != pollFds.end(); ++it) 
 	{
-		if (it->fd == clientFd) 
+		if (it->fd == clientFd)
 	{
 				pollFds.erase(it);
 				break;
@@ -195,29 +195,34 @@ bool	Server::validPassword( std::string client_pass ) const {
 	return false;
 }
 
-//------------------------------- Utils ------------------------------------------
-bool	Server::isClientAuth(int clientFd)
-{
-	std::map<int, Client*>::iterator it = clients.find(clientFd);
-
-	return (it->second->getAuth());
-}
-
 //------------------------------- Msg Functions ----------------------------------
 
-int	Server::handleMsg(std::string msg, int clientFd)
+void	Server::handleMsg(std::string msg, Client *client)
 {
 	std::cout << "Msg is : " << msg << std::endl;
-	std::cout << "fd is : " << clientFd << std::endl;
-	if (isClientAuth(clientFd) == false)//client is not authorized
+	if (msg.empty())
+		return ;
+	int	command = 0;
+	
+	command = checkCommand(msg);	
+	if (command == -1)
 	{
-		std::cout << "Handshake goes here" << std::endl;
-		if (checkCommand(msg) == -1)
-			return (-1); //unknown command num reply?
+		std::cout << "Unknown command" << std::endl;
+		return ; //unknown command num reply?
 	}
-	std::cout << "After handshake" << std::endl;
-	//parse command
-	return (0);
+	if (client->getAuth() == false)//client is not authorized
+	{
+		if (command > 2)
+		{
+			std::cout << "Client needs to be registered first" << std::endl;
+		}
+		ServerHandshake(msg, client, command);
+	}
+	else
+	{
+		std::cout << "After handshake" << std::endl;
+	}
+	return ;
 }
 
 int	Server::checkCommand(std::string msg)
@@ -236,8 +241,107 @@ int	Server::checkCommand(std::string msg)
 	return (-1);
 }
 
-//------------------------------- Client Functions -------------------------------
+void	Server::ServerHandshake(std::string msg, Client *client, int command)
+{
+	switch(command)
+	{
+		case 0:
+			pass(msg, client);
+			break ;
+		case 1:
+			if (client->getPass() == true)
+			{ 
+				std::cout << "do NICK command" << std::endl;
+			}
+			break ;
+		case 2:
+			if (client->getPass() == true && client->getNick().empty() == false)
+				std::cout << "do USER command" << std::endl;
+			break ;
+		default:
+			std::cerr << "Handshake default case, something went wrong" << std::endl;
+	}
+}
 
+//Returns an allocated array, delete after use
+std::string*	Server::returnParams(std::string msg)
+{
+	unsigned long	i = 0;
+	unsigned long	n = countParams(msg);
+	std::string	*params;
+
+	params = new std::string[n];
+	std::string::size_type	pos = msg.find(' ');
+	while (i < n)
+	{
+		if (msg[0] == ':')
+		{
+			params[i] = msg.substr(0, msg.length());
+			std::cout << "param " << i << " is " << params[i] << std::endl;
+			break ;
+		}
+		params[i++] = msg.substr(0, pos);
+		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
+		msg.erase(0, pos + 1);
+		pos = msg.find(' ');
+	}
+	return (params) ;
+}
+
+int	Server::countParams(std::string msg)
+{
+	int				n = 1;
+	unsigned long	i = 0;
+	bool			last = false;
+	
+	while (i < msg.size())
+	{
+		while (msg[i++] == ' ')
+		{
+			if (msg[i] != ' ' && !last)
+				n++;
+			if (msg[i] == ':')
+				last = true;
+		}
+	}
+	std::cout << "n is " << n << std::endl;
+	return (n);
+}
+
+//------------------------------- Command Functions ------------------------------
+
+void	Server::pass(std::string msg, Client *client)
+{
+	std::cout << "do PASS command" << std::endl;
+	if (client->getPass() == true)
+	{
+		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
+		return ;
+	}
+	std::string *params = returnParams(msg);
+	if (params[1].empty())
+	{
+		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
+	}
+	else if(this->serverPass.compare(params[1]) == 0)
+	{
+		std::cout << serverPass << "\n";
+		std::cout << params[1] << "\n";
+		std::cout << "correct Pass" << std::endl;
+		client->setPass(true);
+	}
+	else
+	{
+		std::cout << serverPass << "\n";
+		std::cout << params[1] << "\n";
+		std::cout << "Wrong password" << std::endl;
+	}
+	delete[] params;
+	return ;
+}
+
+//------------------------------- Client Functions -------------------------------
+  
 bool Server::clientIsRegistered(int clientFd) {
 	std::map<int, Client*>::iterator it = clients.find(clientFd);
 	if (it != clients.end()) {
@@ -267,6 +371,12 @@ void	Server::addClient(int clientFd) {
 	Client *new_client = createClient(clientFd);
 	clients.insert(std::make_pair(clientFd, new_client));
 	return;
+}
+
+Client*	Server::getClient(int clientFd)
+{
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+	return (it->second);
 }
 
 char foldChar(char c) {
