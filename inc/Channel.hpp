@@ -21,6 +21,10 @@ class Channel
 		Channel();
 		~Channel();
 		
+		void	addClient(Client *client);
+		
+		const std::vector<std::string>& Channel::getClientNicks() const;
+
 		int join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels);
 };
 

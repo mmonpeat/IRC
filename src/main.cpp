@@ -51,6 +51,20 @@ int		check_args(int ac, char **av)
 	return EXIT_SUCCESS;
 }
 
+
+std::vector<std::string> parseJoinChannels(const std::string& line)
+{
+	std::vector<std::string> result;
+	std::stringstream ss(line);
+	std::string channel;
+
+	while (std::getline(ss, channel, ',')) {
+		if (!channel.empty())
+			result.push_back(channel);
+	}
+	return result;
+}
+
 int main(int argc, char **argv)
 {
 	// if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
@@ -71,10 +85,26 @@ int main(int argc, char **argv)
 	(void)argv;
 	
 	//coses que ja rebre per arguments al join quan tot funcioni
-    std::vector<Channel>		channelsExistents;
+    std::vector<Channel> channelsExistents;
+
+	Client client(1);
+	client.setNick("prova");
+
+	// Crear 2 canals on el client ja hi és
+	Channel ch1;
+	ch1.setName("&Canal1");
+	ch1.addClientNick("prova"); // Simula que el client hi és
+
+	Channel ch2;
+	ch2.setName("&Canal2");
+	ch2.addClientNick("prova");
+
+	channelsExistents.push_back(ch1);
+	channelsExistents.push_back(ch2);
+
     std::vector<std::string>    CheckChannels;// argument vector  dun split names channels(pot ser 1 o més)
 
-	//pero els afejeixo pq no els rebo encara
+	//PROVA DE FILTRE DE NOM CHANNEL
     CheckChannels.push_back("&HelloWorld");
 	CheckChannels.push_back("#CanalInalid");
 	CheckChannels.push_back("&Canal Inalid");
@@ -82,12 +112,7 @@ int main(int argc, char **argv)
 	CheckChannels.push_back("&Canal,Invalid");
 	CheckChannels.push_back("&TooLong" + std::string(45, 'x'));
 
-	Client client(1);
-	client.setNick("prova");
-
-	Channel fuck;
-
-	fuck.join(client, channelsExistents, CheckChannels);
+	.join(client, channelsExistents, CheckChannels);
 
 	return (EXIT_SUCCESS);
 }

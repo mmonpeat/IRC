@@ -1,4 +1,5 @@
 #include "Channel.hpp"
+#include "Client.hpp"
 
 std::vector<std::string> checkChannelNameRules(std::vector<std::string>& CheckChannels)
 {
@@ -42,13 +43,58 @@ std::vector<std::string> checkChannelNameRules(std::vector<std::string>& CheckCh
 	return (newListChannels);
 }
 
-// MAX_CHANNELS_PER_CLIENT
-int ClientLimitChannels(Client& client, std::vector<std::string> newListChannels)
+int countClientChannels(Client& client, const std::vector<Channel>& channelsExistents)
 {
-	(void)newListChannels;
-	(void)client;
-	
+	int count = 0;
+	std::string clientNick = client.getNick();
+	for (size_t i = 0; i < channelsExistents.size(); ++i)
+	{
+		const std::vector<std::string>& nickList = channelsExistents[i].getClientNicks();
+		for (size_t j = 0; j < nickList.size(); ++j)
+		{
+			if (nickList[j] == clientNick)
+			{
+				count++;
+				break; // Un cop trobat en aquest canal, no cal seguir-lo buscant dins del mateix canal
+			}
+		}
+	}
+
 	return (0);
+}
+// MAX_CHANNELS_PER_CLIENT = 10
+int ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, std::vector<std::string> newListChannels)
+{
+	const int MAX_CHANNELS_PER_CLIENT = 5;
+
+	int currentCount = countClientChannels(client, channelsExistents);
+	std::cout << "\nValors de en quants canals esta el client:" << currentCount << "\n";
+	int slotsLeft = MAX_CHANNELS_PER_CLIENT - currentCount;
+	std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
+	if (slotsLeft <= 0)
+	{
+		for (size_t i = 0; i < newListChannels.size(); ++i)
+		{
+			std::cerr << "405 ERR_TOOMANYCHANNELS: " << client.getNick()
+			          << " " << newListChannels[i]
+			          << " :You have joined too many channels" << std::endl;
+		}
+		newListChannels.clear();
+		return (-1);
+	}
+
+	if ((int)newListChannels.size() > slotsLeft)
+	{
+		for (size_t i = slotsLeft; i < newListChannels.size(); ++i)
+		{
+			std::cerr << "405 ERR_TOOMANYCHANNELS: " << client.getNick()
+			          << " " << newListChannels[i]
+			          << " :You have joined too many channels" << std::endl;
+		}
+		newListChannels.resize(slotsLeft); // es queden només els que caben
+	}
+
+	return 0;
 }
 
 //ClientLimitChannels - countName of Channels //numeros iteracions delvector newListChannels
@@ -63,7 +109,7 @@ int Channel::join(Client& client, std::vector<Channel> &channelsExistents, std::
         std::cout << newListChannels.at(i) << std::endl;
     }
 
-	ClientLimitChannels(client, newListChannels);
+	ClientLimitChannels(client, channelsExistents, newListChannels);
 
 
 	(void)channelsExistents;
@@ -77,18 +123,6 @@ int Channel::join(Client& client, std::vector<Channel> &channelsExistents, std::
     return (0);
 }
 
-// std::vector<std::string> parseJoinChannels(const std::string& line)
-// {
-// 	std::vector<std::string> result;
-// 	std::stringstream ss(line);
-// 	std::string channel;
-
-// 	while (std::getline(ss, channel, ',')) {
-// 		if (!channel.empty())
-// 			result.push_back(channel);
-// 	}
-// 	return result;
-// }
 
 //std::vector<Channel>		channels;
 // newChannel
