@@ -163,7 +163,7 @@ void Server::handleClientData(int clientFd)
 				received.erase(0, pos + del.length());
 				pos = received.find(del);
 			}
-			std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
+			//std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
 
@@ -277,6 +277,7 @@ std::string*	Server::returnParams(std::string msg)
 		if (msg[0] == ':')
 		{
 			params[i] = msg.substr(0, msg.length());
+			std::cout << "param " << i << " is " << params[i] << std::endl;
 			break ;
 		}
 		params[i++] = msg.substr(0, pos);
@@ -284,7 +285,6 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos + 1);
 		pos = msg.find(' ');
 	}
-	std::cout << "param " << i << " is " << params[i] << std::endl;
 	return (params) ;
 }
 
@@ -304,6 +304,7 @@ int	Server::countParams(std::string msg)
 				last = true;
 		}
 	}
+	std::cout << "n is " << n << std::endl;
 	return (n);
 }
 
@@ -323,10 +324,20 @@ void	Server::pass(std::string msg, Client *client)
 		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
 		return ;
 	}
-	if (params[1].compare(this->serverPass))
+	if (this->serverPass.compare(params[1]) == 0)
+	{
+		std::cout << serverPass << "\n";
+		std::cout << params[1] << "\n";
+		std::cout << "correct Pass" << std::endl;
 		client->setPass(true);
+	}
 	else
+	{
+		std::cout << serverPass << "\n";
+		std::cout << params[1] << "\n";
 		std::cout << "Wrong password" << std::endl;
+	}
+	//check if extra parameters are given?
 	return ;
 }
 
