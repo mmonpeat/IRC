@@ -280,10 +280,11 @@ std::string*	Server::returnParams(std::string msg)
 			break ;
 		}
 		params[i++] = msg.substr(0, pos);
-		std::cout << "param " << i << " is " << params[i] << std::endl;
+		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
 		msg.erase(0, pos + 1);
 		pos = msg.find(' ');
 	}
+	std::cout << "param " << i << " is " << params[i] << std::endl;
 	return (params) ;
 }
 
