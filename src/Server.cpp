@@ -318,7 +318,16 @@ void	Server::pass(std::string msg, Client *client)
 		return ;
 	}
 	std::string *params = returnParams(msg);
-	(void)params;
+	if (params[1].empty())
+	{
+		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
+		return ;
+	}
+	if (params[1].compare(this->serverPass))
+		client->setPass(true);
+	else
+		std::cout << "Wrong password" << std::endl;
+	return ;
 }
 
 //------------------------------- Client Functions -------------------------------
