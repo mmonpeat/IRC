@@ -29,13 +29,20 @@ class Channel
 		Channel(std::string name, Client *client);
 		~Channel(void);
 
+		// Modes settings getters
+		bool	isLimitModeSet(void);
+		bool	isInviteModeSet(void);
+		bool	isTopicModeSet(void);
+		bool	isPasswordSet(void);
+
+
+		// Channel functions
 		void	addClient(Client *client);
 		void	removeClient(Client* client);
 		void	addOperator(Client *new_op);
 		void	removeOperator(Client *op);
 		bool	isClient(Client* client);
-		bool	isChannelEmpty(void) const; //llamar cada vez que alguien haga quit
-
+		bool	isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void	displayTopic(void) const;
 		
 
@@ -43,6 +50,7 @@ class Channel
 		bool	isOperator(std::string nick) const;
 		void	changeTopic(std::string topic, Client* client);
 		void	kickUser(Client* kicker, Client* target);
+
 		//void	changeMode(Client* client, std::string command);
 };
 

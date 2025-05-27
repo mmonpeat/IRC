@@ -39,27 +39,34 @@ Channel::~Channel(void) {
     std::cout << "Channel " << this->_name << " destructor has been called" << std::endl;
     return;
 }
- 
+
+//---------------------------------- Modes setting getters -----------------------------------
+
+bool	Channel::isLimitModeSet(void) {
+	if (this->_limit_set == true)
+		return true;
+	return false;
+}
+
+bool	Channel::isInviteModeSet(void) {
+	if (this->_invite_set == true)
+		return true;
+	return false;
+}
+
+bool	Channel::isTopicModeSet(void) {
+	if (this->_topic_set == true)
+		return true;
+	return false;
+}
+
+bool	Channel::isPasswordSet(void) {
+	if (this->_password_set == true)
+		return true;
+	return false;
+}
 
 //---------------------------------- Class Functions -----------------------------------------
-
-void	Channel::removeClient(Client* client) {
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == client->getNick())
-			_clients.erase(it);
-			break;
-	}
-	//check in channel is empty first, check if it is also an op
-	std::string	message = "deleted";
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		send((*it)->getFd(), message.c_str(), message.size(), 0);
-	}
-}
-
-void	Channel::removeOperator(Client *op) {
-
-}
-
 void	Channel::addClient(Client *client) {
 	this->_clients.push_back(client);
 	std::string	message = client->getNick() + " (" + client->getRealName() + ") has joined \r\n";
@@ -68,6 +75,30 @@ void	Channel::addClient(Client *client) {
 		send((*it)->getFd(), message.c_str(), message.size(), 0);
 	}
 	return;
+}
+
+void	Channel::removeClient(Client* client) {
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == client->getNick()) {
+			if (isOperator(client->getNick()))
+				removeOperator(client);
+			_clients.erase(it);
+			break;
+		}
+	}
+	// check if it is empty and call break to not print the message
+	std::string	message = "deleted \r\n";
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		send((*it)->getFd(), message.c_str(), message.size(), 0);
+	}
+}
+
+void	Channel::removeOperator(Client *op) {
+	for (std::vector<Client*>::const_iterator it = _operators.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == op->getNick())
+			_operators.erase(it);
+			break;
+	}
 }
 
 void	Channel::addOperator(Client *new_op) {
@@ -80,18 +111,25 @@ void	Channel::addOperator(Client *new_op) {
 	return;
 }
 
+
 bool	Channel::isClient(Client *client) {
-	return true;
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == client->getNick())
+			return true;
+	}
+	return false;
 }
 
 bool	Channel::isChannelEmpty(void) const {
+	bool	isEmpty = true;
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-
+		isEmpty = false;
 	}
+	return (isEmpty);
+
 }
 
 void	Channel::displayTopic(void) const {
-	//check if it is empty maybe
 	 for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
 		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
 	 }
@@ -109,9 +147,8 @@ bool    Channel::isOperator(std::string nick) const {
 	return false;
 }
 
-
 void Channel::changeTopic(const std::string new_topic, Client* client) {
-	if (isOperator(client->getNick())) {
+	if (isOperator(client->getNick()) || isTopicModeSet() == false) {
 		_topic = new_topic;
 
 		std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
@@ -127,10 +164,14 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 //operators can kick other operators
 void	Channel::kickUser(Client* kicker, Client* target) {
 	if (isOperator(kicker->getNick()) == false) {
-		std::cout << "You have no rights to kick users in this chat" << std::endl;
+		std::string message = " have no rights to kick users from this channel \r\n";
+		for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+		{
+			if (*it)
+				send((*it)->getFd(), message.c_str(), message.size(), 0);
+		}
 		return;
 	}
 	removeClient(target);
-	//maybe message to users of the channel
 	return;
 }
