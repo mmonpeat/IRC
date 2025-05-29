@@ -215,6 +215,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 		if (command > 2)
 		{
 			std::cout << "Client needs to be registered first" << std::endl;
+			return ;
 		}
 		ServerHandshake(msg, client, command);
 	}
