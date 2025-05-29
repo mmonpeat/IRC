@@ -37,14 +37,7 @@ class Channel
 
 		void	addClient(Client *client);
 		
-		std::vector<std::string> getClientNicks() const;
-
-		// std::vector<std::string> checkChannelNameRules(std::vector<std::string>& CheckChannels);
-		// int countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
-		// std::vector<std::string> ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, std::vector<std::string> newListChannels);
-
-		int join(Client& client, std::vector<Channel> &channelsExistents, \
-			std::vector<std::string> CheckChannels);
+		std::vector<std::string> 	getClientNicks() const;
 };
 
 

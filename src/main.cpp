@@ -52,19 +52,6 @@ int		check_args(int ac, char **av)
 }
 
 
-std::vector<std::string> parseJoinChannels(const std::string& line)
-{
-	std::vector<std::string> result;
-	std::stringstream ss(line);
-	std::string channel;
-
-	while (std::getline(ss, channel, ',')) {
-		if (!channel.empty())
-			result.push_back(channel);
-	}
-	return result;
-}
-
 int main(int argc, char **argv)
 {
 	// if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
@@ -101,8 +88,8 @@ int main(int argc, char **argv)
 	std::string joinCommand = "&Canal3,&Canal4,&Canal5,&Canal6,&Canal7";
 	std::vector<std::string> requestedChannels = parseJoinChannels(joinCommand);
 
-	Channel fakeJoin("&fake", &client); // només per usar el .join()
-	fakeJoin.join(client, channelsExistents, requestedChannels);
+	Server serv;
+	serv.join(client, channelsExistents, requestedChannels);
 
 	return (EXIT_SUCCESS);
 }

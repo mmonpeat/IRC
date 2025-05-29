@@ -69,6 +69,17 @@ class Server
 			public:
 				specificException(const std::string &msg);
 		};
+
+
+		/*  JOIN  */
+		std::vector<std::string> 	parseJoinChannels(const std::string& line);
+		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels);
+		std::vector<std::string> 	checkChannelNameRules(std::vector<std::string>& CheckChannels);
+		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
+		std::vector<std::string> 	ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, std::vector<std::string> newListChannels);
+		//default constructor per a provar join, borrrar despres
+		Server();
+		
 };
 
 #endif

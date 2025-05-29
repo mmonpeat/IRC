@@ -1,7 +1,8 @@
 #include "Channel.hpp"
 #include "Client.hpp"
+#include "Server.hpp"
 
-std::vector<std::string> checkChannelNameRules(std::vector<std::string>& CheckChannels)
+std::vector<std::string> Server::checkChannelNameRules(std::vector<std::string>& CheckChannels)
 {
 	std::vector<std::string> newListChannels;
 
@@ -43,7 +44,7 @@ std::vector<std::string> checkChannelNameRules(std::vector<std::string>& CheckCh
 	return (newListChannels);
 }
 
-int countClientChannels(Client& client, const std::vector<Channel>& channelsExistents)
+int Server::countClientChannels(Client& client, const std::vector<Channel>& channelsExistents)
 {
 	int count = 0;
 	std::string clientNick = client.getNick();
@@ -62,7 +63,7 @@ int countClientChannels(Client& client, const std::vector<Channel>& channelsExis
 	return (count);
 }
 // MAX_CHANNELS_PER_CLIENT = 10
-std::vector<std::string> ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, \
+std::vector<std::string> Server::ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, \
 	std::vector<std::string> newListChannels)
 {
 	const int MAX_CHANNELS_PER_CLIENT = 5;
@@ -102,7 +103,7 @@ std::vector<std::string> ClientLimitChannels(Client& client, std::vector<Channel
 
 // argument vector  dun split names channels(pot ser 1 o més)
 //channelsExistents en tot el servidor 
-int Channel::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels)
+int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels)
 {
 	std::vector<std::string> newListChannels = checkChannelNameRules(CheckChannels);
 	std::cout << "\nChannels que segueixen les normes amb el nom:\n";
@@ -121,11 +122,49 @@ int Channel::join(Client& client, std::vector<Channel> &channelsExistents, std::
     return (0);
 }
 
+std::vector<std::string> Server::parseJoinChannels(const std::string& line)
+{
+	std::vector<std::string> result;
+	std::stringstream ss(line);
+	std::string channel;
+
+	while (std::getline(ss, channel, ',')) {
+		if (!channel.empty())
+			result.push_back(channel);
+	}
+	return (result);
+}
+
+Server::Server() {
+	std::cout << "Server constructor\n";
+}
 
 //std::vector<Channel>		channels;
 // newChannel
 
-//pot haver-hi múltiples canals en una sola comanda JOIN.(ns pero ua putada)
+//pot haver-hi múltiples canals en una sola comanda JOIN.i una key per dos channels diferents mirar exemples
+/*
+Command Examples:
+
+  JOIN #foobar                    ; join channel #foobar.
+
+  JOIN &foo fubar                 ; join channel &foo using key "fubar".
+
+  JOIN #foo,&bar fubar            ; join channel #foo using key "fubar"
+                                  and &bar using no key.
+
+  JOIN #foo,#bar fubar,foobar     ; join channel #foo using key "fubar".
+                                  and channel #bar using key "foobar".
+
+  JOIN #foo,#bar                  ; join channels #foo and #bar.
+
+Message Examples:
+
+  :WiZ JOIN #Twilight_zone        ; WiZ is joining the channel
+                                  #Twilight_zone
+
+  :dan-!d@localhost JOIN #test    ; dan- is joining the channel #test
+*/
 
 /*
 1. Validar comanda JOIN (canals i keys)
