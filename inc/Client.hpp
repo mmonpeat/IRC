@@ -14,7 +14,6 @@ class Client
 		int			_fd;
 		std::string	_nick;
 		std::string	_username;	// USER params
-		std::string	_hostname;	// USER params
 		std::string	_real_name;	// USER params
 		bool		_pass;
 		bool		_auth;
