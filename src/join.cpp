@@ -1,5 +1,3 @@
-#include "Channel.hpp"
-#include "Client.hpp"
 #include "Server.hpp"
 
 std::vector<std::string> Server::checkChannelNameRules(std::vector<std::string>& CheckChannels)

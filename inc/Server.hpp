@@ -14,6 +14,7 @@
 #include <netdb.h> //getaddrinfo, freeaddrinfo
 #include <fcntl.h> //fcntl
 #include <poll.h> //poll
+#include <sstream>
 
 #include "Client.hpp"
 #include "Channel.hpp"
