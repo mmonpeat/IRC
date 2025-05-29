@@ -276,7 +276,7 @@ std::string*	Server::returnParams(std::string msg)
 	{
 		if (msg[0] == ':')
 		{
-			params[i] = msg.substr(0, msg.length());
+			params[i] = msg.substr(1, msg.length());
 			std::cout << "param " << i << " is " << params[i] << std::endl;
 			break ;
 		}
@@ -339,7 +339,16 @@ void	Server::pass(std::string msg, Client *client)
 	delete[] params;
 	return ;
 }
+/*
+void	Server::nick(std::string, Client *client)
+{
+	
+}
 
+void	Server::user(std::string, Client *client)
+{
+}
+*/
 //------------------------------- Client Functions -------------------------------
   
 bool Server::clientIsRegistered(int clientFd) {
