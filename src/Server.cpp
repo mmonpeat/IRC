@@ -343,7 +343,7 @@ void	Server::pass(std::string msg, Client *client)
 	return ;
 }
 
-void	Server::nick(std::string, Client *client)
+void	Server::nick(std::stringi msg, Client *client)
 {
 	std::string	*params = returnParams(msg);
 	if (params[1].empty())
@@ -367,11 +367,14 @@ void	Server::nick(std::string, Client *client)
 	return ;
 }
 
-/*
-void	Server::user(std::string, Client *client)
+void	Server::user(std::string msg, Client *client)
 {
+	if (countParams(msg) < 3)
+	{
+		std::cerr << "ERR_NEEDMOREPARAMS\n"
+	}
 }
-*/
+
 //------------------------------- Client Functions -------------------------------
   
 bool Server::clientIsRegistered(int clientFd) {
