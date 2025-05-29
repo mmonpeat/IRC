@@ -55,7 +55,9 @@ class Server
 		//parser msg functions
 		int		handleMsg(std::string msg, int clientFd);
 		int		checkCommand(std::string msg);
-	
+		std::string*	returnParams(std::string msg);
+		int				countParams(std::string msg);
+		
 		//handeling client
 		bool	clientIsRegistered(int clientFd);
 		Client*	createClient(int clientFd);
@@ -73,8 +75,8 @@ class Server
 
 
 		/*  JOIN  */
-		std::vector<std::string> 	parseJoinChannels(const std::string& line);
-		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels);
+		std::vector<std::string> 	convertToVector(const std::string& line);
+		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		std::vector<std::string> 	checkChannelNameRules(std::vector<std::string>& CheckChannels);
 		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
 		std::vector<std::string> 	ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, std::vector<std::string> newListChannels);

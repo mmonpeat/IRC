@@ -236,6 +236,51 @@ int	Server::checkCommand(std::string msg)
 	return (-1);
 }
 
+//Returns an allocated array, delete after use
+std::string*	Server::returnParams(std::string msg)
+{
+	unsigned long	i = 0;
+	unsigned long	n = countParams(msg);
+	std::string	*params;
+
+	params = new std::string[n];
+	std::string::size_type	pos = msg.find(' ');
+	while (i < n)
+	{
+		if (msg[0] == ':')
+		{
+			params[i] = msg.substr(1, msg.length());
+			std::cout << "param " << i << " is " << params[i] << std::endl;
+			break ;
+		}
+		params[i++] = msg.substr(0, pos);
+		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
+		msg.erase(0, pos + 1);
+		pos = msg.find(' ');
+	}
+	return (params) ;
+}
+
+int	Server::countParams(std::string msg)
+{
+	int				n = 1;
+	unsigned long	i = 0;
+	bool			last = false;
+	
+	while (i < msg.size())
+	{
+		while (msg[i++] == ' ')
+		{
+			if (msg[i] != ' ' && !last)
+				n++;
+			if (msg[i] == ':')
+				last = true;
+		}
+	}
+	std::cout << "n is " << n << std::endl;
+	return (n);
+}
+
 //------------------------------- Client Functions -------------------------------
 
 bool Server::clientIsRegistered(int clientFd) {

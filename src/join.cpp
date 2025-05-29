@@ -14,8 +14,8 @@ std::vector<std::string> Server::checkChannelNameRules(std::vector<std::string>&
             std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
             continue;
         }
-		// Comprovar comenci amb & o tmb #???
-		if (channelName[0] != '&')
+		// Comprovar comenci amb #
+		if (channelName[0] != '#')
 		{
 			std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
             continue;
@@ -70,7 +70,7 @@ std::vector<std::string> Server::ClientLimitChannels(Client& client, std::vector
 	std::cout << "\nValors de en quants canals esta el client "<< client.getNick() << ":" << currentCount << "\n";
 	int slotsLeft = MAX_CHANNELS_PER_CLIENT - currentCount;
 	std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
-	
+
 	if (slotsLeft <= 0)
 	{
 		for (size_t i = 0; i < newListChannels.size(); ++i)
@@ -101,26 +101,32 @@ std::vector<std::string> Server::ClientLimitChannels(Client& client, std::vector
 
 // argument vector  dun split names channels(pot ser 1 o més)
 //channelsExistents en tot el servidor 
-int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels)
+int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords)
 {
 	std::vector<std::string> newListChannels = checkChannelNameRules(CheckChannels);
 	std::cout << "\nChannels que segueixen les normes amb el nom:\n";
     for (size_t i = 0; i < newListChannels.size(); ++i) {
         std::cout << newListChannels.at(i) << std::endl;
     }
+	newListChannels = ClientLimitChannels(client, channelsExistents, newListChannels);//dins KATE FUNCIONS, revisar si son el mateix channel o no aqui s'ha de fer un loop amb voctors
 
-	newListChannels = ClientLimitChannels(client, channelsExistents, newListChannels);
-
+	// aqui pass amb channel 
+	//findSameChannel
     std::cout << "channels que hem d'afegit pq hi ha espai per el client: " << newListChannels.size() << std::endl;
 	 for (size_t i = 0; i < newListChannels.size(); ++i) {
         std::cout << newListChannels.at(i) << std::endl;
+    }
+
+	std::cout << "password channels: " << ChannelsPasswords.size() << std::endl;
+	 for (size_t i = 0; i < ChannelsPasswords.size(); ++i) {
+        std::cout << ChannelsPasswords.at(i) << std::endl;
     }
 
     newListChannels.clear();
     return (0);
 }
 
-std::vector<std::string> Server::parseJoinChannels(const std::string& line)
+std::vector<std::string> Server::convertToVector(const std::string& line)
 {
 	std::vector<std::string> result;
 	std::stringstream ss(line);
@@ -130,8 +136,7 @@ std::vector<std::string> Server::parseJoinChannels(const std::string& line)
 		if (!channel.empty())
 			result.push_back(channel);
 	}
-	return (result);//haure de retornar un vector<struct JoinInfo> o vector<pair<string, string>> amb cada channel la sev key, 
-	//si no te key igual pot passar depenent del channel so puc possar NULL?!
+	return (result);//haure de retornar un vector<struct JoinInfo> 
 }
 
 Server::Server() {
@@ -156,14 +161,6 @@ Command Examples:
                                   and channel #bar using key "foobar".
 
   JOIN #foo,#bar                  ; join channels #foo and #bar.
-
-Message Examples:
-
-  :WiZ JOIN #Twilight_zone        ; WiZ is joining the channel
-                                  #Twilight_zone
-
-  :dan-!d@localhost JOIN #test    ; dan- is joining the channel #test
-
 
 
   CLARIFICAAAAAAR
