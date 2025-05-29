@@ -323,8 +323,10 @@ void	Server::pass(std::string msg, Client *client)
 	if (params[1].empty())
 	{
 		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
+		delete[] params;
+		return ;
 	}
-	else if(this->serverPass.compare(params[1]) == 0)
+	if(this->serverPass.compare(params[1]) == 0)
 	{
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
@@ -340,12 +342,20 @@ void	Server::pass(std::string msg, Client *client)
 	delete[] params;
 	return ;
 }
-/*
+
 void	Server::nick(std::string, Client *client)
 {
-	
+	std::string	*params = returnParams(msg);
+	if (params[1].empty())
+	{
+		std::cerr << "ERR_NONICKNAMEGIVEN\n"
+		//send numeric reply
+	}
+	delete[] params;
+	return ;
 }
 
+/*
 void	Server::user(std::string, Client *client)
 {
 }
