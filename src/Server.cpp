@@ -343,7 +343,7 @@ void	Server::pass(std::string msg, Client *client)
 	return ;
 }
 
-void	Server::nick(std::stringi msg, Client *client)
+void	Server::nick(std::string msg, Client *client)
 {
 	std::string	*params = returnParams(msg);
 	if (params[1].empty())
