@@ -24,8 +24,7 @@
 
 //set modes to default
 Channel::Channel(std::string name, Client* client) : _name(name), _topic("No topic is set"){
-    //addOperator(Client* client)
-    client->getNick(); //esta aqui de chorrada para que no se queje el make
+    addOperator(client);
 	_limit_set = false;
 	_invite_set = false;
 	_topic_set = true;
@@ -40,31 +39,44 @@ Channel::~Channel(void) {
     return;
 }
 
-//---------------------------------- Modes setting getters -----------------------------------
+//---------------------------------- Modes setting getters and checkers -----------------------------------
 
-bool	Channel::isLimitModeSet(void) {
+bool	Channel::isLimitModeSet(void) const {
 	if (this->_limit_set == true)
 		return true;
 	return false;
 }
 
-bool	Channel::isInviteModeSet(void) {
+bool	Channel::isInviteModeSet(void) const {
 	if (this->_invite_set == true)
 		return true;
 	return false;
 }
 
-bool	Channel::isTopicModeSet(void) {
+bool	Channel::isTopicModeSet(void) const {
 	if (this->_topic_set == true)
 		return true;
 	return false;
 }
 
-bool	Channel::isPasswordSet(void) {
+bool	Channel::isPasswordSet(void) const {
 	if (this->_password_set == true)
 		return true;
 	return false;
 }
+
+bool	Channel::isPasswordValid(std::string password) const {
+	if (!password.empty() && !this->_password.empty() && (password == this->_password))
+		return true;
+	return false;
+}
+
+//---------------------------------- Vriables getters -----------------------------------
+
+std::string	Channel::getChannelName(void) {
+	return this->_name;
+}
+
 
 //---------------------------------- Class Functions -----------------------------------------
 void	Channel::addClient(Client *client) {
