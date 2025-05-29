@@ -348,9 +348,21 @@ void	Server::nick(std::string, Client *client)
 	std::string	*params = returnParams(msg);
 	if (params[1].empty())
 	{
-		std::cerr << "ERR_NONICKNAMEGIVEN\n"
+		std::cerr << "ERR_NONICKNAMEGIVEN\n";
 		//send numeric reply
+		delete[] params;
+		return ;
 	}
+	if(isNickUnique(params[1]) == false)
+	{
+		std::cerr << "ERR_NICKNAMEINUSE\n";
+		//send numeric reply
+		delete[] params;
+		return ;
+	}
+	//check nick characters
+	client->setNick(params[1]);
+	std::cout << "Nick set as " << client->getNick() << std::endl;
 	delete[] params;
 	return ;
 }
