@@ -14,7 +14,7 @@ std::vector<std::string> Server::checkChannelNameRules(std::vector<std::string>&
             std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
             continue;
         }
-		// Comprovar comenci amb &
+		// Comprovar comenci amb & o tmb #???
 		if (channelName[0] != '&')
 		{
 			std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
@@ -130,7 +130,8 @@ std::vector<std::string> Server::parseJoinChannels(const std::string& line)
 		if (!channel.empty())
 			result.push_back(channel);
 	}
-	return (result);
+	return (result);//haure de retornar un vector<struct JoinInfo> o vector<pair<string, string>> amb cada channel la sev key, 
+	//si no te key igual pot passar depenent del channel so puc possar NULL?!
 }
 
 Server::Server() {
@@ -141,7 +142,7 @@ Server::Server() {
 // newChannel
 
 //pot haver-hi múltiples canals en una sola comanda JOIN.i una key per dos channels diferents mirar exemples
-/*
+/* DOCUMENTACIÓOO
 Command Examples:
 
   JOIN #foobar                    ; join channel #foobar.
@@ -162,6 +163,24 @@ Message Examples:
                                   #Twilight_zone
 
   :dan-!d@localhost JOIN #test    ; dan- is joining the channel #test
+
+
+
+  CLARIFICAAAAAAR
+  | Comanda IRC                                 | Canal    | Key        | Relació         |
+| ------------------------------------------- | -------- | ---------- | --------------- |
+| `JOIN channel1 key1`                        | channel1 | key1       | canal 1 → key 1 |
+| `JOIN channel1,channel2 key1,key2`          | channel1 | key1       | canal 1 → key 1 |
+|                                             | channel2 | key2       | canal 2 → key 2 |
+| `JOIN channel1,channel2 key1`               | channel1 | key1       | canal 1 → key 1 |
+|                                             | channel2 | (cap clau) | canal 2 → sense |
+| `JOIN channel1,channel2,channel3 key1,key2` | channel1 | key1       | canal 1 → key 1 |
+|                                             | channel2 | key2       | canal 2 → key 2 |
+|                                             | channel3 | (cap clau) | canal 3 → sense |
+| `JOIN channel1,channel2,channel3`           | channel1 | (cap clau) | canal 1 → sense |
+|                                             | channel2 | (cap clau) | canal 2 → sense |
+|                                             | channel3 | (cap clau) | canal 3 → sense |
+
 */
 
 /*

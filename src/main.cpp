@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 	channelsExistents.push_back(ch2);
 	std::cout << "Client està ja en 2 canals.\n";
 
-	std::string joinCommand = "&Canal3,&Canal4,&Canal5,&Canal6,&Canal7";
+	std::string joinCommand = "&Canal7";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
 
 	Server serv;
 	std::vector<std::string> requestedChannels = serv.parseJoinChannels(joinCommand);
