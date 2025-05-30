@@ -261,6 +261,7 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 		default:
 			std::cerr << "Handshake default case, something went wrong" << std::endl;
 	}
+	return ;
 }
 
 //Returns an allocated array, delete after use
@@ -386,6 +387,7 @@ void	Server::user(std::string msg, Client *client)
 	client->setRealName(params[2]);
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
+	std::cout << "auth is " << client->getAuth() << std::endl;
 	delete[] params;
 	return ;
 }

@@ -38,8 +38,9 @@ void		Client::setAuth(bool status){
 }
 
 void		Client::setPass(bool status){
-	this->_pass = status;
+	this->_auth = status;
 }
+
 //------------------------------ Getters -----------------------------------------
 
 std::string	Client::getNick(void) const {
