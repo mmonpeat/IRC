@@ -15,6 +15,7 @@
 #include <fcntl.h> //fcntl
 #include <poll.h> //poll
 #include <sstream>
+#include <algorithm>//std::find
 
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -77,9 +78,8 @@ class Server
 		/*  JOIN  */
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
-		std::vector<std::string> 	checkChannelNameRules(std::vector<std::string>& CheckChannels);
+		bool					 	checkChannelNameRules(const std::string& channelName);
 		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
-		std::vector<std::string> 	ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, std::vector<std::string> newListChannels);
 		//default constructor per a provar join, borrrar despres
 		Server();
 		

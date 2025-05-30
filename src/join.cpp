@@ -1,128 +1,87 @@
 #include "Server.hpp"
 
-std::vector<std::string> Server::checkChannelNameRules(std::vector<std::string>& CheckChannels)
+bool Server::checkChannelNameRules(const std::string& channelName)
 {
-	std::vector<std::string> newListChannels;
-
-	for (size_t i = 0; i < CheckChannels.size(); ++i)
+	// Comprovar longitud
+    if (channelName.empty() || channelName.length() > 50) 
 	{
-		const std::string& channelName = CheckChannels[i];
-	
-		// Comprovar longitud
-        if (channelName.length() == 0 || channelName.length() > 50) 
+        std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+		return (false);
+    }
+	// Comprovar comenci amb #
+	if (channelName[0] != '#')
+	{
+		std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+		return (false);
+	}
+	//caracters prohibits
+	for (size_t j = 0; j < channelName.size(); ++j)
+	{
+		char c = channelName[j];
+		if (c == ' ' || c == ',' || c == 7 || c == '\0' || c == '\r' || c == '\n' || c == ':')
 		{
-            std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
-            continue;
-        }
-		// Comprovar comenci amb #
-		if (channelName[0] != '#')
-		{
-			std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
-            continue;
-		}
-		//caracters prohibits
-		bool correct = true;
-		for (size_t j = 0; j < channelName.size(); ++j)
-		{
-			char c = channelName[j];
-			if (c == ' ' || c == ',' || c == 7 || c == '\0' || c == '\r' || c == '\n' || c == ':')
-			{
-                std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
-                correct = false;
-				break;
-			}
-		}
-
-		if (correct)
-		{
-			newListChannels.push_back(channelName);
+ 	       std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+			return (false);
 		}
 	}
-	CheckChannels.clear();
-	return (newListChannels);
+	return (true);
 }
 
 int Server::countClientChannels(Client& client, const std::vector<Channel>& channelsExistents)
 {
 	int count = 0;
-	std::string clientNick = client.getNick();
-	for (size_t i = 0; i < channelsExistents.size(); ++i)
-	{
-		const std::vector<std::string>& nickList = channelsExistents[i].getClientNicks();
-		for (size_t j = 0; j < nickList.size(); ++j)
-		{
-			if (nickList[j] == clientNick)
-			{
-				count++;
-				break; // Un cop trobat en aquest canal, no cal seguir-lo buscant dins del mateix canal
-			}
-		}
-	}
-	return (count);
+    const std::string& clientNick = client.getNick();
+    
+    for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); 
+         it != channelsExistents.end(); ++it) 
+    {
+        const std::vector<std::string>& nickList = it->getClientNicks();
+        if (std::find(nickList.begin(), nickList.end(), clientNick) != nickList.end()) {
+            count++;
+        }
+    }
+    return count;
 }
-// MAX_CHANNELS_PER_CLIENT = 10
-std::vector<std::string> Server::ClientLimitChannels(Client& client, std::vector<Channel>& channelsExistents, \
-	std::vector<std::string> newListChannels)
+
+int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)
 {
-	const int MAX_CHANNELS_PER_CLIENT = 5;
+	const int MAX_CHANNELS_PER_CLIENT = 5;//10
 
 	int currentCount = countClientChannels(client, channelsExistents);
 	std::cout << "\nValors de en quants canals esta el client "<< client.getNick() << ":" << currentCount << "\n";
 	int slotsLeft = MAX_CHANNELS_PER_CLIENT - currentCount;
 	std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
 
-	if (slotsLeft <= 0)
+	if (slotsLeft <= 0) {
+        std::cerr << "405 ERR_TOOMANYCHANNELS " << client.getNick()
+                  << " :You have joined too many channels" << std::endl;
+        return -1;
+    }
+	int validChannelsProcessed = 0; 
+	for (size_t i = 0; i < ChannelsNames.size() && slotsLeft > 0; i++)
 	{
-		for (size_t i = 0; i < newListChannels.size(); ++i)
-		{
+		const std::string& channelName = ChannelsNames[i];
+        if (!checkChannelNameRules(channelName)) {
+            continue; // Saltar canals amb noms invàlids
+        }
+		// Si arribem aquí, el channel és vàlid
+        validChannelsProcessed++;
+		if (validChannelsProcessed > slotsLeft) {
 			std::cerr << "405 ERR_TOOMANYCHANNELS: " << client.getNick()
-			          << " " << newListChannels[i]
-			          << " :You have joined too many channels" << std::endl;
+                      << " " << channelName
+                      << " :You have joined too many channels" << std::endl;
+            continue;
 		}
-		newListChannels.clear();
-		return (newListChannels);
-	}
-
-	if ((int)newListChannels.size() > slotsLeft)
-	{
-		for (size_t i = slotsLeft; i < newListChannels.size(); ++i)
+		if (i <= ChannelsPasswords.size())
 		{
-			std::cerr << "405 ERR_TOOMANYCHANNELS: " << client.getNick()
-			          << " " << newListChannels[i]
-			          << " :You have joined too many channels" << std::endl;
+			std::string channelPass = ChannelsPasswords[i];
+			std::cout << "Processant canal vàlid: " << channelName 
+            		<< " amb password: " << channelPass << std::endl;
 		}
-		newListChannels.resize(slotsLeft); // es queden només els que caben
+		std::cout << "Processant canal vàlid: " << channelName << std::endl;
 	}
-
-	return (newListChannels);
-}
-
-//ClientLimitChannels - countName of Channels //numeros iteracions delvector newListChannels
-
-// argument vector  dun split names channels(pot ser 1 o més)
-//channelsExistents en tot el servidor 
-int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords)
-{
-	std::vector<std::string> newListChannels = checkChannelNameRules(CheckChannels);
-	std::cout << "\nChannels que segueixen les normes amb el nom:\n";
-    for (size_t i = 0; i < newListChannels.size(); ++i) {
-        std::cout << newListChannels.at(i) << std::endl;
-    }
-	newListChannels = ClientLimitChannels(client, channelsExistents, newListChannels);//dins KATE FUNCIONS, revisar si son el mateix channel o no aqui s'ha de fer un loop amb voctors
-
-	// aqui pass amb channel 
-	//findSameChannel
-    std::cout << "channels que hem d'afegit pq hi ha espai per el client: " << newListChannels.size() << std::endl;
-	 for (size_t i = 0; i < newListChannels.size(); ++i) {
-        std::cout << newListChannels.at(i) << std::endl;
-    }
-
-	std::cout << "password channels: " << ChannelsPasswords.size() << std::endl;
-	 for (size_t i = 0; i < ChannelsPasswords.size(); ++i) {
-        std::cout << ChannelsPasswords.at(i) << std::endl;
-    }
-
-    newListChannels.clear();
+	ChannelsNames.clear();
+	ChannelsPasswords.clear();
     return (0);
 }
 
@@ -136,7 +95,7 @@ std::vector<std::string> Server::convertToVector(const std::string& line)
 		if (!channel.empty())
 			result.push_back(channel);
 	}
-	return (result);//haure de retornar un vector<struct JoinInfo> 
+	return (result);
 }
 
 Server::Server() {

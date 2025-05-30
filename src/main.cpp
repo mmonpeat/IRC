@@ -87,14 +87,20 @@ int main(int argc, char **argv)
 
 	/* AIXO HA D'ANAR A PARSE JOIN */
 	Server serv;
-	std::string msg = "#Canal7 1234";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
+	std::string msg = "&Canal3,#Canal4";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
 	std::string *params = serv.returnParams(msg);
-	std::vector<std::string> requestedChannels = serv.convertToVector(params[0]);
-	std::vector<std::string> passChannels = serv.convertToVector(params[1]);
-	delete[] params;
-	
-	serv.join(client, channelsExistents, requestedChannels, passChannels);
+	int numParams = serv.countParams(msg);
 
+	if (numParams == 0 || numParams > 3)
+		std::cerr << "Error: número invàlid de paràmetres per a JOIN" << std::endl;	
+	else
+	{
+		std::vector<std::string> requestedChannels = serv.convertToVector(params[0]);
+		std::vector<std::string> passChannels = serv.convertToVector(params[1]);
+		delete[] params;
+		
+		serv.join(client, channelsExistents, requestedChannels, passChannels);
+	}
 	return (EXIT_SUCCESS);
 }
 
