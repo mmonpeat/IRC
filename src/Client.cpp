@@ -34,11 +34,11 @@ void		Client::setRealName( std::string real_name ) {
 }
 
 void		Client::setAuth(bool status){
-	this->_pass = status;
+	this->_auth = status;
 }
 
 void		Client::setPass(bool status){
-	this->_auth = status;
+	this->_pass = status;
 }
 
 //------------------------------ Getters -----------------------------------------

@@ -217,6 +217,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 			return ;
 		}
 		ServerHandshake(msg, client, command);
+		return ;
 	}
 	else
 	{
@@ -251,7 +252,7 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 		case 1:
 			if (client->getPass() == true)
 			{
-				nick(msg, client);	 
+				nick(msg, client); 
 			}
 			break ;
 		case 2:
