@@ -371,8 +371,22 @@ void	Server::user(std::string msg, Client *client)
 {
 	if (countParams(msg) < 3)
 	{
-		std::cerr << "ERR_NEEDMOREPARAMS\n"
+		std::cerr << "ERR_NEEDMOREPARAMS\n";
+		//sen numeric reply
+		return ;
 	}
+	if (client->getAuth() == true)
+	{
+		//i think this part might be redundant by how handle_msg is gonna work. delete later if so
+		std::cerr << "ERR_ALREADYREGISTERED\n";
+		return ;
+	}
+	std::string	*params = returnParams(msg);
+	client->setUserName(params[1]);
+	client->setRealName(params[2]);
+	client->setAuth(true);
+	delete[] params;
+	return ;
 }
 
 //------------------------------- Client Functions -------------------------------

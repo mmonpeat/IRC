@@ -28,14 +28,13 @@ void 		Client::setUserName(std::string user_name) {
 	return;
 }
 
-void		Client::setHostName(std::string host_name) {
-	this->_hostname = host_name;
-	return;
-}
-
 void		Client::setRealName( std::string real_name ) {
 	this->_real_name = real_name;
 	return;
+}
+
+void		Client::setAuth(bool status){
+	this->_pass = status;
 }
 
 void		Client::setPass(bool status){
