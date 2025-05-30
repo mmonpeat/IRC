@@ -50,6 +50,10 @@ std::string	Client::getUserName(void) const {
 	return (this->_username);
 }
 
+std::string	Client::getRealName(void) const {
+	return (this->_real_name);
+}
+
 int			Client::getFd(void) const {
 	return (this->_fd);
 }
