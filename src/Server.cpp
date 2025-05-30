@@ -305,7 +305,7 @@ int	Server::countParams(std::string msg)
 				last = true;
 		}
 	}
-	std::cout << "n is " << n << std::endl;
+	//std::cout << "n is " << n << std::endl;
 	return (n);
 }
 
@@ -383,7 +383,9 @@ void	Server::user(std::string msg, Client *client)
 	}
 	std::string	*params = returnParams(msg);
 	client->setUserName(params[1]);
+	std::cout << "user name set as: " << client->getUserName() << "\n";
 	client->setRealName(params[2]);
+	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
 	delete[] params;
 	return ;
