@@ -76,7 +76,6 @@ void Server::bindAndListen(sockaddr_in &addr)
 	}
 }
 
-
 void Server::start()
 {
 	std::cout << "comencar a acceptar, send, recv, fer poll..." << std::endl;
@@ -251,13 +250,13 @@ void	Server::ServerHandshake(std::string msg, Client *client, int command)
 			break ;
 		case 1:
 			if (client->getPass() == true)
-			{ 
-				std::cout << "do NICK command" << std::endl;
+			{
+				nick(msg, client);	 
 			}
 			break ;
 		case 2:
 			if (client->getPass() == true && client->getNick().empty() == false)
-				std::cout << "do USER command" << std::endl;
+				user(msg, client);
 			break ;
 		default:
 			std::cerr << "Handshake default case, something went wrong" << std::endl;
