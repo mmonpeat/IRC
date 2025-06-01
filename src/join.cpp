@@ -78,7 +78,50 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 			std::cout << "Processant canal vàlid: " << channelName 
             		<< " amb password: " << channelPass << std::endl;
 		}
+
+		//channelName existeix i que passi per lo de les majuscules min kate, isUnikeNick
+		//SI EXISTEIX EL CHANNEL 
+		//rescriure channelName i possar el nom del channel que ja existeix per depsres poder ferr == 
+		/*
+		- mirar mode: 
+			1. si invite-only
+				if (isInviteModeSet() == true)//te invitació
+				{
+					//add client to channelName (reescrit)
+				} else {
+					473: ERR_INVITEONLYCHAN "<channel> :Cannot join channel (+i)"
+				}
+			2. si te pass, que el pass sigui correcte (no correcte: error: 475)
+				
+				if (isPasswordSet == true && channelPass != "null") 
+				{
+					Tnim l' error 467 ERR_KEYSET, 
+					si se intenta poner pass(+k) en un canal que ya tiene. 
+					"<channel> :Channel key already set")
+				} else if (isPasswordValid(channelPass) == true && channelPass != "null"){
+					//add channelPass to ChannelsExistens._password
+					ChannelsExistens._password = channelPass; ??
+				} else if (isPasswordValid(channelPass) == false){
+					475: ERR_BADCHANNELKEY "<channel> :Cannot join channel (+k)"
+	 			} else {
+					//afegir client al channel sense comprovar pass, pq no hauria de tenir
+					//o comprovar channelPass == null
+					//no es guaarda pass && channelPass == null, sente que sárriba sent null sino ja ho haurens pillats els if
+				}
+			3. si hi ha lloc i no esta ple +l (Ple: error: 471)
+				
+				if (isLimitModeSet(void) == false)
+					//add client to channel
+				else 
+					471: ERR_CHANNELISFULL "<channel> :Cannot join channel (+l)"
+		
+		*/
+		//
+
+
 		std::cout << "Processant canal vàlid: " << channelName << std::endl;
+
+		//existeix el channel funcions kate
 	}
 	ChannelsNames.clear();
 	ChannelsPasswords.clear();
