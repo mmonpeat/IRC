@@ -224,6 +224,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 	else
 	{
 		std::cout << "After handshake" << std::endl;
+		CommandCall(params, client, command);
 	}
 	delete[] params;
 	return ;
@@ -252,9 +253,7 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 			break ;
 		case 1:
 			if (client->getPass() == true)
-			{
 				nick(params, client); 
-			}
 			break ;
 		case 2:
 			if (client->getPass() == true && client->getNick().empty() == false)
@@ -262,6 +261,49 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 			break ;
 		default:
 			std::cerr << "Handshake default case, something went wrong" << std::endl;
+	}
+	return ;
+}
+
+void	Server::CommandCall(std::string *params, Client *client, int command)
+{
+	switch(command)
+	{
+		case 0:
+			pass(params, client);
+			break ;
+		case 1:
+			nick(params, client); 
+			break ;
+		case 2:
+			user(params, client);
+			break ;
+		case 3:
+			std::cout << "JOIN goes here" << std::endl;
+			//join(params, client);
+			break;
+		case 4:
+			std::cout << "PRIVMSG goes here" << std::endl;
+			//privmsg(params, client);
+			break;
+		case 5:
+			std::cout << "KICK goes here" << std::endl;
+			//kick(params, client);
+			break;
+		case 6:
+			std::cout << "INVITE goes here" << std::endl;
+			//invite(params, client);
+			break;
+		case 7:
+			std::cout << "TOPIC goes here" << std::endl;
+			//topic(params, client);
+			break;
+		case 8:
+			std::cout << "MODE goes here" << std::endl;
+			//mode(params, client);
+			break;
+		default:
+			std::cerr << "Unknown command" << std::endl;
 	}
 	return ;
 }
@@ -324,7 +366,6 @@ void	Server::pass(std::string *params, Client *client)
 	if (params[1].empty())
 	{
 		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
-		delete[] params;
 		return ;
 	}
 	if(this->serverPass.compare(params[1]) == 0)
@@ -349,14 +390,12 @@ void	Server::nick(std::string *params, Client *client)
 	{
 		std::cerr << "ERR_NONICKNAMEGIVEN\n";
 		//send numeric reply
-		delete[] params;
 		return ;
 	}
 	if(isNickUnique(params[1]) == false)
 	{
 		std::cerr << "ERR_NICKNAMEINUSE\n";
 		//send numeric reply
-		delete[] params;
 		return ;
 	}
 	//check nick characters
@@ -367,7 +406,7 @@ void	Server::nick(std::string *params, Client *client)
 
 void	Server::user(std::string *params, Client *client)
 {
-	if (countParams(msg) < 3)
+	if (params[2].empty())
 	{
 		std::cerr << "ERR_NEEDMOREPARAMS\n";
 		//sen numeric reply
@@ -375,7 +414,6 @@ void	Server::user(std::string *params, Client *client)
 	}
 	if (client->getAuth() == true)
 	{
-		//i think this part might be redundant by how handle_msg is gonna work. delete later if so
 		std::cerr << "ERR_ALREADYREGISTERED\n";
 		return ;
 	}
