@@ -59,7 +59,8 @@ class Server
 		//command functions
 		void	pass(std::string *params, Client* client);		
 		void	nick(std::string *params, Client* client);		
-		void	user(std::string *params, Client* client);	
+		void	user(std::string *params, Client* client);
+
 	
 		//handling client
 		bool	clientIsRegistered(int clientFd);
