@@ -50,7 +50,7 @@ class Server
 
 		//parser msg functions
 		void			handleMsg(std::string msg, Client* client);
-		int				checkCommand(std::string *params);
+		int				checkCommand(std::string param);
 		void			ServerHandshake(std::string *params, Client* client, int command);
 		std::string*	returnParams(std::string msg);
 		int				countParams(std::string msg);

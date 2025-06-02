@@ -226,17 +226,15 @@ void	Server::handleMsg(std::string msg, Client *client)
 	return ;
 }
 
-int	Server::checkCommand(std::string msg)
+int	Server::checkCommand(std::string param)
 {
-	std::string	command[3] = 
+	std::string	command[9] = 
 	{
-		"PASS", "NICK", "USER"
+		"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
 	};
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		std::string::size_type	pos;
-		pos = msg.find(command[i]);
-		if (pos == 0)
+		if (param.compare(command[i]) == 0)
 			return (i);
 	}
 	return (-1);
