@@ -14,7 +14,6 @@ class Client
 		int			_fd;
 		std::string	_nick;
 		std::string	_username;	// USER params
-		std::string	_hostname;	// USER params
 		std::string	_real_name;	// USER params
 		bool		_pass;
 		bool		_auth;
@@ -26,11 +25,13 @@ class Client
 
 		void		setNick(std::string nick);
 		void 		setUserName(std::string user_name);
-		void		setHostName(std::string host_name);
 		void		setRealName(std::string real_name);
+		void		setAuth(bool status);
 		void		setPass(bool status);
 
 		std::string	getNick(void) const;
+		std::string	getUserName(void) const;
+		std::string	getRealName(void) const;
 		int			getFd(void) const;
 		bool		getAuth(void) const;
 		bool		getPass(void) const;
