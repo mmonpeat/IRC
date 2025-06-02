@@ -201,32 +201,35 @@ void	Server::handleMsg(std::string msg, Client *client)
 	std::cout << "Msg is : " << msg << std::endl;
 	if (msg.empty())
 		return ;
-	int	command = 0;
 	
-	command = checkCommand(msg);	
+	std::string	*params = returnParams(msg);
+	int	command = checkCommand(params[0]);
+
 	if (command == -1)
 	{
 		std::cout << "Unknown command" << std::endl;
+		delete[] params;
 		return ; //unknown command num reply?
 	}
 	if (client->getAuth() == false)//client is not authorized
 	{
 		if (command > 2)
 		{
-			std::cout << "Client needs to be registered first" << std::endl;
+			std::cout << "Client needs to be registered first" << std::endl;	
+			delete[] params;
 			return ;
 		}
-		ServerHandshake(msg, client, command);
-		return ;
+		ServerHandshake(params, client, command);
 	}
 	else
 	{
 		std::cout << "After handshake" << std::endl;
 	}
+	delete[] params;
 	return ;
 }
 
-int	Server::checkCommand(std::string param)
+int	Server::checkCommand(std::string parameter)
 {
 	std::string	command[9] = 
 	{
@@ -234,28 +237,28 @@ int	Server::checkCommand(std::string param)
 	};
 	for (int i = 0; i < 9; i++)
 	{
-		if (param.compare(command[i]) == 0)
+		if (parameter.compare(command[i]) == 0)
 			return (i);
 	}
 	return (-1);
 }
 
-void	Server::ServerHandshake(std::string msg, Client *client, int command)
+void	Server::ServerHandshake(std::string *params, Client *client, int command)
 {
 	switch(command)
 	{
 		case 0:
-			pass(msg, client);
+			pass(params, client);
 			break ;
 		case 1:
 			if (client->getPass() == true)
 			{
-				nick(msg, client); 
+				nick(params, client); 
 			}
 			break ;
 		case 2:
 			if (client->getPass() == true && client->getNick().empty() == false)
-				user(msg, client);
+				user(params, client);
 			break ;
 		default:
 			std::cerr << "Handshake default case, something went wrong" << std::endl;
@@ -310,7 +313,7 @@ int	Server::countParams(std::string msg)
 
 //------------------------------- Command Functions ------------------------------
 
-void	Server::pass(std::string msg, Client *client)
+void	Server::pass(std::string *params, Client *client)
 {
 	std::cout << "do PASS command" << std::endl;
 	if (client->getPass() == true)
@@ -318,7 +321,6 @@ void	Server::pass(std::string msg, Client *client)
 		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
 		return ;
 	}
-	std::string *params = returnParams(msg);
 	if (params[1].empty())
 	{
 		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
@@ -338,13 +340,11 @@ void	Server::pass(std::string msg, Client *client)
 		std::cout << params[1] << "\n";
 		std::cout << "Wrong password" << std::endl;
 	}
-	delete[] params;
 	return ;
 }
 
-void	Server::nick(std::string msg, Client *client)
+void	Server::nick(std::string *params, Client *client)
 {
-	std::string	*params = returnParams(msg);
 	if (params[1].empty())
 	{
 		std::cerr << "ERR_NONICKNAMEGIVEN\n";
@@ -362,11 +362,10 @@ void	Server::nick(std::string msg, Client *client)
 	//check nick characters
 	client->setNick(params[1]);
 	std::cout << "Nick set as " << client->getNick() << std::endl;
-	delete[] params;
 	return ;
 }
 
-void	Server::user(std::string msg, Client *client)
+void	Server::user(std::string *params, Client *client)
 {
 	if (countParams(msg) < 3)
 	{
@@ -380,14 +379,12 @@ void	Server::user(std::string msg, Client *client)
 		std::cerr << "ERR_ALREADYREGISTERED\n";
 		return ;
 	}
-	std::string	*params = returnParams(msg);
 	client->setUserName(params[1]);
 	std::cout << "user name set as: " << client->getUserName() << "\n";
 	client->setRealName(params[2]);
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
 	std::cout << "auth is " << client->getAuth() << std::endl;
-	delete[] params;
 	return ;
 }
 
