@@ -71,6 +71,15 @@ bool	Channel::isPasswordValid(std::string password) const {
 	return false;
 }
 
+bool	Channel::isClientInvited(Client* client) const {
+	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
+		if (*it == client->getNick())
+			return true;
+	}
+	return false;
+}
+
+
 //---------------------------------- Vriables getters -----------------------------------
 
 std::string	Channel::getChannelName(void) {
@@ -82,8 +91,7 @@ std::string	Channel::getChannelName(void) {
 void	Channel::addClient(Client *client) {
 	this->_clients.push_back(client);
 	std::string	message = client->getNick() + " (" + client->getRealName() + ") has joined \r\n";
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
-	{
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		send((*it)->getFd(), message.c_str(), message.size(), 0);
 	}
 	return;
@@ -141,12 +149,21 @@ bool	Channel::isChannelEmpty(void) const {
 
 }
 
-void	Channel::displayTopic(void) const {
-	 for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
-		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
+void 	Channel::broadcastMessage(std::string message) const {
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
+		if (*it)
+			send((*it)->getFd(), message.c_str(), message.size(), 0);
 	 }
-	 return;
+	return;
 }
+
+void	Channel::displayTopic(void) const {
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
+		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
+	}
+	return;
+}
+
 
 //---------------------------------- OPs Functions -------------------------------------------
 
@@ -162,26 +179,18 @@ bool    Channel::isOperator(std::string nick) const {
 void Channel::changeTopic(const std::string new_topic, Client* client) {
 	if (isOperator(client->getNick()) || isTopicModeSet() == false) {
 		_topic = new_topic;
-
 		std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
-
-		for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-		{
-			if (*it)
-				send((*it)->getFd(), message.c_str(), message.size(), 0);
-		}
+		broadcastMessage(message);
+		return;
 	}
+	return;
 }
 
 //operators can kick other operators
 void	Channel::kickUser(Client* kicker, Client* target) {
 	if (isOperator(kicker->getNick()) == false) {
 		std::string message = " have no rights to kick users from this channel \r\n";
-		for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-		{
-			if (*it)
-				send((*it)->getFd(), message.c_str(), message.size(), 0);
-		}
+		broadcastMessage(message);
 		return;
 	}
 	removeClient(target);

@@ -38,12 +38,8 @@ class Channel
 		bool		isTopicModeSet(void) const;
 		bool		isPasswordSet(void) const;
 		bool		isPasswordValid(std::string password) const;
-		//bool		isClientInvited(Client* Client) const; //puede ser nick
+		bool		isClientInvited(Client* client) const; //puede ser nick
 
-		//is invited
-
-
-		
 		// Variable getters
 		std::string	getChannelName(void);
 
@@ -55,8 +51,7 @@ class Channel
 		bool		isClient(Client* client);
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
-		//void broadcastMessage(std::string message);
-		//confirm the password;
+		void 		broadcastMessage(std::string message) const;
 		
 
 		// Channel functions for ops
