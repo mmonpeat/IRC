@@ -1,0 +1,14 @@
+#ifndef NUMERIC_REPLIES_HPP
+# define NUMERIC_REPLIES_HPP
+
+//command replies
+# define	RPL_WELCOME				001
+
+//error replies
+# define	ERR_NONICKNAMEGIVEN		431
+# define	ERR_NICKNAMEINUSE		433
+# define	ERR_NOTREGISTERED		451
+# define	ERR_NEEDMOREPARAMS		461
+# define	ERR_ALREADYREGISTERED	462
+
+#endif
