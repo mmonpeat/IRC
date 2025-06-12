@@ -17,6 +17,7 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "NumericReplies.hpp"
 
 class Server
 {

@@ -366,7 +366,7 @@ void	Server::pass(std::string *params, Client *client)
 	if (params[1].empty())
 	{
 		std::cerr << "testing ERR_NEEDMOREPARAMS" << std::endl;
-		sendReply(client.getFd(), errNeedMoreParams(params[0]));
+		sendReply(client->getFd(), errNeedMoreParams(params[0]));
 		return ;
 	}
 	if(this->serverPass.compare(params[1]) == 0)
