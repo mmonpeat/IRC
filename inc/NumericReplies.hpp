@@ -36,8 +36,8 @@ inline	std::string	errNotRegistered(void){
 	return (":localhost 451 :You have not registered\r\n");
 }
 
-inline	std::string	errNeedMoreParams(std::string nickname, std::string command){
-	return (":localhost 461 " + nickname + command + " :Not enough parameters\r\n");
+inline	std::string	errNeedMoreParams(std::string command){
+	return (":localhost 461 " + command + " :Not enough parameters\r\n");
 }
 
 inline	std::string errAlreadyRegistered(std::string nickname){
