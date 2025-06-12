@@ -1,5 +1,5 @@
-#ifndef NUMERIC_REPLIES_HPP
-# define NUMERIC_REPLIES_HPP
+#ifndef NUMERICREPLIES_HPP
+# define NUMERICREPLIES_HPP
 
 //command replies
 # define	RPL_WELCOME				001
