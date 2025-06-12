@@ -303,7 +303,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//mode(params, client);
 			break;
 		default:
-			std::cerr << "Unknown command" << std::endl;
+			std::cerr << "ERR_UNKNOWN COMMAND" << std::endl;
 	}
 	return ;
 }
@@ -365,7 +365,8 @@ void	Server::pass(std::string *params, Client *client)
 	}
 	if (params[1].empty())
 	{
-		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
+		std::cerr << "testing ERR_NEEDMOREPARAMS" << std::endl;
+		sendReply(client.getFd(), errNeedMoreParams(params[0]));
 		return ;
 	}
 	if(this->serverPass.compare(params[1]) == 0)
@@ -423,6 +424,14 @@ void	Server::user(std::string *params, Client *client)
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
 	std::cout << "auth is " << client->getAuth() << std::endl;
+	//send rplwelcome
+	return ;
+}
+
+//------------------------------- Reply Functions ------------------------------
+void	Server::sendReply(int client_fd, std::string reply)
+{
+	send(client_fd, reply.c_str(), reply.length(), 0);
 	return ;
 }
 
