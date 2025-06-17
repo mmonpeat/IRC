@@ -174,12 +174,13 @@ void Server::removeClient(int clientFd)
 		it != pollFds.end(); ++it) 
 	{
 		if (it->fd == clientFd)
-	{
+		{
 				pollFds.erase(it);
 				break;
 		}
 	}
 	std::cout << "Close client with: fd=" << clientFd << std::endl;
+	delete clients[clientFd];
 	clients.erase(clientFd);
 	close(clientFd);
 }
