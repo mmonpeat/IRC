@@ -174,12 +174,13 @@ void Server::removeClient(int clientFd)
 		it != pollFds.end(); ++it) 
 	{
 		if (it->fd == clientFd)
-	{
+		{
 				pollFds.erase(it);
 				break;
 		}
 	}
 	std::cout << "Close client with: fd=" << clientFd << std::endl;
+	delete clients[clientFd];
 	clients.erase(clientFd);
 	close(clientFd);
 }
@@ -207,15 +208,15 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 	if (command == -1)
 	{
-		std::cout << "Unknown command" << std::endl;
+		sendReply(client->getFd(), errUnknownCommand(client->getNick()));
 		delete[] params;
-		return ; //unknown command num reply?
+		return ;
 	}
 	if (client->getAuth() == false)//client is not authorized
 	{
 		if (command > 2)
 		{
-			std::cout << "Client needs to be registered first" << std::endl;	
+			sendReply(client->getFd(), errNotRegistered());
 			delete[] params;
 			return ;
 		}
@@ -303,7 +304,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//mode(params, client);
 			break;
 		default:
-			std::cerr << "Unknown command" << std::endl;
+			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
 	}
 	return ;
 }
@@ -360,12 +361,12 @@ void	Server::pass(std::string *params, Client *client)
 	std::cout << "do PASS command" << std::endl;
 	if (client->getPass() == true)
 	{
-		std::cerr << "ERR_ALREADYREGISTERED" << std::endl; // numeric reply
+		sendReply(client->getFd(), errAlreadyRegistered(client->getNick()));
 		return ;
 	}
 	if (params[1].empty())
 	{
-		std::cerr << "ERR_NEEDMOREPARAMS" << std::endl;
+		sendReply(client->getFd(), errNeedMoreParams(params[0]));
 		return ;
 	}
 	if(this->serverPass.compare(params[1]) == 0)
@@ -388,14 +389,12 @@ void	Server::nick(std::string *params, Client *client)
 {
 	if (params[1].empty())
 	{
-		std::cerr << "ERR_NONICKNAMEGIVEN\n";
-		//send numeric reply
+		sendReply(client->getFd(), errNoNickNameGiven());
 		return ;
 	}
 	if(isNickUnique(params[1]) == false)
 	{
-		std::cerr << "ERR_NICKNAMEINUSE\n";
-		//send numeric reply
+		sendReply(client->getFd(), errNickNameInUse(client->getNick(), params[1]));
 		return ;
 	}
 	//check nick characters
@@ -408,13 +407,12 @@ void	Server::user(std::string *params, Client *client)
 {
 	if (params[2].empty())
 	{
-		std::cerr << "ERR_NEEDMOREPARAMS\n";
-		//sen numeric reply
+		sendReply(client->getFd(), errNeedMoreParams(params[0]));
 		return ;
 	}
 	if (client->getAuth() == true)
 	{
-		std::cerr << "ERR_ALREADYREGISTERED\n";
+		sendReply(client->getFd(), errAlreadyRegistered(client->getNick()));
 		return ;
 	}
 	client->setUserName(params[1]);
@@ -423,6 +421,14 @@ void	Server::user(std::string *params, Client *client)
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
 	std::cout << "auth is " << client->getAuth() << std::endl;
+	sendReply(client->getFd(), rplWelcome(client->getNick()));
+	return ;
+}
+
+//------------------------------- Reply Functions ------------------------------
+void	Server::sendReply(int client_fd, std::string reply)
+{
+	send(client_fd, reply.c_str(), reply.length(), 0);
 	return ;
 }
 
