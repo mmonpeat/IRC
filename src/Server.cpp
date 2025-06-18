@@ -149,11 +149,17 @@ void Server::handleClientData(int clientFd)
     int bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	
 
-    if (bytesRead <= 0) {
+    if (bytesRead == 0) {
+			std::cout << "CONNECTION closed\n";
         	removeClient(clientFd);  // Desconexión o error
+	} else if (bytesRead < 0) {
+		std::cout << "RECV error\n";
 	} else {
-     		buffer[bytesRead] = '\0';
+			//client function to add to client buffer client->addToBuffer(buffer, bytesRead);
+     		buffer[bytesRead] = '\0'; // delete this
+			
 			std::string	received(buffer);
+			//change from here, get received from the client buffer. so function to get that.
 			std::string	del = "\r\n";
 			std::string::size_type	pos = received.find(del);
 			while (pos != std::string::npos)
@@ -366,6 +372,7 @@ void	Server::pass(std::string *params, Client *client)
 	}
 	if (params[1].empty())
 	{
+		std::cout << "TEST" << std::endl;
 		sendReply(client->getFd(), errNeedMoreParams(params[0]));
 		return ;
 	}
