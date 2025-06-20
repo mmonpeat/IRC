@@ -155,9 +155,9 @@ void Server::handleClientData(int clientFd)
 	} else if (bytesRead < 0) {
 		std::cout << "RECV error\n";
 	} else {
-			//client function to add to client buffer client->addToBuffer(buffer, bytesRead);
      		buffer[bytesRead] = '\0'; // delete this
-			
+			//find client.
+			//client function to add to client buffer client->addToBuffer(buffer, bytesRead);
 			std::string	received(buffer);
 			//change from here, get received from the client buffer. so function to get that.
 			std::string	del = "\r\n";

@@ -69,3 +69,8 @@ bool		Client::getAuth(void) const {
 
 
 //------------------------------ Functions -----------------------------------------
+
+void	Client::addToBuffer(char *buffer)
+{
+		_inputBuffer.append(buffer);
+}
