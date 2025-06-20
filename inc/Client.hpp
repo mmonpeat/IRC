@@ -39,6 +39,7 @@ class Client
 		bool		getPass(void) const;
 
 		void		addToBuffer(char *buffer);
+		bool		readBuffer(std::string *msg);
 };
 
 #endif
