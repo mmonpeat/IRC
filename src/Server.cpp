@@ -156,25 +156,13 @@ void Server::handleClientData(int clientFd)
 		std::cout << "RECV error\n";
 	} else {
      		buffer[bytesRead] = '\0';
-			clients[clientFd].addToBuffer(buffer);
+			clients[clientFd]->addToBuffer(buffer);
 
-			std::string	*msg;
-			if (clients[clientFd].readBuffer(&msg))
+			std::string	msg;
+			if (clients[clientFd]->readBuffer(&msg))
 			{
 				handleMsg(msg, clients[clientFd]);
 			}
-/*
-			//change from here, get received from the client buffer. so function to get that.
-			std::string	received(buffer); //old
-			std::string	del = "\r\n"; //old
-			std::string::size_type	pos = received.find(del); //old
-			while (pos != std::string::npos) //old
-			{
-				handleMsg(received.substr(0, pos), getClient(clientFd));
-				received.erase(0, pos + del.length());
-				pos = received.find(del);
-			}*/
-			//std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
 
