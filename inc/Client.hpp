@@ -30,8 +30,8 @@ class Client
 		void		setPass(bool status);
 
 		std::string	getNick(void) const;
-		std::string	getUserName(void) const;
 		std::string	getRealName(void) const;
+		std::string	getUserName(void) const;
 		int			getFd(void) const;
 		bool		getAuth(void) const;
 		bool		getPass(void) const;

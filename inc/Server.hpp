@@ -89,6 +89,9 @@ class Server
 		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		bool					 	checkChannelNameRules(const std::string& channelName);
 		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
+		bool						equalChannels(std::string new_channel, std::string channel) const;
+		bool						isChannelNameUnique(std::string channelToCheck) const;
+		char 						foldChar(char c);
 		//default constructor per a provar join, borrrar despres
 		Server();
 		

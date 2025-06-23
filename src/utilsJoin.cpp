@@ -1,3 +1,5 @@
+#include "Server.hpp"
+
 bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 	if (new_channel == channel)
 		return true;
