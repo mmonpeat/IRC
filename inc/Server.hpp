@@ -19,6 +19,7 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "NumericReplies.hpp"
 
 class Server
 {
@@ -37,10 +38,7 @@ class Server
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
-		
-		//utils
-		bool	isClientAuth(int clientFd); //checks if client has finished handshake
-
+	
 	public:
 		Server(int port, const std::string &pass);
 		~Server();
@@ -60,11 +58,20 @@ class Server
 		void			CommandCall(std::string *params, Client* client, int command);
 		std::string*	returnParams(std::string msg);
 		int				countParams(std::string msg);
+	
+		//command functions
+		void	pass(std::string *params, Client* client);		
+		void	nick(std::string *params, Client* client);		
+		void	user(std::string *params, Client* client);
 		
-		//handeling client
+		//reply functions
+		void	sendReply(int client_fd, std::string reply);
+	
+		//handling client
 		bool	clientIsRegistered(int clientFd);
 		Client*	createClient(int clientFd);
 		void	addClient(int clientFd);
+		Client*	getClient(int clientFd);
 
 		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE

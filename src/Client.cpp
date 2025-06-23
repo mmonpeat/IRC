@@ -4,6 +4,7 @@
 
 Client::Client(int fd): _fd(fd) {
 	std::cout << "Client constructor called" << std::endl;
+	_pass = false;
 	_auth = false; // hasta que el cliente tenga todos los campos registrados
 	return;
 	}
@@ -27,20 +28,27 @@ void 		Client::setUserName(std::string user_name) {
 	return;
 }
 
-void		Client::setHostName(std::string host_name) {
-	this->_hostname = host_name;
-	return;
-}
-
 void		Client::setRealName( std::string real_name ) {
 	this->_real_name = real_name;
 	return;
+}
+
+void		Client::setAuth(bool status){
+	this->_auth = status;
+}
+
+void		Client::setPass(bool status){
+	this->_pass = status;
 }
 
 //------------------------------ Getters -----------------------------------------
 
 std::string	Client::getNick(void) const {
 	return (this->_nick);
+}
+
+std::string	Client::getUserName(void) const {
+	return (this->_username);
 }
 
 std::string	Client::getRealName(void) const {
@@ -51,10 +59,13 @@ int			Client::getFd(void) const {
 	return (this->_fd);
 }
 
+bool		Client::getPass(void) const {
+	return (this->_pass);
+}
+
 bool		Client::getAuth(void) const {
 	return (this->_auth);
 }
-
 
 
 //------------------------------ Functions -----------------------------------------

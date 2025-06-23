@@ -76,7 +76,6 @@ void Server::bindAndListen(sockaddr_in &addr)
 	}
 }
 
-
 void Server::start()
 {
 	std::cout << "comencar a acceptar, send, recv, fer poll..." << std::endl;
@@ -159,11 +158,11 @@ void Server::handleClientData(int clientFd)
 			std::string::size_type	pos = received.find(del);
 			while (pos != std::string::npos)
 			{
-				handleMsg(received.substr(0, pos), clientFd);
+				handleMsg(received.substr(0, pos), getClient(clientFd));
 				received.erase(0, pos + del.length());
 				pos = received.find(del);
 			}
-			std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
+			//std::cout << "Mensaje de fd=" << clientFd << ": " << buffer << std::endl;
 		}
 }
 
@@ -174,13 +173,14 @@ void Server::removeClient(int clientFd)
 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
 		it != pollFds.end(); ++it) 
 	{
-		if (it->fd == clientFd) 
-	{
+		if (it->fd == clientFd)
+		{
 				pollFds.erase(it);
 				break;
 		}
 	}
 	std::cout << "Close client with: fd=" << clientFd << std::endl;
+	delete clients[clientFd];
 	clients.erase(clientFd);
 	close(clientFd);
 }
@@ -193,14 +193,6 @@ bool	Server::validPassword( std::string client_pass ) const {
 	if (client_pass == this->serverPass)
 		return true;
 	return false;
-}
-
-//------------------------------- Utils ------------------------------------------
-bool	Server::isClientAuth(int clientFd)
-{
-	std::map<int, Client*>::iterator it = clients.find(clientFd);
-
-	return (it->second->getAuth());
 }
 
 //------------------------------- Msg Functions ----------------------------------
@@ -362,8 +354,86 @@ int	Server::countParams(std::string msg)
 	return (n);
 }
 
-//------------------------------- Client Functions -------------------------------
+//------------------------------- Command Functions ------------------------------
 
+void	Server::pass(std::string *params, Client *client)
+{
+	std::cout << "do PASS command" << std::endl;
+	if (client->getPass() == true)
+	{
+		sendReply(client->getFd(), errAlreadyRegistered(client->getNick()));
+		return ;
+	}
+	if (params[1].empty())
+	{
+		sendReply(client->getFd(), errNeedMoreParams(params[0]));
+		return ;
+	}
+	if(this->serverPass.compare(params[1]) == 0)
+	{
+		std::cout << serverPass << "\n";
+		std::cout << params[1] << "\n";
+		std::cout << "correct Pass" << std::endl;
+		client->setPass(true);
+	}
+	else
+	{
+		std::cout << serverPass << "\n";
+		std::cout << params[1] << "\n";
+		std::cout << "Wrong password" << std::endl;
+	}
+	return ;
+}
+
+void	Server::nick(std::string *params, Client *client)
+{
+	if (params[1].empty())
+	{
+		sendReply(client->getFd(), errNoNickNameGiven());
+		return ;
+	}
+	if(isNickUnique(params[1]) == false)
+	{
+		sendReply(client->getFd(), errNickNameInUse(client->getNick(), params[1]));
+		return ;
+	}
+	//check nick characters
+	client->setNick(params[1]);
+	std::cout << "Nick set as " << client->getNick() << std::endl;
+	return ;
+}
+
+void	Server::user(std::string *params, Client *client)
+{
+	if (params[2].empty())
+	{
+		sendReply(client->getFd(), errNeedMoreParams(params[0]));
+		return ;
+	}
+	if (client->getAuth() == true)
+	{
+		sendReply(client->getFd(), errAlreadyRegistered(client->getNick()));
+		return ;
+	}
+	client->setUserName(params[1]);
+	std::cout << "user name set as: " << client->getUserName() << "\n";
+	client->setRealName(params[2]);
+	std::cout << "real name set as: " << client->getRealName() << std::endl;
+	client->setAuth(true);
+	std::cout << "auth is " << client->getAuth() << std::endl;
+	sendReply(client->getFd(), rplWelcome(client->getNick()));
+	return ;
+}
+
+//------------------------------- Reply Functions ------------------------------
+void	Server::sendReply(int client_fd, std::string reply)
+{
+	send(client_fd, reply.c_str(), reply.length(), 0);
+	return ;
+}
+
+//------------------------------- Client Functions -------------------------------
+  
 bool Server::clientIsRegistered(int clientFd) {
 	std::map<int, Client*>::iterator it = clients.find(clientFd);
 	if (it != clients.end()) {
@@ -393,6 +463,12 @@ void	Server::addClient(int clientFd) {
 	Client *new_client = createClient(clientFd);
 	clients.insert(std::make_pair(clientFd, new_client));
 	return;
+}
+
+Client*	Server::getClient(int clientFd)
+{
+	std::map<int, Client*>::iterator it = clients.find(clientFd);
+	return (it->second);
 }
 
 char foldChar(char c) {
