@@ -205,35 +205,116 @@ bool	Server::isClientAuth(int clientFd)
 
 //------------------------------- Msg Functions ----------------------------------
 
-int	Server::handleMsg(std::string msg, int clientFd)
+void	Server::handleMsg(std::string msg, Client *client)
 {
 	std::cout << "Msg is : " << msg << std::endl;
-	std::cout << "fd is : " << clientFd << std::endl;
-	if (isClientAuth(clientFd) == false)//client is not authorized
+	if (msg.empty())
+		return ;
+	
+	std::string	*params = returnParams(msg);
+	int	command = checkCommand(params[0]);
+
+	if (command == -1)
 	{
-		std::cout << "Handshake goes here" << std::endl;
-		if (checkCommand(msg) == -1)
-			return (-1); //unknown command num reply?
+		sendReply(client->getFd(), errUnknownCommand(client->getNick()));
+		delete[] params;
+		return ;
 	}
-	std::cout << "After handshake" << std::endl;
-	//parse command
-	return (0);
+	if (client->getAuth() == false)//client is not authorized
+	{
+		if (command > 2)
+		{
+			sendReply(client->getFd(), errNotRegistered());
+			delete[] params;
+			return ;
+		}
+		ServerHandshake(params, client, command);
+	}
+	else
+	{
+		std::cout << "After handshake" << std::endl;
+		CommandCall(params, client, command);
+	}
+	delete[] params;
+	return ;
 }
 
-int	Server::checkCommand(std::string msg)
+int	Server::checkCommand(std::string parameter)
 {
-	std::string	command[3] = 
+	std::string	command[9] = 
 	{
-		"PASS", "NICK", "USER"
+		"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
 	};
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		std::string::size_type	pos;
-		pos = msg.find(command[i]);
-		if (pos == 0)
+		if (parameter.compare(command[i]) == 0)
 			return (i);
 	}
 	return (-1);
+}
+
+void	Server::ServerHandshake(std::string *params, Client *client, int command)
+{
+	switch(command)
+	{
+		case 0:
+			pass(params, client);
+			break ;
+		case 1:
+			if (client->getPass() == true)
+				nick(params, client); 
+			break ;
+		case 2:
+			if (client->getPass() == true && client->getNick().empty() == false)
+				user(params, client);
+			break ;
+		default:
+			std::cerr << "Handshake default case, something went wrong" << std::endl;
+	}
+	return ;
+}
+
+void	Server::CommandCall(std::string *params, Client *client, int command)
+{
+	switch(command)
+	{
+		case 0:
+			pass(params, client);
+			break ;
+		case 1:
+			nick(params, client); 
+			break ;
+		case 2:
+			user(params, client);
+			break ;
+		case 3:
+			std::cout << "JOIN goes here" << std::endl;
+			//join(params, client);
+			break;
+		case 4:
+			std::cout << "PRIVMSG goes here" << std::endl;
+			//privmsg(params, client);
+			break;
+		case 5:
+			std::cout << "KICK goes here" << std::endl;
+			//kick(params, client);
+			break;
+		case 6:
+			std::cout << "INVITE goes here" << std::endl;
+			//invite(params, client);
+			break;
+		case 7:
+			std::cout << "TOPIC goes here" << std::endl;
+			//topic(params, client);
+			break;
+		case 8:
+			std::cout << "MODE goes here" << std::endl;
+			//mode(params, client);
+			break;
+		default:
+			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
+	}
+	return ;
 }
 
 //Returns an allocated array, delete after use
@@ -277,7 +358,7 @@ int	Server::countParams(std::string msg)
 				last = true;
 		}
 	}
-	std::cout << "n is " << n << std::endl;
+	//std::cout << "n is " << n << std::endl;
 	return (n);
 }
 
