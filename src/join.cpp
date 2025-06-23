@@ -1,5 +1,6 @@
 #include "Server.hpp"
 
+
 bool Server::checkChannelNameRules(const std::string& channelName)
 {
 	// Comprovar longitud
@@ -78,7 +79,7 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 			std::cout << "Processant canal vàlid: " << channelName 
             		<< " amb password: " << channelPass << std::endl;
 		}
-
+		if (isChannelNameUnique(channelName) != true)//ja existeix
 		//channelName existeix i que passi per lo de les majuscules min kate, isUnikeNick
 		//SI, EXISTEIX EL CHANNEL 
 		//rescriure channelName i possar el nom del channel que ja existeix per depsres poder ferr == 

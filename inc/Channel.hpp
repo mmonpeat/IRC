@@ -32,8 +32,12 @@ class Channel
 		Channel(std::string name, Client *client);
 		~Channel(void);
 
-		std::string getName() const;
-		std::string getRealName() const;
+		std::string getName() const;//channel name
+		//he de fer
+		//get topic
+		//get operator
+
+		std::string getRealName() const;//client
 
 		void	addClient(Client *client);
 		
