@@ -214,7 +214,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 	}
 	if (client->getAuth() == false)//client is not authorized
 	{
-		if (command > 2)
+		if (command > 3)
 		{
 			sendReply(client->getFd(), errNotRegistered());
 			delete[] params;
@@ -233,11 +233,11 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 int	Server::checkCommand(std::string parameter)
 {
-	std::string	command[9] = 
+	std::string	command[10] = 
 	{
-		"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
+		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
 	};
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		if (parameter.compare(command[i]) == 0)
 			return (i);
@@ -250,13 +250,15 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 	switch(command)
 	{
 		case 0:
+			return ;
+		case 1:
 			pass(params, client);
 			break ;
-		case 1:
+		case 2:
 			if (client->getPass() == true)
 				nick(params, client); 
 			break ;
-		case 2:
+		case 3:
 			if (client->getPass() == true && client->getNick().empty() == false)
 				user(params, client);
 			break ;
@@ -270,36 +272,36 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 {
 	switch(command)
 	{
-		case 0:
+		case 1:
 			pass(params, client);
 			break ;
-		case 1:
+		case 2:
 			nick(params, client); 
 			break ;
-		case 2:
+		case 3:
 			user(params, client);
 			break ;
-		case 3:
+		case 4:
 			std::cout << "JOIN goes here" << std::endl;
 			//join(params, client);
 			break;
-		case 4:
+		case 5:
 			std::cout << "PRIVMSG goes here" << std::endl;
 			//privmsg(params, client);
 			break;
-		case 5:
+		case 6:
 			std::cout << "KICK goes here" << std::endl;
 			//kick(params, client);
 			break;
-		case 6:
+		case 7:
 			std::cout << "INVITE goes here" << std::endl;
 			//invite(params, client);
 			break;
-		case 7:
+		case 8:
 			std::cout << "TOPIC goes here" << std::endl;
 			//topic(params, client);
 			break;
-		case 8:
+		case 9:
 			std::cout << "MODE goes here" << std::endl;
 			//mode(params, client);
 			break;

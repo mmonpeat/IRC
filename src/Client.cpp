@@ -83,8 +83,8 @@ bool	Client::readBuffer(std::string *msg)
 	else
 	{
 		*msg = _inputBuffer.substr(0, pos);
-		if (msg.length() > 510)
-			std::cout << "msg too long" << std::endl; //what do? send reply but which??
+		//if (msg->length() > 510)
+		//	std::cout << "msg too long" << std::endl; //what do? send reply but which??
 		_inputBuffer.erase(0, pos + 2);
 		return (true);
 	}
