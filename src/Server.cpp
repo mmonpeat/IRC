@@ -250,7 +250,11 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 	switch(command)
 	{
 		case 0:
-			return ;
+			{
+				std::string	reply = ":localhost CAP * LS :\r\n";
+				sendReply(client->getFd(), reply);
+				break ;
+			}
 		case 1:
 			pass(params, client);
 			break ;
