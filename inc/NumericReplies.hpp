@@ -13,7 +13,7 @@
 # define	ERR_NOTREGISTERED		451
 # define	ERR_NEEDMOREPARAMS		461
 # define	ERR_ALREADYREGISTERED	462
-
+# define	ERR_PASSMISMATCH		464
 
 //Messages
 inline	std::string	rplWelcome(std::string nickname){
@@ -42,6 +42,10 @@ inline	std::string	errNeedMoreParams(std::string command){
 
 inline	std::string errAlreadyRegistered(std::string nickname){
 	return (":localhost 462 " + nickname + ":You may not reregister\r\n");
+}
+
+inline	std::string errPassMismatch(void){
+	return (":localhost 464 :Password incorrect\r\n");
 }
 
 #endif

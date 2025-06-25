@@ -387,7 +387,7 @@ void	Server::pass(std::string *params, Client *client)
 	{
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
-		std::cout << "Wrong password" << std::endl;
+		sendReply(client->getFd(), errPassMismatch());
 	}
 	return ;
 }
