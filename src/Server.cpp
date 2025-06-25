@@ -387,7 +387,6 @@ void	Server::pass(std::string *params, Client *client)
 	{
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
-		sendReply(client->getFd(), errPassMismatch());
 	}
 	return ;
 }
@@ -407,6 +406,8 @@ void	Server::nick(std::string *params, Client *client)
 	//check nick characters
 	client->setNick(params[1]);
 	std::cout << "Nick set as " << client->getNick() << std::endl;
+	std::string	reply = "Nick set as " + client->getNick() + "\r\n";
+	sendReply(client->getFd(), reply);
 	return ;
 }
 
@@ -423,12 +424,16 @@ void	Server::user(std::string *params, Client *client)
 		return ;
 	}
 	client->setUserName(params[1]);
+	std::string	reply = "username set as " + client->getUserName() + "\r\n";
 	std::cout << "user name set as: " << client->getUserName() << "\n";
+	sendReply(client->getFd(), reply);
+	reply = "real name set as " + client->getRealName() + "\r\n";
 	client->setRealName(params[2]);
+	sendReply(client->getFd(), reply);
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
-	std::cout << "auth is " << client->getAuth() << std::endl;
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
+	std::cout << "auth is " << client->getAuth() << std::endl;
 	return ;
 }
 
