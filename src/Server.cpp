@@ -159,7 +159,7 @@ void Server::handleClientData(int clientFd)
 			clients[clientFd]->addToBuffer(buffer);
 
 			std::string	msg;
-			if (clients[clientFd]->readBuffer(&msg))
+			while (clients[clientFd]->readBuffer(&msg))
 			{
 				handleMsg(msg, clients[clientFd]);
 			}
@@ -214,7 +214,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 	}
 	if (client->getAuth() == false)//client is not authorized
 	{
-		if (command > 2)
+		if (command > 3)
 		{
 			sendReply(client->getFd(), errNotRegistered());
 			delete[] params;
@@ -233,11 +233,11 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 int	Server::checkCommand(std::string parameter)
 {
-	std::string	command[9] = 
+	std::string	command[10] = 
 	{
-		"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
+		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
 	};
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		if (parameter.compare(command[i]) == 0)
 			return (i);
@@ -250,13 +250,19 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 	switch(command)
 	{
 		case 0:
+			{
+				std::string	reply = ":localhost CAP * LS :\r\n";
+				sendReply(client->getFd(), reply);
+				break ;
+			}
+		case 1:
 			pass(params, client);
 			break ;
-		case 1:
+		case 2:
 			if (client->getPass() == true)
 				nick(params, client); 
 			break ;
-		case 2:
+		case 3:
 			if (client->getPass() == true && client->getNick().empty() == false)
 				user(params, client);
 			break ;
@@ -270,36 +276,36 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 {
 	switch(command)
 	{
-		case 0:
+		case 1:
 			pass(params, client);
 			break ;
-		case 1:
+		case 2:
 			nick(params, client); 
 			break ;
-		case 2:
+		case 3:
 			user(params, client);
 			break ;
-		case 3:
+		case 4:
 			std::cout << "JOIN goes here" << std::endl;
 			//join(params, client);
 			break;
-		case 4:
+		case 5:
 			std::cout << "PRIVMSG goes here" << std::endl;
 			//privmsg(params, client);
 			break;
-		case 5:
+		case 6:
 			std::cout << "KICK goes here" << std::endl;
 			//kick(params, client);
 			break;
-		case 6:
+		case 7:
 			std::cout << "INVITE goes here" << std::endl;
 			//invite(params, client);
 			break;
-		case 7:
+		case 8:
 			std::cout << "TOPIC goes here" << std::endl;
 			//topic(params, client);
 			break;
-		case 8:
+		case 9:
 			std::cout << "MODE goes here" << std::endl;
 			//mode(params, client);
 			break;
@@ -375,13 +381,15 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		std::cout << "correct Pass" << std::endl;
+		//std::string reply = ":localhost :Correct password\r\n";
+		//sendReply(client->getFd(), reply);
 		client->setPass(true);
 	}
 	else
 	{
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
-		std::cout << "Wrong password" << std::endl;
+		sendReply(client->getFd(), errPassMismatch());
 	}
 	return ;
 }
@@ -401,6 +409,8 @@ void	Server::nick(std::string *params, Client *client)
 	//check nick characters
 	client->setNick(params[1]);
 	std::cout << "Nick set as " << client->getNick() << std::endl;
+	//std::string	reply = ":localhost :Nick set as " + client->getNick() + "\r\n";
+	//sendReply(client->getFd(), reply);
 	return ;
 }
 
@@ -417,12 +427,16 @@ void	Server::user(std::string *params, Client *client)
 		return ;
 	}
 	client->setUserName(params[1]);
-	std::cout << "user name set as: " << client->getUserName() << "\n";
-	client->setRealName(params[2]);
+	//std::string	reply = ":localhost :username set as " + client->getUserName() + "\r\n";
+	std::cout << "user name set as:" << client->getUserName() << "\n";
+	//sendReply(client->getFd(), reply);
+	//reply = ":localhost :real name set as " + client->getRealName() + "\r\n";
+	client->setRealName(params[4]);
+	//sendReply(client->getFd(), reply);
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
-	std::cout << "auth is " << client->getAuth() << std::endl;
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
+	std::cout << "auth is " << client->getAuth() << std::endl;
 	return ;
 }
 
