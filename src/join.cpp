@@ -80,6 +80,11 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
             		<< " amb password: " << channelPass << std::endl;
 		}
 		if (isChannelNameUnique(channelName) != true)//ja existeix
+		{
+			std::cout << "\nJa existeix el channel" << "\n";
+		}
+		std::cout << "\nNO existeix el channel, crearem un nou" << "\n";
+
 		//channelName existeix i que passi per lo de les majuscules min kate, isUnikeNick
 		//SI, EXISTEIX EL CHANNEL 
 		//rescriure channelName i possar el nom del channel que ja existeix per depsres poder ferr == 

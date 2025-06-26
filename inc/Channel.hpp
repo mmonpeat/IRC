@@ -42,7 +42,7 @@ class Channel
 		bool		isClientInvited(Client* client) const; //puede ser nick
 
 		// Variable getters
-		std::string	getChannelName(void);
+		std::string	getChannelName(void) const;
 		std::vector<std::string> getClientNicks() const;
 		
 		// Channel functions

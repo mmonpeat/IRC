@@ -93,7 +93,7 @@ bool	Channel::isClientInvited(Client* client) const {
 
 //---------------------------------- Vriables getters -----------------------------------
 
-std::string	Channel::getChannelName(void) {
+std::string	Channel::getChannelName(void) const{
 	return this->_name;
 }
 std::vector<std::string> Channel::getClientNicks() const

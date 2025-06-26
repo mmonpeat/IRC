@@ -471,7 +471,7 @@ Client*	Server::getClient(int clientFd)
 	return (it->second);
 }
 
-char foldChar(char c) {
+char Server::foldChar(char c) const {
     if (c >= 'A' && c <= 'Z')
         return c + 32;
     if (c == '[') return '{';

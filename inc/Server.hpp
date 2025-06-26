@@ -73,6 +73,7 @@ class Server
 		void	addClient(int clientFd);
 		Client*	getClient(int clientFd);
 
+		char	foldChar(char c) const;
 		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE
 
@@ -91,7 +92,6 @@ class Server
 		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
 		bool						equalChannels(std::string new_channel, std::string channel) const;
 		bool						isChannelNameUnique(std::string channelToCheck) const;
-		char 						foldChar(char c);
 		//default constructor per a provar join, borrrar despres
 		Server();
 		

@@ -13,13 +13,10 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 }
 
 bool	Server::isChannelNameUnique(std::string channelToCheck) const {
-    for (std::map<int, Channel*>::const_iterator it = channels.begin(); it != channels.end(); ++it)
+    for (std::vector<Channel>::const_iterator it = channels.begin(); it != channels.end(); ++it)
     {
-        Channel* channel = it->second;
-        if (channel && channel->getAuth()) {
-			if (equalChannels(channel->getName(), channelToCheck))
-				return false;
-		}
+		if (equalChannels(it->getChannelName(), channelToCheck))
+			return false;
 	}
     return true;
 }
