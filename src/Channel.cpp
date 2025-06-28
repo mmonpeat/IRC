@@ -29,7 +29,7 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
 	_invite_set = false;
 	_topic_set = true;
 	_password_set = false;
-    std::cout << "Channel " << this->_name << " constructor has been called" << std::endl;
+    std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
     return;
 }
 
@@ -39,7 +39,7 @@ Channel::Channel(std::string name, Client *client, std::string password) :  _nam
 	_invite_set = false;
 	_topic_set = true;
 	_password_set = true;
-    std::cout << "Channel " << this->_name << " constructor has been called" << std::endl;
+    std::cout << "Channel " << this->_name << " constructor with password has been called" << std::endl;
     return;
 }
 
@@ -50,15 +50,8 @@ Channel::~Channel(void) {
     return;
 }
 
-//---------------------------------- setters and getters ------------
-void	Channel::setChannelLimit(int limit) {
-	this->_channel_limit = limit;//pero crec que hauria de ser indefinit no?
-    this->_limit_set = true;
-}
 
-int 	Channel::getChannelLimit() const {
-    return this->_channel_limit;
-}
+
 //---------------------------------- Modes setting getters and checkers -----------------------------------
 
 bool	Channel::isLimitModeSet(void) const {
@@ -113,6 +106,16 @@ std::vector<std::string> Channel::getClientNicks() const
 		nicks.push_back(_clients[i]->getNick());
 	}
 	return nicks;
+}
+
+int 	Channel::getChannelLimit(void) const {
+    return this->_channel_limit;
+}
+
+//---------------------------------- setters  ------------
+void	Channel::setChannelLimit(int limit) {
+	this->_channel_limit = limit;//pero crec que hauria de ser indefinit no?
+    this->_limit_set = true;
 }
 
 //---------------------------------- Class Functions -----------------------------------------
@@ -194,7 +197,17 @@ void	Channel::displayTopic(void) const {
 	return;
 }
 
-
+int	Channel::numberOfClients(std::vector<Channel>& channelsExistents, std::string& channelName)
+{
+	for(std::vector<Channel>::iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+	{
+		if(it->getChannelName() == channelName)
+		{
+			return (static_cast<int>(it->_clients.size()));
+		}
+	}
+	return (-1);
+}
 //---------------------------------- OPs Functions -------------------------------------------
 
 bool    Channel::isOperator(std::string nick) const {

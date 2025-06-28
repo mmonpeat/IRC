@@ -76,10 +76,13 @@ int main(int argc, char **argv)
 
 	Client client(1);
 	client.setNick("prova");
+	Client Maria(1);
+	client.setNick("Maria");
 
 	Channel ch1("#Canal1", &client);
 	Channel ch2("#Canal2", &client);
 	ch1.addClient(&client);
+	ch1.addClient(&Maria);
 	ch2.addClient(&client);
 	channelsExistents.push_back(ch1);
 	channelsExistents.push_back(ch2);

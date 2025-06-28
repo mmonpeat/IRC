@@ -33,12 +33,6 @@ class Channel
 		Channel(std::string name, Client *client, std::string password);
 		~Channel(void);
 
-		//setters
-		void		setChannelLimit(int limit);
-
-		//getters
-		int 		getChannelLimit() const;
-
 		// Modes settings getters and checkers
 		bool		isLimitModeSet(void) const;
 		bool		isInviteModeSet(void) const;
@@ -48,9 +42,13 @@ class Channel
 		bool		isClientInvited(Client* client) const; //puede ser nick
 
 		// Variable getters
-		std::string	getChannelName(void) const;
-		std::vector<std::string> getClientNicks() const;
-		
+		std::string					getChannelName(void) const;
+		std::vector<std::string> 	getClientNicks() const;
+		int 						getChannelLimit(void) const;
+
+		//setters
+		void		setChannelLimit(int limit);
+
 		// Channel functions
 		void		addClient(Client *client);
 		void		removeClient(Client* client);
@@ -60,7 +58,7 @@ class Channel
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
-		
+		int			numberOfClients(std::vector<Channel>& channelsExistents, std::string& channelName);
 
 		// Channel functions for ops
 		bool		isOperator(std::string nick) const;
