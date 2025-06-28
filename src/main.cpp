@@ -77,8 +77,8 @@ int main(int argc, char **argv)
 	Client client(1);
 	client.setNick("prova");
 
-	Channel ch1("&Canal1", &client);
-	Channel ch2("&Canal2", &client);
+	Channel ch1("#Canal1", &client);
+	Channel ch2("#Canal2", &client);
 	ch1.addClient(&client);
 	ch2.addClient(&client);
 	channelsExistents.push_back(ch1);
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 
 	/* AIXO HA D'ANAR A PARSE JOIN */
 	Server serv;
-	std::string msg = "&Canal3,#Canal4";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
+	std::string msg = "&Canal3,#Canal4,#canal1";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
 	std::string *params = serv.returnParams(msg);
 	int numParams = serv.countParams(msg);
 

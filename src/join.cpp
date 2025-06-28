@@ -61,7 +61,7 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 	int validChannelsProcessed = 0; 
 	for (size_t i = 0; i < ChannelsNames.size() && slotsLeft > 0; i++)
 	{
-		const std::string& channelName = ChannelsNames[i];
+		std::string& channelName = ChannelsNames[i];
         if (!checkChannelNameRules(channelName)) {
             continue; // Saltar canals amb noms invàlids
         }
@@ -79,12 +79,9 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 			std::cout << "Processant canal vàlid: " << channelName 
             		<< " amb password: " << channelPass << std::endl;
 		}
-		if (isChannelNameUnique(channelName) != true)//ja existeix
-		{
-			std::cout << "\nJa existeix el channel" << "\n";
-		}
-		std::cout << "\nNO existeix el channel, crearem un nou" << "\n";
-
+		channelName = getUniqueChannelName(channelName, channelsExistents);
+		std::cout << "\nchannelName:" << channelName << std::endl;
+		
 		//channelName existeix i que passi per lo de les majuscules min kate, isUnikeNick
 		//SI, EXISTEIX EL CHANNEL 
 		//rescriure channelName i possar el nom del channel que ja existeix per depsres poder ferr == 
@@ -117,7 +114,7 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 				}
 			3. si hi ha lloc i no esta ple +l (Ple: error: 471)
 				
-				if (isLimitModeSet(void) == false)
+				if (isLimitModeSet(void) == false || hi ha espai, get limit_channel > contar clients dins del channel)
 					//add client to channel
 				else 
 					471: ERR_CHANNELISFULL "<channel> :Cannot join channel (+l)"
@@ -146,7 +143,7 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 				indicate to the client that it didn't supply enough
 				parameters.)
 		*/
-		std::cout << "Processant canal vàlid: " << channelName << std::endl;
+		std::cout << "Processant canal vàlid: " << channelName /*<< "channel limit is set?:"<< isLimitModeSet() */<< std::endl;
 
 		//existeix el channel funcions kate
 	}

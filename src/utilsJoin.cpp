@@ -12,11 +12,12 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 	return true;
 }
 
-bool	Server::isChannelNameUnique(std::string channelToCheck) const {
-    for (std::vector<Channel>::const_iterator it = channels.begin(); it != channels.end(); ++it)
+std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
+    std::cout << "\nFuncio getUniqueChannelName:" << channelToCheck << std::endl;
+	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
 		if (equalChannels(it->getChannelName(), channelToCheck))
-			return false;
+			return (it->getChannelName());
 	}
-    return true;
+    return (channelToCheck);
 }

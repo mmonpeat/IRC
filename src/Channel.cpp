@@ -50,6 +50,15 @@ Channel::~Channel(void) {
     return;
 }
 
+//---------------------------------- setters and getters ------------
+void	Channel::setChannelLimit(int limit) {
+	this->_channel_limit = limit;//pero crec que hauria de ser indefinit no?
+    this->_limit_set = true;
+}
+
+int 	Channel::getChannelLimit() const {
+    return this->_channel_limit;
+}
 //---------------------------------- Modes setting getters and checkers -----------------------------------
 
 bool	Channel::isLimitModeSet(void) const {

@@ -33,6 +33,12 @@ class Channel
 		Channel(std::string name, Client *client, std::string password);
 		~Channel(void);
 
+		//setters
+		void		setChannelLimit(int limit);
+
+		//getters
+		int 		getChannelLimit() const;
+
 		// Modes settings getters and checkers
 		bool		isLimitModeSet(void) const;
 		bool		isInviteModeSet(void) const;
