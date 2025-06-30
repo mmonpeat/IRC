@@ -79,56 +79,10 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 				std::cerr << "471 ERR_CHANNELISFULL " << channelName << " :Cannot join channel (+l)" << std::endl;
 			else if (it->isLimitModeSet() == false)
 				it->addClient(&client);
+
+			//
 		}
 	}
-			/*
-				1. afegir client al chanel
-					- mirar mode: 
-						1. si invite-only
-							if (isInviteModeSet() == true)//te invitació
-							{
-								//add client to channelName (reescrit)
-							} else {
-								473: ERR_INVITEONLYCHAN "<channel> :Cannot join channel (+i)"
-							}
-						2. si te pass, que el pass sigui correcte (no correcte: error: 475)
-							
-							if (isPasswordSet == true && channelPass != "null") 
-							{
-								Tnim l' error 467 ERR_KEYSET, 
-								si se intenta poner pass(+k) en un canal que ya tiene. 
-								"<channel> :Channel key already set")
-							} else if (isPasswordValid(channelPass) == true && channelPass != "null"){
-								//add channelPass to ChannelsExistens._password
-								ChannelsExistens._password = channelPass; ??
-							} else if (isPasswordValid(channelPass) == false){
-								475: ERR_BADCHANNELKEY "<channel> :Cannot join channel (+k)"
-							} else {
-								//afegir client al channel sense comprovar pass, pq no hauria de tenir
-								//o comprovar channelPass == null
-								//no es guaarda pass && channelPass == null, sente que sárriba sent null sino ja ho haurens pillats els if
-							}
-						3. si hi ha lloc i no esta ple +l (Ple: error: 471)
-							
-							if (isLimitModeSet(void) == false || hi ha espai, get limit_channel > contar clients dins del channel)
-								//add client to channel
-							else 
-								471: ERR_CHANNELISFULL "<channel> :Cannot join channel (+l)"
-
-				2. Informar tots els usuaris del canal amb missatge de JOIN.
-						//no se
-				3. Enviar nomes al client:(abaix tents mes info)
-						- El topic (RPL_TOPIC) si n’hi ha.
-						(332: RPL_TOPIC "<channel> :<topic>" -> When sending a TOPIC message to 
-						determine the channel topic, one of two replies is sent.  If
-						the topic is set, RPL_TOPIC is sent back else RPL_NOTOPIC.)
-
-						- La llista d’usuaris (RPL_NAMREPLY i RPL_ENDOFNAMES) documentaci'o:
-							353     RPL_NAMREPLY
-								"<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
-							366     RPL_ENDOFNAMES
-											"<channel> :End of /NAMES list"
-				*/
 }
 
 int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)
@@ -172,6 +126,22 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 			channelName = getUniqueChannelName(channelName, channelsExistents);
 			std::cout << "\nJa existeix el channel: " << channelName << "Password: " << channelPass << std::endl;
 			checkModeToAddClient(client, channelsExistents, channelName, channelPass);
+			//
+			/*
+				2. Informar tots els usuaris del canal amb missatge de JOIN.
+						//no se
+				3. Enviar nomes al client:(abaix tents mes info)
+						- El topic (RPL_TOPIC) si n’hi ha.
+						(332: RPL_TOPIC "<channel> :<topic>" -> When sending a TOPIC message to 
+						determine the channel topic, one of two replies is sent.  If
+						the topic is set, RPL_TOPIC is sent back else RPL_NOTOPIC.)
+
+						- La llista d’usuaris (RPL_NAMREPLY i RPL_ENDOFNAMES) documentaci'o:
+							353     RPL_NAMREPLY
+								"<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
+							366     RPL_ENDOFNAMES
+											"<channel> :End of /NAMES list"
+			*/
 		} else {
 			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << "Password: " << channelPass << std::endl;
 			//NO, EXISTEIX EL CHANNEL 
