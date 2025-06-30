@@ -71,9 +71,11 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 				//NOOOOOOOOOOOO
 				//it->setPassword(channelPass);//pots afegir un client i que possi el pass aquest que no estava implementat
 			}
-
+			
+			//it->setChannelLimit(4);
 			//si hi ha lloc i no esta ple +l (Ple: error: 471)
-			if ((it->isLimitModeSet() == true) && (it->getChannelLimit() == it->numberOfClients(channelsExistents, channelName)))
+			//std::cout << "LIMIT: getChannelLimit: " << it->getChannelLimit() << " numberOfClients: " << it->numberOfClients(channelsExistents, channelName) << std::endl;
+			if ((it->isLimitModeSet() == true) && (it->getChannelLimit() >= it->numberOfClients(channelsExistents, channelName) ))
 				std::cerr << "471 ERR_CHANNELISFULL " << channelName << " :Cannot join channel (+l)" << std::endl;
 			else if (it->isLimitModeSet() == false)
 				it->addClient(&client);
