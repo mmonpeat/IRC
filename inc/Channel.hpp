@@ -45,6 +45,7 @@ class Channel
 		std::string					getChannelName(void) const;
 		std::vector<std::string> 	getClientNicks() const;
 		int 						getChannelLimit(void) const;
+		std::string					getTopic(void) const;
 
 		//setters
 		void		setChannelLimit(int limit);

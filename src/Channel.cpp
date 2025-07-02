@@ -112,6 +112,10 @@ int 	Channel::getChannelLimit(void) const {
     return this->_channel_limit;
 }
 
+std::string	Channel::getTopic(void) const {
+	return this->_topic;
+}
+
 //---------------------------------- setters  ------------
 void	Channel::setChannelLimit(int limit) {
 	this->_channel_limit = limit;//pero crec que hauria de ser indefinit no?

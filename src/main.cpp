@@ -75,9 +75,9 @@ int main(int argc, char **argv)
     std::vector<Channel> channelsExistents;
 
 	Client client(1);
-	client.setNick("prova");
+	client.setNick("Elna");
 	Client Maria(1);
-	client.setNick("Maria");
+	Maria.setNick("Maria");
 
 	Channel ch1("#Canal1", &client);
 	Channel ch2("#Canal2", &client);

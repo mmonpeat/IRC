@@ -1,18 +1,22 @@
 #include "Server.hpp"
 
 
-bool Server::checkChannelNameRules(const std::string& channelName)
+bool Server::checkChannelNameRules(Client& client, const std::string& channelName)
 {
 	// Comprovar longitud
     if (channelName.empty() || channelName.length() > 50) 
 	{
-        std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+        //std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+		std::string err = "476 ERR_BADCHANMASK " + channelName + " :Bad Channel Mask\r\n";
+		sendReply(client.getFd(), err);
 		return (false);
     }
 	// Comprovar comenci amb #
 	if (channelName[0] != '#')
 	{
-		std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+		std::string err = "476 ERR_BADCHANMASK " + channelName + " :Bad Channel Mask\r\n";
+		sendReply(client.getFd(), err);
+		//std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
 		return (false);
 	}
 	//caracters prohibits
@@ -21,7 +25,9 @@ bool Server::checkChannelNameRules(const std::string& channelName)
 		char c = channelName[j];
 		if (c == ' ' || c == ',' || c == 7 || c == '\0' || c == '\r' || c == '\n' || c == ':')
 		{
- 	    	std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+ 	    	//std::cerr << "476 ERR_BADCHANMASK " << channelName << " :Bad Channel Mask" << std::endl;
+			std::string err = "476 ERR_BADCHANMASK " + channelName + " :Bad Channel Mask\r\n";
+			sendReply(client.getFd(), err);
 			return (false);
 		}
 	}
@@ -46,45 +52,94 @@ int Server::countClientChannels(Client& client, const std::vector<Channel>& chan
 
 void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channelsExistents, std::string& channelName, std::string& channelPass)
 {
-
 	for(std::vector<Channel>::iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
 	{
 		if(it->getChannelName() == channelName)
 		{
-			//invite-only
-			if (it->isInviteModeSet() == true)//te invitació
-				std::cerr << "473 ERR_INVITEONLYCHAN " << channelName << " :Cannot join channel (+i)" << std::endl;
-			else
-				it->addClient(&client);
+			bool canJoin = true;
 
-			//si te password, que el pass sigui correcte
-			std::cout << "\nJa existeix el channel:" << channelName << "Password: " << channelPass << std::endl;
-			if (it->isPasswordSet() == true && !channelPass.empty())
-				std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
-			else if (it->isPasswordValid(channelPass) == false)
-				std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
-			else if (it->isPasswordValid(channelPass) == true && !channelPass.empty()){
-				//channelsExistents._password = channelPass;//pass ja existent i add cient
-				it->addClient(&client);
-			} else if (!channelPass.empty()){
-				it->addClient(&client);
-				//NOOOOOOOOOOOO
-				//it->setPassword(channelPass);//pots afegir un client i que possi el pass aquest que no estava implementat
+			// Mode +i (invite-only)
+			if (it->isInviteModeSet())
+			{
+				//std::cerr << "473 ERR_INVITEONLYCHAN " << channelName << " :Cannot join channel (+i)" << std::endl;
+				std::string err = "473 ERR_INVITEONLYCHAN " + channelName + " :Cannot join channel (+i)\r\n";
+				sendReply(client.getFd(), err);
+				canJoin = false;
 			}
-			
-			//it->setChannelLimit(4);
+
+			// Mode +k (password)
+			if (it->isPasswordSet())
+			{
+				if (channelPass.empty())
+				{
+					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
+					sendReply(client.getFd(), err);
+					// std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
+					//ns on haauria d'anar la dde que el passa ja esta setado?
+					//std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
+					canJoin = false;
+				}
+				else if (!it->isPasswordValid(channelPass))
+				{
+					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
+					sendReply(client.getFd(), err);
+					//std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
+					canJoin = false;
+				}
+			}
+
+			// Mode +l (limit)
+			//it->setChannelLimit(2);
 			//si hi ha lloc i no esta ple +l (Ple: error: 471)
 			//std::cout << "LIMIT: getChannelLimit: " << it->getChannelLimit() << " numberOfClients: " << it->numberOfClients(channelsExistents, channelName) << std::endl;
-			//comprovar si fa join al chanell i possa una contra pero no hi ha contra pq no esta seteada ha dúnir el clinet al chanel. Si s´uneix
-			if ((it->isLimitModeSet() == true) && (it->getChannelLimit() >= it->numberOfClients(channelsExistents, channelName) ))
-				std::cerr << "471 ERR_CHANNELISFULL " << channelName << " :Cannot join channel (+l)" << std::endl;
-			else if (it->isLimitModeSet() == false)
+			if (it->isLimitModeSet())
+			{
+				int limit = it->getChannelLimit();
+				int current = it->numberOfClients(channelsExistents, channelName);
+				if (limit != -1 && current >= limit)
+				{
+					std::string err = "471 ERR_CHANNELISFULL " + channelName + " :Cannot join channel (+l)\r\n";
+					sendReply(client.getFd(), err);
+					//std::cerr << "471 ERR_CHANNELISFULL " << channelName << " :Cannot join channel (+l)" << std::endl;
+					canJoin = false;
+				}
+			}
+
+			// Afegir client si pot unir-se
+			if (canJoin)
+			{
 				it->addClient(&client);
-			
-			//
+				std::cerr << "affegeix client" << std::endl;
+
+				// 1. JOIN a tots els del canal
+				//std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
+				//it->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
+				std::string joinMsg = std::string(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
+				it->broadcastMessage(joinMsg);
+
+				// 2. TOPIC només al client
+				if (!it->isTopicModeSet())
+					sendReply(client.getFd(), "332 " + client.getNick() + " " + channelName + " :" + it->getTopic() + "\r\n");
+				else
+					sendReply(client.getFd(), "331 " + client.getNick() + " " + channelName + " :No topic is set\r\n");
+
+				// 3. Llista d'usuaris (NAMREPLY + ENDOFNAMES)
+				std::string names = "";
+				const std::vector<std::string>& nickList = it->getClientNicks();
+				for (size_t i = 0; i < nickList.size(); ++i)
+				{
+					if (i > 0) names += " ";
+					names += nickList[i];
+				}
+				sendReply(client.getFd(), "353 " + client.getNick() + " = " + channelName + " :" + names + "\r\n");
+				sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
+		
+			}
+
+			//ENVIAR PER FD
 			/*
 				2. Informar tots els usuaris del canal amb missatge de JOIN.
-						//no se
+						//pepito sha unit al canal
 				3. Enviar nomes al client:(abaix tents mes info)
 						- El topic (RPL_TOPIC) si n’hi ha.
 						(332: RPL_TOPIC "<channel> :<topic>" -> When sending a TOPIC message to 
@@ -112,7 +167,7 @@ void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExis
 		newChannel.setPasswordMode(true); // activa mode +k
 	}
 	channelsExistents.push_back(newChannel);
-
+	std::cout << "Enteoria a creat el channel amb el password\n"<< std::endl;
 }
 int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)
 {
@@ -124,23 +179,26 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 	std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
 
 	if (slotsLeft <= 0) {
-        std::cerr << "405 ERR_TOOMANYCHANNELS " << client.getNick()
-                  << " :You have joined too many channels" << std::endl;
+		std::string err = "405 ERR_TOOMANYCHANNELS " + client.getNick() + " :You have joined too many channels\r\n";
+		sendReply(client.getFd(), err);
+        //std::cerr << "405 ERR_TOOMANYCHANNELS " << client.getNick() << " :You have joined too many channels" << std::endl;
         return -1;
     }
 	int validChannelsProcessed = 0; 
 	for (size_t i = 0; i < ChannelsNames.size() && slotsLeft > 0; i++)
 	{
 		std::string& channelName = ChannelsNames[i];
-        if (!checkChannelNameRules(channelName)) {
+        if (!checkChannelNameRules(client, channelName)) {
             continue; // Saltar canals amb noms invàlids
         }
 		// Si arribem aquí, el channel és vàlid
         validChannelsProcessed++;
 		if (validChannelsProcessed > slotsLeft) {
-			std::cerr << "405 ERR_TOOMANYCHANNELS: " << client.getNick()
-                      << " " << channelName
-                      << " :You have joined too many channels" << std::endl;
+			std::string err = "405 ERR_TOOMANYCHANNELS " + client.getNick() + " " + channelName + " :You have joined too many channels\r\n";
+			sendReply(client.getFd(), err);
+			// std::cerr << "405 ERR_TOOMANYCHANNELS: " << client.getNick()
+            //           << " " << channelName
+            //           << " :You have joined too many channels" << std::endl;
             continue;
 		}
 		std::string channelPass;
@@ -153,10 +211,10 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 		if (isChannelNameUnique(channelName, channelsExistents) != true)
 		{
 			channelName = getUniqueChannelName(channelName, channelsExistents);
-			std::cout << "\nJa existeix el channel: " << channelName << "Password: " << channelPass << std::endl;
+			std::cout << "\nJa existeix el channel: " << channelName << " Password: " << channelPass << std::endl;
 			checkModeToAddClient(client, channelsExistents, channelName, channelPass);
 		} else {
-			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << "Password: " << channelPass << std::endl;
+			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << std::endl;
 			createNewChannel(client, channelsExistents, channelName, channelPass);
 			//NO, EXISTEIX EL CHANNEL 
 			/*- crear channel:
