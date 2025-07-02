@@ -48,7 +48,9 @@ class Channel
 
 		//setters
 		void		setChannelLimit(int limit);
-
+		void		setPassword(const std::string& password);
+		void		setPasswordMode(bool mode);
+		
 		// Channel functions
 		void		addClient(Client *client);
 		void		removeClient(Client* client);

@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
 	/* AIXO HA D'ANAR A PARSE JOIN */
 	Server serv;
-	std::string msg = "&Canal3,#Canal4,#canal1";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
+	std::string msg = "&Canal3,#Canal4,#canal1 123,1234,1231";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
 	std::string *params = serv.returnParams(msg);
 	int numParams = serv.countParams(msg);
 

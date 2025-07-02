@@ -118,6 +118,17 @@ void	Channel::setChannelLimit(int limit) {
     this->_limit_set = true;
 }
 
+void Channel::setPassword(const std::string& password)
+{
+	this->_password = password;
+	this->_password_set = true;
+}
+
+void Channel::setPasswordMode(bool mode)
+{
+	this->_password_set = mode;
+}
+
 //---------------------------------- Class Functions -----------------------------------------
 void	Channel::addClient(Client *client) {
 	this->_clients.push_back(client);

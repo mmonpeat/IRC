@@ -94,6 +94,7 @@ class Server
 		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
 		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
 		void						checkModeToAddClient(Client& client, std::vector<Channel>& channelsExistents, std::string& channelName, std::string& channelPass);
+		void						createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass);
 		//default constructor per a provar join, borrrar despres
 		Server();
 		
