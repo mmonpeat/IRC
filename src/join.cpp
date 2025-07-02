@@ -101,8 +101,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 	}
 }
 
-void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExistents, 
-                              const std::string& channelName, const std::string& channelPass)
+void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass)
 {
 	Channel newChannel(channelName, &client);
 	newChannel.addOperator(&client); // primer usuari = operador
