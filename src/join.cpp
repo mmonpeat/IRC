@@ -113,9 +113,9 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 
 				// 1. JOIN a tots els del canal
 				//std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
-				//it->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
-				std::string joinMsg = std::string(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
-				it->broadcastMessage(joinMsg);
+				it->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
+				// std::string joinMsg = std::string(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
+				//it->broadcastMessage(joinMsg);
 
 				// 2. TOPIC només al client
 				if (!it->isTopicModeSet())
@@ -169,6 +169,7 @@ void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExis
 	channelsExistents.push_back(newChannel);
 	std::cout << "Enteoria a creat el channel amb el password\n"<< std::endl;
 }
+
 int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)
 {
 	const int MAX_CHANNELS_PER_CLIENT = 5;//10
@@ -216,16 +217,6 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 		} else {
 			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << std::endl;
 			createNewChannel(client, channelsExistents, channelName, channelPass);
-			//NO, EXISTEIX EL CHANNEL 
-			/*- crear channel:
-				- afegir client
-				- possar el client com operador
-				- gestinar pass si s'ha possat  
-					461: ERR_NEEDMOREPARAMS "<command> :Not enough parameters"
-					(Returned by the server by numerous commands to
-					indicate to the client that it didn't supply enough
-					parameters.)
-			*/
 		}
 	}
 	ChannelsNames.clear();
@@ -233,22 +224,9 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
     return (0);
 }
 
-std::vector<std::string> Server::convertToVector(const std::string& line)
-{
-	std::vector<std::string> result;
-	std::stringstream ss(line);
-	std::string channel;
-
-	while (std::getline(ss, channel, ',')) {
-		if (!channel.empty())
-			result.push_back(channel);
-	}
-	return (result);
-}
-
-Server::Server() {
-	std::cout << "Server constructor\n";
-}
+// Server::Server() {
+// 	std::cout << "Server constructor\n";
+// }
 
 //std::vector<Channel>		channels;
 // newChannel

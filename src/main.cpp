@@ -54,21 +54,32 @@ int		check_args(int ac, char **av)
 
 int main(int argc, char **argv)
 {
-	// if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
-	// int	port = set_port(argv[1]);
-	// std::string password = argv[2];
-	// std::cout << port << " y password: " << password << std::endl;
-	// std::cout << "IRC starts" << std::endl;
-	// try
-	// {
-	// 	Server server(port, password);
-	// } catch(const Server::specificException &e) {
-	// 	std::cerr << "Server exception caught: " << e.what() << std::endl;
-	// 	return (EXIT_FAILURE);
-	// }
-	// std::cout << "despres start" << std::endl;
+	if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
+	int	port = set_port(argv[1]);
+	std::string password = argv[2];
+	std::cout << port << " y password: " << password << std::endl;
+	std::cout << "IRC starts" << std::endl;
+	try
+	{
+		Server server(port, password);
+	} catch(const Server::specificException &e) {
+		std::cerr << "Server exception caught: " << e.what() << std::endl;
+		return (EXIT_FAILURE);
+	}
+	std::cout << "despres start" << std::endl;
+	return (EXIT_SUCCESS);
+}
 
-	(void)argc;
+/*
+PROVA JOIN
+- crear channel1 i channel2
+- clients maria, usuari1
+- maria esta en channel1 i channel2 i usuari1 en el channel1
+- Primera comanda : 
+*/
+
+/*
+(void)argc;
 	(void)argv;
 	
 	//coses que ja rebre per arguments al join quan tot funcioni
@@ -88,7 +99,7 @@ int main(int argc, char **argv)
 	channelsExistents.push_back(ch2);
 	std::cout << "Client està ja en 2 canals.\n";
 
-	/* AIXO HA D'ANAR A PARSE JOIN */
+	//AIXO HA D'ANAR A PARSE JOIN 
 	Server serv;
 	std::string msg = "&Canal3,#Canal4,#canal1 123,1234,1231";//&Canal3,&Canal4,&Canal5,&Canal6,&Canal7
 	std::string *params = serv.returnParams(msg);
@@ -104,15 +115,4 @@ int main(int argc, char **argv)
 		
 		serv.join(client, channelsExistents, requestedChannels, passChannels);
 	}
-	return (EXIT_SUCCESS);
-}
-
-/*
-//PROVA DE FILTRE DE NOM CHANNEL
-    CheckChannels.push_back("&HelloWorld");
-	CheckChannels.push_back("#CanalInalid");
-	CheckChannels.push_back("&Canal Inalid");
-	CheckChannels.push_back("CanalInalid");
-	CheckChannels.push_back("&Canal,Invalid");
-	CheckChannels.push_back("&TooLong" + std::string(45, 'x'));
 */

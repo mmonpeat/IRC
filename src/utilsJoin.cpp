@@ -1,5 +1,18 @@
 #include "Server.hpp"
 
+std::vector<std::string> Server::convertToVector(const std::string& line)
+{
+	std::vector<std::string> result;
+	std::stringstream ss(line);
+	std::string channel;
+
+	while (std::getline(ss, channel, ',')) {
+		if (!channel.empty())
+			result.push_back(channel);
+	}
+	return (result);
+}
+
 bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 	if (new_channel == channel)
 		return true;
