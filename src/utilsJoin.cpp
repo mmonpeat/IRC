@@ -1,5 +1,14 @@
 #include "Server.hpp"
 
+void	Server::prepareForJoin(std::string *params, Client *client)
+{
+	std::vector<std::string> requestedChannels = convertToVector(params[0]);
+	std::vector<std::string> passChannels = convertToVector(params[1]);
+	delete[] params;
+	
+	join(*client, this->channels, requestedChannels, passChannels);
+}
+
 std::vector<std::string> Server::convertToVector(const std::string& line)
 {
 	std::vector<std::string> result;

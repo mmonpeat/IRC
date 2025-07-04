@@ -93,6 +93,7 @@ class Server
 		void						createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass);
 		
 		//utils join
+		void						prepareForJoin(std::string *params, Client *client);
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		bool						equalChannels(std::string new_channel, std::string channel) const;
 		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;

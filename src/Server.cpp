@@ -103,8 +103,8 @@ void Server::start()
 			{
 				if (pollFds[i].fd == serverSocketFd)
 				{
-					acceptNewConnection();
 					std::cout << "loop handle new connection" << std::endl;
+					acceptNewConnection();
 				} else {
 					std::cout << "loop handle client data" << std::endl;
 					if (clientIsRegistered(pollFds[i].fd) == false)
@@ -233,6 +233,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 int	Server::checkCommand(std::string parameter)
 {
+	std::cout << "checkCommand" << std::endl;
 	std::string	command[10] = 
 	{
 		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
@@ -287,7 +288,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			break ;
 		case 4:
 			std::cout << "JOIN goes here" << std::endl;
-			//join(params, client);
+			prepareForJoin(params, client);
 			break;
 		case 5:
 			std::cout << "PRIVMSG goes here" << std::endl;
