@@ -17,6 +17,8 @@ class Client
 		std::string	_real_name;	// USER params
 		bool		_pass;
 		bool		_auth;
+		std::string	_inputBuffer; //what the server receives from the client
+		std::string	_outputBuffer; //what we send to the client
 
 	public:
 		Client(int fd);
@@ -35,6 +37,9 @@ class Client
 		int			getFd(void) const;
 		bool		getAuth(void) const;
 		bool		getPass(void) const;
+
+		void		addToBuffer(char *buffer);
+		bool		readBuffer(std::string *msg);
 };
 
 #endif
