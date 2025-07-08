@@ -261,7 +261,8 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 			break ;
 		case 2:
 			if (client->getPass() == true)
-				nick(params, client); 
+				nick(params, client);
+				
 			break ;
 		case 3:
 			if (client->getPass() == true && client->getNick().empty() == false)
@@ -456,6 +457,7 @@ bool Server::clientIsRegistered(int clientFd) {
 		// Found the client
 		std::cout << "Client with fd " << clientFd << " found: ";
 		std::cout << it->second->getNick() << std::endl;
+		std::cout << "here??\n";
 		return true;
 	} else {
 		std::cout << "No client found for fd: " << clientFd << std::endl;
