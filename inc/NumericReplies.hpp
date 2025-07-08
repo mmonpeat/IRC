@@ -21,7 +21,7 @@ inline	std::string	rplWelcome(std::string nickname){
 }
 
 inline	std::string errUnknownCommand(std::string nickname){
-	return (":localhost 421 " + nickname + ":Unknown command\r\n");
+	return (":localhost 421 " + nickname + " :Unknown command\r\n");
 }
 
 inline	std::string	errNoNickNameGiven(void){
