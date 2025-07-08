@@ -78,7 +78,7 @@ bool	Channel::isPasswordSet(void) const {
 	return false;
 }
 
-bool	Channel::isPasswordValid(std::string password) const {
+bool	Channel::isPasswordValidChannel(std::string password) const {
 	if (!password.empty() && !this->_password.empty() && (password == this->_password))
 		return true;
 	return false;
@@ -118,7 +118,7 @@ std::string	Channel::getTopic(void) const {
 
 //---------------------------------- setters  ------------
 void	Channel::setChannelLimit(int limit) {
-	this->_channel_limit = limit;//pero crec que hauria de ser indefinit no?
+	this->_channel_limit = limit;
     this->_limit_set = true;
 }
 

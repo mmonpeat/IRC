@@ -38,7 +38,7 @@ class Channel
 		bool		isInviteModeSet(void) const;
 		bool		isTopicModeSet(void) const;
 		bool		isPasswordSet(void) const;
-		bool		isPasswordValid(std::string password) const;
+		bool		isPasswordValidChannel(std::string password) const;
 		bool		isClientInvited(Client* client) const; //puede ser nick
 
 		// Variable getters

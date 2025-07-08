@@ -2,10 +2,13 @@
 
 void	Server::prepareForJoin(std::string *params, Client *client)
 {
-	std::vector<std::string> requestedChannels = convertToVector(params[0]);
-	std::vector<std::string> passChannels = convertToVector(params[1]);
-	//delete[] params;
-	std::cout << "Prepare for join\n";
+	std::vector<std::string> requestedChannels = convertToVector(params[1]);
+	std::vector<std::string> passChannels;
+	if (params->size() == 2)
+	{
+		passChannels = convertToVector(params[2]);
+	} 
+
 	join(*client, this->channels, requestedChannels, passChannels);
 }
 

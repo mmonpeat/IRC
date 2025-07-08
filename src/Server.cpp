@@ -288,7 +288,6 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			user(params, client);
 			break ;
 		case 4:
-			std::cout << "JOIN goes here" << std::endl;
 			prepareForJoin(params, client);
 			break;
 		case 5:

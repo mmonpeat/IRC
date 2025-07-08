@@ -79,7 +79,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 					//std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
 					canJoin = false;
 				}
-				else if (!it->isPasswordValid(channelPass))
+				else if (!it->isPasswordValidChannel(channelPass))
 				{
 					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
 					sendReply(client.getFd(), err);
@@ -96,7 +96,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 			{
 				int limit = it->getChannelLimit();
 				int current = it->numberOfClients(channelsExistents, channelName);
-				if (limit != -1 && current >= limit)
+				if (current >= limit)
 				{
 					std::string err = "471 ERR_CHANNELISFULL " + channelName + " :Cannot join channel (+l)\r\n";
 					sendReply(client.getFd(), err);
@@ -135,23 +135,6 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 				sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
 		
 			}
-
-			//ENVIAR PER FD
-			/*
-				2. Informar tots els usuaris del canal amb missatge de JOIN.
-						//pepito sha unit al canal
-				3. Enviar nomes al client:(abaix tents mes info)
-						- El topic (RPL_TOPIC) si n’hi ha.
-						(332: RPL_TOPIC "<channel> :<topic>" -> When sending a TOPIC message to 
-						determine the channel topic, one of two replies is sent.  If
-						the topic is set, RPL_TOPIC is sent back else RPL_NOTOPIC.)
-
-						- La llista d’usuaris (RPL_NAMREPLY i RPL_ENDOFNAMES) documentaci'o:
-							353     RPL_NAMREPLY
-								"<channel> :[[@|+]<nick> [[@|+]<nick> [...]]]"
-							366     RPL_ENDOFNAMES
-											"<channel> :End of /NAMES list"
-			*/
 		}
 	}
 }
@@ -185,9 +168,11 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
         //std::cerr << "405 ERR_TOOMANYCHANNELS " << client.getNick() << " :You have joined too many channels" << std::endl;
         return -1;
     }
-	int validChannelsProcessed = 0; 
+	int validChannelsProcessed = 0;
+	std::cout << "segfoult  AAAAAAAAAAAAAAAAAAAA" << std::endl;
 	for (size_t i = 0; i < ChannelsNames.size() && slotsLeft > 0; i++)
 	{
+		std::cout << "segfoult  AAAAAAAAAAAAAAAAAAAA 1111111111111111111" << std::endl;
 		std::string& channelName = ChannelsNames[i];
         if (!checkChannelNameRules(client, channelName)) {
             continue; // Saltar canals amb noms invàlids
@@ -203,7 +188,7 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
             continue;
 		}
 		std::string channelPass;
-		if (i <= ChannelsPasswords.size())
+		if (i < ChannelsPasswords.size())
 		{
 			channelPass = ChannelsPasswords[i];
 			std::cout << "Processant canal vàlid: " << channelName 
