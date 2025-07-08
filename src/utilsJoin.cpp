@@ -40,7 +40,6 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
 	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
-		std::cout << "\nFuncio isChannelNameUnique:" << channelToCheck << std::endl;
 		if (equalChannels(it->getChannelName(), channelToCheck))
 			return false;
 	}
@@ -48,7 +47,6 @@ bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<
 }
 
 std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-    std::cout << "\nFuncio getUniqueChannelName:" << channelToCheck << std::endl;
 	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
 		if (equalChannels(it->getChannelName(), channelToCheck))

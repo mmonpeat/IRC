@@ -86,7 +86,6 @@ void Server::start()
 	serverPoll.events = POLLIN;
 	serverPoll.revents = 0;
 	pollFds.push_back(serverPoll);
-	std::cout << "Principal loop poll" << std::endl;
 	
 	while(true)
 	{
@@ -98,15 +97,11 @@ void Server::start()
 
 		for (size_t i = 0; i < pollFds.size(); ++i)
 		{
-			std::cout << "dins for" << std::endl;
 			if (pollFds[i].revents & POLLIN)
 			{
 				if (pollFds[i].fd == serverSocketFd)
-				{
-					std::cout << "loop handle new connection" << std::endl;
 					acceptNewConnection();
-				} else {
-					std::cout << "loop handle client data" << std::endl;
+				else {
 					if (clientIsRegistered(pollFds[i].fd) == false)
 						addClient(pollFds[i].fd);
 					handleClientData(pollFds[i].fd);
@@ -125,7 +120,7 @@ void Server::acceptNewConnection()
 	if (clientFd == -1) 
 	{
 		std::cerr << "Error en accept()" << std::endl;
-        	return;
+        return;
 	}
 
 	fcntl(clientFd, F_SETFL, O_NONBLOCK); // Non-blocking
@@ -135,11 +130,6 @@ void Server::acceptNewConnection()
 	clientPoll.events = POLLIN;
 	clientPoll.revents = 0;
 	pollFds.push_back(clientPoll);
-
-	//std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) 
-           //   << ":" << ntohs(clientAddr.sin_port) << std::endl;
-	//clients.insert(std::make_pair(clientFd, Client(clientFd))); // Create client
-	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
 void Server::handleClientData(int clientFd)
@@ -168,7 +158,6 @@ void Server::handleClientData(int clientFd)
 
 void Server::removeClient(int clientFd) 
 {
-    
 	// Delete pollFds
 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
 		it != pollFds.end(); ++it) 
@@ -223,17 +212,13 @@ void	Server::handleMsg(std::string msg, Client *client)
 		ServerHandshake(params, client, command);
 	}
 	else
-	{
-		std::cout << "After handshake" << std::endl;
 		CommandCall(params, client, command);
-	}
 	delete[] params;
 	return ;
 }
 
 int	Server::checkCommand(std::string parameter)
 {
-	std::cout << "checkCommand" << std::endl;
 	std::string	command[10] = 
 	{
 		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
@@ -357,7 +342,6 @@ int	Server::countParams(std::string msg)
 				last = true;
 		}
 	}
-	//std::cout << "n is " << n << std::endl;
 	return (n);
 }
 
@@ -452,16 +436,10 @@ void	Server::sendReply(int client_fd, std::string reply)
   
 bool Server::clientIsRegistered(int clientFd) {
 	std::map<int, Client*>::iterator it = clients.find(clientFd);
-	if (it != clients.end()) {
-		// Found the client
-		std::cout << "Client with fd " << clientFd << " found: ";
-		std::cout << it->second->getNick() << std::endl;
-		std::cout << "here??\n";
+	if (it != clients.end()) 
 		return true;
-	} else {
-		std::cout << "No client found for fd: " << clientFd << std::endl;
+	else
 		return false;
-	}
 }
 
 
