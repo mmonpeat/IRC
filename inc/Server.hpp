@@ -91,6 +91,9 @@ class Server
 		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
 		void						checkModeToAddClient(Client& client, std::vector<Channel>& channelsExistents, std::string& channelName, std::string& channelPass);
 		void						createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass);
+
+		/*  MODE  */
+		void						channelModes(std::string *params, Client *client);
 		
 		//utils join
 		void						prepareForJoin(std::string *params, Client *client);

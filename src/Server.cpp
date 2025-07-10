@@ -293,7 +293,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			break;
 		case 9:
 			std::cout << "MODE goes here" << std::endl;
-			//mode(params, client);
+			channelModes(params, client);
 			break;
 		default:
 			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
@@ -308,7 +308,7 @@ std::string*	Server::returnParams(std::string msg)
 	unsigned long	n = countParams(msg);
 	std::string	*params;
 
-	params = new std::string[n];
+	params = new std::string[n+1];
 	std::string::size_type	pos = msg.find(' ');
 	while (i < n)
 	{
@@ -323,6 +323,7 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos + 1);
 		pos = msg.find(' ');
 	}
+	params[n+1] = '\0';
 	return (params) ;
 }
 
