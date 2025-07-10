@@ -94,6 +94,8 @@ class Server
 
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);
+		bool						doesChannelExist(std::string& name);
+		bool						isModeValid(std::string *params);
 		
 		//utils join
 		void						prepareForJoin(std::string *params, Client *client);
