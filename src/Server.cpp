@@ -75,10 +75,34 @@ void Server::bindAndListen(sockaddr_in &addr)
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
 }
+void Server::mostrarChannels(void)
+{
+	for (size_t i = 0; i < channels.size(); ++i)
+	{
+		std::cout << "------------------------------------------------------------------" << std::endl;
+		std::cout << "Canal #" << i + 1 << " -> Nom: " << channels[i].getChannelName() << std::endl;
+		std::cout << "  Nombre de clients: " << channels[i].getClientNicks().size() << std::endl;
 
+		if (channels[i].isPasswordSet())
+			std::cout << "  Mode +k (password) activat" << std::endl;
+		if (channels[i].isInviteModeSet())
+			std::cout << "  Mode +i (invite-only) activat" << std::endl;
+		if (channels[i].isLimitModeSet())
+			std::cout << "  Mode +l (limit) activat. Límits: " << channels[i].getChannelLimit() << std::endl;
+
+		std::cout << "  Membres: ";
+		const std::vector<std::string>& nicks = channels[i].getClientNicks();
+		for (size_t j = 0; j < nicks.size(); ++j)
+		{
+			std::cout << nicks[j];
+			if (j < nicks.size() - 1) std::cout << ", ";
+		}
+		std::cout << std::endl << std::endl;
+	}
+}
 void Server::start()
 {
-	std::cout << "comencar a acceptar, send, recv, fer poll..." << std::endl;
+	std::cout << "comenca..." << std::endl;
 
 
 	struct pollfd serverPoll;
@@ -138,7 +162,7 @@ void Server::handleClientData(int clientFd)
 	char buffer[512];
     int bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	
-
+	
     if (bytesRead == 0) {
 			std::cout << "CONNECTION closed\n";
         	removeClient(clientFd);  // Desconexión o error
@@ -152,6 +176,7 @@ void Server::handleClientData(int clientFd)
 			while (clients[clientFd]->readBuffer(&msg))
 			{
 				handleMsg(msg, clients[clientFd]);
+				mostrarChannels();
 			}
 		}
 }

@@ -98,8 +98,8 @@ class Server
 		bool						equalChannels(std::string new_channel, std::string channel) const;
 		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
 		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
-		//default constructor per a provar join, borrrar despres
-		//Server();
+		//per mostrar borrar
+		void 	mostrarChannels(void);
 		
 };
 

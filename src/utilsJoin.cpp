@@ -2,12 +2,15 @@
 
 void	Server::prepareForJoin(std::string *params, Client *client)
 {
-	std::vector<std::string> requestedChannels = convertToVector(params[1]);
+	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
-	if (params->size() == 2)
-	{
+
+	if (!params[1].empty())
+		requestedChannels = convertToVector(params[1]);
+
+	// Comprova si hi ha password (no accedeixis fora límits)
+	if (!params[2].empty())
 		passChannels = convertToVector(params[2]);
-	} 
 
 	join(*client, this->channels, requestedChannels, passChannels);
 }

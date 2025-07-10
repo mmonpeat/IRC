@@ -170,17 +170,21 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 			sendReply(client.getFd(), err);
             continue;
 		}
+		
 		std::string channelPass;
 		if (i < ChannelsPasswords.size())
 			channelPass = ChannelsPasswords[i];
-		if (isChannelNameUnique(channelName, channelsExistents) != true)
-		{
+		if (isChannelNameUnique(channelName, channelsExistents) == true && channelPass.empty()) {
+			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << " :hauria de ser null " << std::endl;
+			createNewChannel(client, channelsExistents, channelName, channelPass);
+		} else if (isChannelNameUnique(channelName, channelsExistents) != true) {
 			channelName = getUniqueChannelName(channelName, channelsExistents);
 			std::cout << "\nJa existeix el channel: " << channelName << " Password: " << channelPass << std::endl;
 			checkModeToAddClient(client, channelsExistents, channelName, channelPass);
 		} else {
-			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << std::endl;
-			createNewChannel(client, channelsExistents, channelName, channelPass);
+			// No permetre crear canals amb password
+			std::string err = "403 ERR_NOSUCHCHANNEL " + channelName + " :Channel must be created without key. Set +k via MODE after joining\r\n";
+			sendReply(client.getFd(), err);
 		}
 	}
 	ChannelsNames.clear();
