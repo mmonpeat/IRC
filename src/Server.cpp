@@ -465,7 +465,7 @@ void	Server::addClient(int clientFd) {
 	
 	if (clients.size() >= 10) {
 		std::cout << "Server full :(  " << std::endl;
-		// habra que eliminar este fd y cerrar la conexion
+		removeClient(clientFd);
 	}
 	
 	Client *new_client = createClient(clientFd);
