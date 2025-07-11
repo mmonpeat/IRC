@@ -218,7 +218,7 @@ int	Channel::numberOfClients(std::vector<Channel>& channelsExistents, std::strin
 	{
 		if(it->getChannelName() == channelName)
 		{
-			return (static_cast<int>(it->_clients.size()));
+			return (static_cast<int>(it->_clients.size()));//it->_operators.size()
 		}
 	}
 	return (-1);
