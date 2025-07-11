@@ -4,7 +4,12 @@ void	Server::prepareForJoin(std::string *params, Client *client)
 {
 	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
-
+	//ns si te sentit que si no esta empty
+	if (!params[3].empty())
+	{
+		std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
+		sendReply(client->getFd(), err);
+	}
 	if (!params[1].empty())
 		requestedChannels = convertToVector(params[1]);
 
