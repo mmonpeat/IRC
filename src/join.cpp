@@ -84,9 +84,9 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 			}
 
 			// Mode +l (limit)
-			it->setChannelLimit(2);
+			it->setChannelLimit(3);
 			//si hi ha lloc i no esta ple +l (Ple: error: 471)
-			std::cout << "LIMIT: getChannelLimit: " << it->getChannelLimit() << " numberOfClients: " << it->numberOfClients(channelsExistents, channelName) << std::endl;
+			//std::cout << "LIMIT: getChannelLimit: " << it->getChannelLimit() << " numberOfClients: " << it->numberOfClients(channelsExistents, channelName) << std::endl;
 			if (it->isLimitModeSet())
 			{
 				int limit = it->getChannelLimit();
@@ -133,6 +133,7 @@ void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExis
 {
 	Channel newChannel(channelName, &client);
 	newChannel.addOperator(&client); // primer usuari = operador
+	newChannel.addClient(&client);
 
 	if (!channelPass.empty())
 	{
