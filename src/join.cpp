@@ -84,7 +84,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 			}
 
 			// Mode +l (limit)
-			it->setChannelLimit(3);
+			//it->setChannelLimit(3);
 			//si hi ha lloc i no esta ple +l (Ple: error: 471)
 			//std::cout << "LIMIT: getChannelLimit: " << it->getChannelLimit() << " numberOfClients: " << it->numberOfClients(channelsExistents, channelName) << std::endl;
 			if (it->isLimitModeSet())
@@ -103,7 +103,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 			if (canJoin)
 			{
 				it->addClient(&client);
-				std::cerr << "affegeix client" << std::endl;
+				//std::cerr << "affegeix client" << std::endl;
 
 				// 1. JOIN a tots els del canal
 				it->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n");
@@ -148,9 +148,9 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 	const int MAX_CHANNELS_PER_CLIENT = 5;//10
 
 	int currentCount = countClientChannels(client, channelsExistents);
-	std::cout << "\nValors de en quants canals esta el client "<< client.getNick() << ":" << currentCount << "\n";
+	//std::cout << "\nValors de en quants canals esta el client "<< client.getNick() << ":" << currentCount << "\n";
 	int slotsLeft = MAX_CHANNELS_PER_CLIENT - currentCount;
-	std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
+	//std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
 
 	if (slotsLeft <= 0) {
 		std::string err = "405 ERR_TOOMANYCHANNELS " + client.getNick() + " :You have joined too many channels\r\n";
@@ -176,11 +176,11 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 		if (i < ChannelsPasswords.size())
 			channelPass = ChannelsPasswords[i];
 		if (isChannelNameUnique(channelName, channelsExistents) == true && channelPass.empty()) {
-			std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << " :hauria de ser null " << std::endl;
+			//std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << " :hauria de ser null " << std::endl;
 			createNewChannel(client, channelsExistents, channelName, channelPass);
 		} else if (isChannelNameUnique(channelName, channelsExistents) != true) {
 			channelName = getUniqueChannelName(channelName, channelsExistents);
-			std::cout << "\nJa existeix el channel: " << channelName << " Password: " << channelPass << std::endl;
+			//std::cout << "\nJa existeix el channel: " << channelName << " Password: " << channelPass << std::endl;
 			checkModeToAddClient(client, channelsExistents, channelName, channelPass);
 		} else {
 			// No permetre crear canals amb password
