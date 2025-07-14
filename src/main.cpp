@@ -5,6 +5,7 @@
 
 #include "Server.hpp"
 #include <csignal>
+#include <cstdio>
 
 int	set_port(char *argv)
 {
@@ -51,12 +52,18 @@ int		check_args(int ac, char **av)
 	}
 	return EXIT_SUCCESS;
 }
+/*
+void	signal_handler(int signum)
+{
+	if (signum == SIGPIPE)
+		std::cout << "ignore" << std::endl;
+}
 
-int	ignore_signals()
+int	start_signals()
 {
 	struct	sigaction	sa;
-	sa.sa_handler = SIG_IGN;
-	sa.sa_flags = SA_RESTART; //try it with and without just in case
+	sa.sa_handler = signal_handler;
+	//sa.sa_flags = SA_RESTART; //try it with and without just in case
 
 	if (sigaction(SIGPIPE, &sa, NULL) == -1)
 	{
@@ -64,11 +71,20 @@ int	ignore_signals()
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
+}*/
+
+int ignore_sigpipe()
+{
+    if (signal(SIGTSTP, SIG_IGN) == SIG_ERR) {
+        perror("Failed to ignore SIGPIPE");
+        return (EXIT_FAILURE);
+    }
+    return (EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv)
 {
-	if (ignore_signals() == EXIT_FAILURE)
+	if (ignore_sigpipe() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
 	int	port = set_port(argv[1]);
