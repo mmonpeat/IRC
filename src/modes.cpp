@@ -38,62 +38,71 @@ bool	Server::doesChannelExist(std::string& name) {
 }
 
 
-bool Server::isModeValid(std::string *params) {
-	if (!params || params[2].empty())
-		return false;
+bool	Server::isModeValid(std::string *params)
+{
+	std::cout << "Modes parameters are: " << params[2] << std::endl;
 
-	std::string modeStr = params[2];
-	char currentSign = 0;
-	bool expectingMode = false;
+	const size_t max_param_num = 3;
 	size_t found_param = 0;
-	size_t max_param_num = 3;
+	char currentSign = 0;
 
-	for (size_t i = 0; i < modeStr.size(); ++i) {
-		char c = modeStr[i];
+	std::string validModes = "itkol";
+	for (size_t i = 0; i < params[2].size(); ++i)
+	{
+		char c = params[2][i];
 
-		if (c == '+' || c == '-') {
-			if (expectingMode) {
-				std::cout << "Error: consecutive '+' or '-' without mode letter" << std::endl;
-				return false;
-			}
+		// Handle +/-
+		if (c == '+' || c == '-')
+		{
 			currentSign = c;
-			expectingMode = true;
+			continue;
 		}
-		else if (c == 'i' || c == 't' || c == 'k' || c == 'l' || c == 'o') {
-			if (currentSign == 0) {
-				std::cout << "Error: mode character without preceding sign" << std::endl;
-				return false;
-			}
 
-			expectingMode = false;
+		// Check for invalid mode characters
+		if (validModes.find(c) == std::string::npos)
+		{
+			std::cout << "Error: invalid mode character '" << c << "'" << std::endl;
+			return false;
+		}
 
-			if (c == 'o') {
-				// o requires a parameter for both + and -
-				++found_param;
-			}
-			else if ((c == 'k' || c == 'l') && currentSign == '+') {
-				// k and l require parameter only on +
-				++found_param;
-			}
-
-			if (found_param > max_param_num) {
+		// RFC-compliant: count param if mode needs one
+		// ---------------- RFC logic below ----------------
+		if ((c == 'k' && (currentSign == '+' || currentSign == '-')) || // highlight: RFC requires parameter for -k
+			(c == 'l' && currentSign == '+') ||
+			(c == 'o') // both +o and -o need a param
+		)
+		{
+			found_param++;
+			if (found_param > max_param_num)
+			{
 				std::cout << "Error: too many parameter-requiring modes" << std::endl;
 				return false;
 			}
 		}
-		else {
-			std::cout << "Error: invalid mode character '" << c << "'" << std::endl;
-			return false;
-		}
-	}
-
-	if (expectingMode) {
-		std::cout << "Error: mode string ends with a sign" << std::endl;
-		return false;
+		// ---------------- end RFC logic ------------------
 	}
 
 	return true;
 }
 
 
+// LIMIT 3 modes that require parameter
+/* input /MODE #pepe +k+l-t+i+o koko 8 poter Polly2 
+ no msg for too many parameters but only executes 3 modes that requiere parameters
+	output: for all users of the channel
+* Polly sets mode +i on #pepe
+* Polly sets mode -t on #pepe
+* Polly sets channel keyword to koko
+* Polly sets channel limit to 8 */
 
+/* Faulty parameters 
+
+
+
+*/
+
+// MODE K -k requieres a password to remove the mode 
+/*
+	Polly2 sets channel keyword to JOhny
+	Polly2 removes channel keyword
+*/
