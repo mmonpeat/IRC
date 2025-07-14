@@ -4,6 +4,7 @@
 //- avoid (80.443 and 22)
 
 #include "Server.hpp"
+#include <csignal>
 
 int	set_port(char *argv)
 {
@@ -51,8 +52,24 @@ int		check_args(int ac, char **av)
 	return EXIT_SUCCESS;
 }
 
+int	ignore_signals()
+{
+	struct	sigaction	sa;
+	sa.sa_handler = SIG_IGN;
+	sa.sa_flags = SA_RESTART; //try it with and without just in case
+
+	if (sigaction(SIGPIPE, &sa, NULL) == -1)
+	{
+		perror("Sigaction failure\n");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
+	if (ignore_signals() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
 	int	port = set_port(argv[1]);
 	std::string password = argv[2];
