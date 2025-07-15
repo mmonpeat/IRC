@@ -6,6 +6,7 @@
 #include "Server.hpp"
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 
 //int	g_status = 0;
 
@@ -58,7 +59,7 @@ int		check_args(int ac, char **av)
 void	signal_handler(int signum)
 {
 	if (signum == SIGTSTP || signum == SIGINT || signum == SIGQUIT)
-		//kill server now do it rip
+		std::cout << "\nSignal caught, shutting down...\n";
 }
 
 int	start_signals()
@@ -66,6 +67,7 @@ int	start_signals()
 	struct	sigaction	sa;
 	sa.sa_handler = signal_handler;
 	sa.sa_flags = SA_RESTART;
+	sigemptyset(&sa.sa_mask);
 
 	if (sigaction(SIGTSTP, &sa, NULL) == -1)
 	{
