@@ -7,6 +7,8 @@
 #include <csignal>
 #include <cstdio>
 
+//int	g_status = 0;
+
 int	set_port(char *argv)
 {
 	std::string	port_av = argv;
@@ -52,39 +54,41 @@ int		check_args(int ac, char **av)
 	}
 	return EXIT_SUCCESS;
 }
-/*
+
 void	signal_handler(int signum)
 {
-	if (signum == SIGPIPE)
-		std::cout << "ignore" << std::endl;
+	if (signum == SIGTSTP || signum == SIGINT || signum == SIGQUIT)
+		//kill server now do it rip
 }
 
 int	start_signals()
 {
 	struct	sigaction	sa;
 	sa.sa_handler = signal_handler;
-	//sa.sa_flags = SA_RESTART; //try it with and without just in case
+	sa.sa_flags = SA_RESTART;
 
-	if (sigaction(SIGPIPE, &sa, NULL) == -1)
+	if (sigaction(SIGTSTP, &sa, NULL) == -1)
+	{
+		perror("Sigaction failure\n");
+		return (EXIT_FAILURE);
+	}
+	if (sigaction(SIGINT, &sa, NULL) == -1)
+	{
+		perror("Sigaction failure\n");
+		return (EXIT_FAILURE);
+	}
+	if (sigaction(SIGQUIT, &sa, NULL) == -1)
 	{
 		perror("Sigaction failure\n");
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
-}*/
-
-int ignore_sigpipe()
-{
-    if (signal(SIGTSTP, SIG_IGN) == SIG_ERR) {
-        perror("Failed to ignore SIGPIPE");
-        return (EXIT_FAILURE);
-    }
-    return (EXIT_SUCCESS);
 }
+
 
 int main(int argc, char **argv)
 {
-	if (ignore_sigpipe() == EXIT_FAILURE)
+	if (start_signals() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
 	int	port = set_port(argv[1]);
@@ -99,7 +103,6 @@ int main(int argc, char **argv)
 		return (EXIT_FAILURE);
 	}
 	std::cout << "despres start" << std::endl;
-
 	return (EXIT_SUCCESS);
 }
 
