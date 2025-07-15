@@ -116,7 +116,7 @@ std::string	Channel::getTopic(void) const {
 	return this->_topic;
 }
 
-//---------------------------------- setters  ------------
+//---------------------------------- Setters -------------------------------------------------
 void	Channel::setChannelLimit(int limit) {
 	this->_channel_limit = limit;
     this->_limit_set = true;
@@ -126,11 +126,26 @@ void Channel::setPassword(const std::string& password)
 {
 	this->_password = password;
 	this->_password_set = true;
+	//send message to the group
 }
 
 void Channel::setPasswordMode(bool mode)
 {
 	this->_password_set = mode;
+}
+
+
+//---------------------------------- Unsetters -----------------------------------------------
+
+void		Channel::unsetPassword(const std::string& password) {
+	if (this->_password == password) {
+		this->_password.clear();
+		this->_password_set = false;
+		//send message to the group
+	}
+	else 
+		std::cout << "The password in wrong" << std::endl;
+	return;
 }
 
 //---------------------------------- Class Functions -----------------------------------------

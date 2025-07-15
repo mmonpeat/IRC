@@ -94,8 +94,12 @@ class Server
 
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);
-		bool						doesChannelExist(std::string& name);
-		bool						isModeValid(std::string *params);
+		Channel*					getChannelByName(std::string& name);
+		int							ptrLen(std::string *ptr);
+		bool						applyModes(std::string *params, Client *client, Channel* channel);
+		void						modeK(Channel *channel, std::string password, char sign, Client *client);
+		void						modeT(Channel *channel, char sign, Client client);
+
 		
 		//utils join
 		void						prepareForJoin(std::string *params, Client *client);

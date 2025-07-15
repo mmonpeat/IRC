@@ -1,91 +1,105 @@
 #include "Server.hpp"
 
+int		Server::ptrLen(std::string *ptr) {
+	int	len = 0;
+
+	while (ptr && ptr != '\0')
+		len++;
+	return len;
+}
+
 void	Server::channelModes(std::string *params, Client *client) {
 
-	int n = 0;
+	int 		len = ptrLen(params);
+	Channel*	channel;
 
-	while (params[n] != "\0") {
-		std::cout << "param is: " << params[n] << std::endl;
-		n++;
-	}
-
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i < len; i++) {
 		if (i == 1)
-			if (doesChannelExist(params[1]) == false) {
-				std::cout << "This channel does not exist" << std::endl;
+			channel = getChannelByName(params[1]);
+			if (channel == NULL) {
+				std::cout << "This channel does not exist." << std::endl; // tiene que ir al cliente
 				return;
 			}
 		if (i == 2)
-			if (isModeValid(params) == false) {
-				std::cout << "Mode parameters are not valid" << std::endl;
+			if (applyModes(params, client, channel) == false) { // maybe better void
 				return;
 			}
 	}
-	//si no llega al 2 no habian mode parameter - dar error
-	//
-	(void)client;
+	//if there are no 2 error message maybe?
 	return;
 }
 
 
-bool	Server::doesChannelExist(std::string& name) {
+Channel*	Server::getChannelByName(std::string& name) {
 	for (std::vector<Channel>::iterator it = channels.begin(); it != channels.end(); it++) {
-		if (equalNicks(it->getChannelName(), name) == true)
-			return true;
+		if (equalNicks(it->getChannelName(), name) == true) // check it it works
+			return &(*it);
 	}
-	std::cout << "El Channel con este nombre no existe" << std::endl; //put proper send and num reply
-	return false;
+	return NULL;
 }
 
 
-bool	Server::isModeValid(std::string *params)
+bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
 {
-	std::cout << "Modes parameters are: " << params[2] << std::endl;
+	std::cout << "Modes parameters are: " << params[2] << std::endl; //delete later
+	
+	const size_t	max_param_num = 3;
+	size_t			found_param = 0;
+	char			currentSign = 0;
+	std::string 	validModes = "itkol";
 
-	const size_t max_param_num = 3;
-	size_t found_param = 0;
-	char currentSign = 0;
-
-	std::string validModes = "itkol";
 	for (size_t i = 0; i < params[2].size(); ++i)
 	{
 		char c = params[2][i];
 
-		// Handle +/-
 		if (c == '+' || c == '-')
 		{
 			currentSign = c;
 			continue;
 		}
-
-		// Check for invalid mode characters
 		if (validModes.find(c) == std::string::npos)
 		{
 			std::cout << "Error: invalid mode character '" << c << "'" << std::endl;
 			return false;
+			// later just itterate
 		}
 
-		// RFC-compliant: count param if mode needs one
-		// ---------------- RFC logic below ----------------
-		if ((c == 'k' && (currentSign == '+' || currentSign == '-')) || // highlight: RFC requires parameter for -k
-			(c == 'l' && currentSign == '+') ||
-			(c == 'o') // both +o and -o need a param
+		if ((c == 'k' && (currentSign == '+' || currentSign == '-')) || (c == 'l' && currentSign == '+') ||
+			(c == 'o')
 		)
 		{
 			found_param++;
 			if (found_param > max_param_num)
 			{
-				std::cout << "Error: too many parameter-requiring modes" << std::endl;
+				std::cout << "Error: too many parameter-requiring modes" << std::endl; //delete later
 				return false;
 			}
 		}
-		// ---------------- end RFC logic ------------------
 	}
-
+	(void) client;
 	return true;
 }
 
+//461 ERR_NEEDMOREPARAMS if no parameter for k
+void	Server::modeK(Channel *channel, std::string password, char sign, Client *client) {
+	if (channel->isOperator(client->getNick()) == false) {
+		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
+		return;
+	}
+	if (channel->isPasswordSet() == false && sign == '+') {
+		channel->setPassword(password);
+	}
+	// check what happens in real servers if mode is on and another +k comes and same for -k
+	else if (channel->isPasswordSet() == true && sign == '-') {
+		channel->unsetPassword(password);
+	}
+	return;
+}
 
+void	Server::modeT(Channel *channel, char sign, Client client) {
+	
+	return;
+}
 // LIMIT 3 modes that require parameter
 /* input /MODE #pepe +k+l-t+i+o koko 8 poter Polly2 
  no msg for too many parameters but only executes 3 modes that requiere parameters
@@ -105,4 +119,16 @@ bool	Server::isModeValid(std::string *params)
 /*
 	Polly2 sets channel keyword to JOhny
 	Polly2 removes channel keyword
+*/
+
+/*
+Code	Name	When it's used
+324	RPL_CHANNELMODEIS	Sent in response to a MODE request, shows current modes (including +k)
+467	ERR_KEYSET	Sent when trying to set +k but a key is already set (optional behavior)
+441	ERR_USERNOTINCHANNEL	If trying to modify modes related to a user not in the channel
+442	ERR_NOTONCHANNEL	If the client is not on the channel
+443	ERR_USERONCHANNEL	If trying to give mode to a user already with it
+461	ERR_NEEDMOREPARAMS	When not enough parameters are provided (e.g. /MODE #chan +k with no key)
+472	ERR_UNKNOWNMODE	If the mode character is unknown (e.g. typo like /MODE #chan +x)
+482	ERR_CHANOPRIVSNEEDED	If a non-operator tries to change the channel mode
 */
