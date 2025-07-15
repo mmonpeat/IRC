@@ -93,6 +93,8 @@ void Server::start()
 		int pollCount = poll(pollFds.data(), pollFds.size(), -1); // wait forever
 		if (pollCount == -1)
 		{
+			if (errno == EINTR)
+				break ;
 			throw Server::specificException("ERROR: poll failed");
 		}
 
