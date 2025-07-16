@@ -180,7 +180,7 @@ int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::v
 			createNewChannel(client, channelsExistents, channelName, channelPass);
 		} else if (isChannelNameUnique(channelName, channelsExistents) != true) {
 			channelName = getUniqueChannelName(channelName, channelsExistents);
-			//std::cout << "\nJa existeix el channel: " << channelName << " Password: " << channelPass << std::endl;
+			//c
 			checkModeToAddClient(client, channelsExistents, channelName, channelPass);
 		} else {
 			// No permetre crear canals amb password
