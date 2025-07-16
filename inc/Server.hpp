@@ -15,6 +15,8 @@
 #include <netdb.h> //getaddrinfo, freeaddrinfo
 #include <fcntl.h> //fcntl
 #include <poll.h> //poll
+#include <sstream>
+#include <algorithm>//std::find
 
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -72,6 +74,7 @@ class Server
 		void	addClient(int clientFd);
 		Client*	getClient(int clientFd);
 
+		char	foldChar(char c) const;
 		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE
 
@@ -81,6 +84,24 @@ class Server
 			public:
 				specificException(const std::string &msg);
 		};
+
+
+		/*  JOIN  */
+		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
+		bool					 	checkChannelNameRules(Client& client, const std::string& channelName);
+		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
+		void						checkModeToAddClient(Client& client, std::vector<Channel>& channelsExistents, std::string& channelName, std::string& channelPass);
+		void						createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass);
+		
+		//utils join
+		void						prepareForJoin(std::string *params, Client *client);
+		std::vector<std::string> 	convertToVector(const std::string& line);
+		bool						equalChannels(std::string new_channel, std::string channel) const;
+		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
+		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
+		//per mostrar borrar
+		void 	mostrarChannels(void);
+		
 };
 
 #endif

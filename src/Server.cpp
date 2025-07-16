@@ -75,10 +75,34 @@ void Server::bindAndListen(sockaddr_in &addr)
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
 }
+void Server::mostrarChannels(void)
+{
+	for (size_t i = 0; i < channels.size(); ++i)
+	{
+		std::cout << "------------------------------------------------------------------" << std::endl;
+		std::cout << "Canal #" << i + 1 << " -> Nom: " << channels[i].getChannelName() << std::endl;
+		std::cout << "  Nombre de clients: " << channels[i].getClientNicks().size() << std::endl;
 
+		if (channels[i].isPasswordSet())
+			std::cout << "  Mode +k (password) activat" << std::endl;
+		if (channels[i].isInviteModeSet())
+			std::cout << "  Mode +i (invite-only) activat" << std::endl;
+		if (channels[i].isLimitModeSet())
+			std::cout << "  Mode +l (limit) activat. Límits: " << channels[i].getChannelLimit() << std::endl;
+
+		std::cout << "  Membres: ";
+		const std::vector<std::string>& nicks = channels[i].getClientNicks();
+		for (size_t j = 0; j < nicks.size(); ++j)
+		{
+			std::cout << nicks[j];
+			if (j < nicks.size() - 1) std::cout << ", ";
+		}
+		std::cout << std::endl << std::endl;
+	}
+}
 void Server::start()
 {
-	std::cout << "comencar a acceptar, send, recv, fer poll..." << std::endl;
+	std::cout << "comenca..." << std::endl;
 
 
 	struct pollfd serverPoll;
@@ -86,7 +110,6 @@ void Server::start()
 	serverPoll.events = POLLIN;
 	serverPoll.revents = 0;
 	pollFds.push_back(serverPoll);
-	std::cout << "Principal loop poll" << std::endl;
 	
 	while(true)
 	{
@@ -100,15 +123,11 @@ void Server::start()
 
 		for (size_t i = 0; i < pollFds.size(); ++i)
 		{
-			std::cout << "dins for" << std::endl;
 			if (pollFds[i].revents & POLLIN)
 			{
 				if (pollFds[i].fd == serverSocketFd)
-				{
 					acceptNewConnection();
-					std::cout << "loop handle new connection" << std::endl;
-				} else {
-					std::cout << "loop handle client data" << std::endl;
+				else {
 					if (clientIsRegistered(pollFds[i].fd) == false)
 						addClient(pollFds[i].fd);
 					handleClientData(pollFds[i].fd);
@@ -127,7 +146,7 @@ void Server::acceptNewConnection()
 	if (clientFd == -1) 
 	{
 		std::cerr << "Error en accept()" << std::endl;
-        	return;
+        return;
 	}
 
 	fcntl(clientFd, F_SETFL, O_NONBLOCK); // Non-blocking
@@ -137,11 +156,6 @@ void Server::acceptNewConnection()
 	clientPoll.events = POLLIN;
 	clientPoll.revents = 0;
 	pollFds.push_back(clientPoll);
-
-	//std::cout << "New client connected: " << inet_ntoa(clientAddr.sin_addr) 
-           //   << ":" << ntohs(clientAddr.sin_port) << std::endl;
-	//clients.insert(std::make_pair(clientFd, Client(clientFd))); // Create client
-	//std::cout << "New client: fd=" << clientFd << std::endl;
 }
 
 void Server::handleClientData(int clientFd)
@@ -150,7 +164,7 @@ void Server::handleClientData(int clientFd)
 	char buffer[512];
     int bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	
-
+	
     if (bytesRead == 0) {
 			std::cout << "CONNECTION closed\n";
         	removeClient(clientFd);  // Desconexión o error
@@ -164,13 +178,13 @@ void Server::handleClientData(int clientFd)
 			while (clients[clientFd]->readBuffer(&msg))
 			{
 				handleMsg(msg, clients[clientFd]);
+				mostrarChannels();
 			}
 		}
 }
 
 void Server::removeClient(int clientFd) 
 {
-    
 	// Delete pollFds
 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
 		it != pollFds.end(); ++it) 
@@ -226,10 +240,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 		ServerHandshake(params, client, command);
 	}
 	else
-	{
-		std::cout << "After handshake" << std::endl;
 		CommandCall(params, client, command);
-	}
 	delete[] params;
 	return ;
 }
@@ -263,7 +274,8 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 			break ;
 		case 2:
 			if (client->getPass() == true)
-				nick(params, client); 
+				nick(params, client);
+				
 			break ;
 		case 3:
 			if (client->getPass() == true && client->getNick().empty() == false)
@@ -289,8 +301,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			user(params, client);
 			break ;
 		case 4:
-			std::cout << "JOIN goes here" << std::endl;
-			//join(params, client);
+			prepareForJoin(params, client);
 			break;
 		case 5:
 			std::cout << "PRIVMSG goes here" << std::endl;
@@ -359,7 +370,6 @@ int	Server::countParams(std::string msg)
 				last = true;
 		}
 	}
-	//std::cout << "n is " << n << std::endl;
 	return (n);
 }
 
@@ -446,15 +456,10 @@ void	Server::sendReply(int client_fd, std::string reply)
   
 bool Server::clientIsRegistered(int clientFd) {
 	std::map<int, Client*>::iterator it = clients.find(clientFd);
-	if (it != clients.end()) {
-		// Found the client
-		std::cout << "Client with fd " << clientFd << " found: ";
-		std::cout << it->second->getNick() << std::endl;
+	if (it != clients.end()) 
 		return true;
-	} else {
-		std::cout << "No client found for fd: " << clientFd << std::endl;
+	else
 		return false;
-	}
 }
 
 
@@ -481,7 +486,7 @@ Client*	Server::getClient(int clientFd)
 	return (it->second);
 }
 
-char foldChar(char c) {
+char Server::foldChar(char c) const {
     if (c >= 'A' && c <= 'Z')
         return c + 32;
     if (c == '[') return '{';
