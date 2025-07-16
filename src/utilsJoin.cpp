@@ -25,6 +25,7 @@ void	Server::prepareForJoin(std::string *params, Client *client)
 	join(*client, this->channels, requestedChannels, passChannels);
 }
 
+
 std::vector<std::string> Server::convertToVector(const std::string& line)
 {
 	std::vector<std::string> result;

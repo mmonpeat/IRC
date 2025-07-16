@@ -9,8 +9,18 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 Server::~Server()
 {
 	close(serverSocketFd);
-	// delete all clients if allocated
-	// delete all channels if allocated
+	// Alliberem tots els clients
+	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+	{
+		delete it->second;
+	}
+	clients.clear(); // buidem el map
+
+	// Netejar canals (no són punters, només netegem el vector)
+	channels.clear();
+
+	// Netejar pollFds
+	pollFds.clear();
 	std::cout << "[Server] Socket closed" << std::endl;
 
 }
