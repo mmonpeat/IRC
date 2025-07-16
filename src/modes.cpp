@@ -96,9 +96,29 @@ void	Server::modeK(Channel *channel, std::string password, char sign, Client *cl
 	return;
 }
 
-void	Server::modeT(Channel *channel, char sign, Client client) {
-	
+void	Server::modeT(Channel *channel, char sign, Client *client) {
+	if (channel->isOperator(client->getNick()) == false) {
+		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
+		return;
+	}
+	if (channel->isTopicModeSet() == false && sign == '+')
+		channel->setTopicMode();
+	else if (channel->isTopicModeSet() == true && sign == '-')
+		channel->unsetTopic();
 	return;
+}
+
+void	Server::modeL(Channel *channel, char sign, Client *client) {
+	if (channel->isOperator(client->getNick()) == false) {
+		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
+		return;
+	}
+	if (channel->)
+
+	else if (channel->isLimitModeSet() == true)
+		channel->unsetLimit();
+
+
 }
 // LIMIT 3 modes that require parameter
 /* input /MODE #pepe +k+l-t+i+o koko 8 poter Polly2 

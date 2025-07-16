@@ -134,10 +134,15 @@ void Channel::setPasswordMode(bool mode)
 	this->_password_set = mode;
 }
 
+void	Channel::setTopicMode(void) {
+	this->_topic_set = true;
+	return;
+}
+
 
 //---------------------------------- Unsetters -----------------------------------------------
 
-void		Channel::unsetPassword(const std::string& password) {
+void	Channel::unsetPassword(const std::string& password) {
 	if (this->_password == password) {
 		this->_password.clear();
 		this->_password_set = false;
@@ -146,6 +151,18 @@ void		Channel::unsetPassword(const std::string& password) {
 	else 
 		std::cout << "The password in wrong" << std::endl;
 	return;
+}
+
+void	Channel::unsetTopic(void) {
+	this->_topic_set = false;
+	std::cout << "Topic mode has been unset" << std::endl; //change it to group message
+	return;
+}
+
+void	Channel::unsetLimit(void) {
+	this->_channel_limit = 0; // standart deafult num is limit if off for irc
+	this->_limit_set = false;
+	std::cout << the Limit of Channel has been lifted << std::endl;
 }
 
 //---------------------------------- Class Functions -----------------------------------------

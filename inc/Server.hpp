@@ -98,7 +98,7 @@ class Server
 		int							ptrLen(std::string *ptr);
 		bool						applyModes(std::string *params, Client *client, Channel* channel);
 		void						modeK(Channel *channel, std::string password, char sign, Client *client);
-		void						modeT(Channel *channel, char sign, Client client);
+		void						modeT(Channel *channel, char sign, Client *client);
 
 		
 		//utils join
