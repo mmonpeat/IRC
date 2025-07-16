@@ -8,28 +8,6 @@ int		Server::ptrLen(std::string *ptr) {
 	return len;
 }
 
-void	Server::channelModes(std::string *params, Client *client) {
-
-	int 		len = ptrLen(params);
-	Channel*	channel;
-
-	for (int i = 0; i < len; i++) {
-		if (i == 1)
-			channel = getChannelByName(params[1]);
-			if (channel == NULL) {
-				std::cout << "This channel does not exist." << std::endl; // tiene que ir al cliente
-				return;
-			}
-		if (i == 2)
-			if (applyModes(params, client, channel) == false) { // maybe better void
-				return;
-			}
-	}
-	//if there are no 2 error message maybe?
-	return;
-}
-
-
 Channel*	Server::getChannelByName(std::string& name) {
 	for (std::vector<Channel>::iterator it = channels.begin(); it != channels.end(); it++) {
 		if (equalNicks(it->getChannelName(), name) == true) // check it it works
@@ -37,6 +15,32 @@ Channel*	Server::getChannelByName(std::string& name) {
 	}
 	return NULL;
 }
+
+
+void	Server::channelModes(std::string *params, Client *client) {
+
+	int 		len = ptrLen(params);
+	Channel*	channel;
+
+	for (int i = 0; i < len; i++) {
+		if (i == 1) {
+			channel = getChannelByName(params[1]);
+			if (channel == NULL) {
+				std::cout << "This channel does not exist." << std::endl; // tiene que ir al cliente
+				return;
+			}
+		}
+		if (i == 2) {
+			if (applyModes(params, client, channel) == false) { // maybe better void
+				return;
+			}
+		}
+	}
+	//if there are no 2 error message maybe?
+	return;
+}
+
+
 
 
 bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
@@ -77,6 +81,7 @@ bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
 		}
 	}
 	(void) client;
+	(void) channel;
 	return true;
 }
 
@@ -108,17 +113,42 @@ void	Server::modeT(Channel *channel, char sign, Client *client) {
 	return;
 }
 
-void	Server::modeL(Channel *channel, char sign, Client *client) {
+bool	Server::isLimitValid(std::string limit) {
+	if (limit.empty() == true || limit.length() > 9)
+		return false;
+	size_t i = 0;
+	if (limit[0] == '+')
+		i = 1;
+	for (; i < limit.length(); i++) {
+		if (!std::isdigit(limit[i]))
+			return false;
+	}
+	return true;
+}
+
+int		Server::strToInt(std::string arg) {
+	if (arg == "0")
+		return 0;
+	return atoi(arg.c_str());
+}
+
+void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client) {
 	if (channel->isOperator(client->getNick()) == false) {
 		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
 		return;
 	}
-	if (channel->)
-
+	if (sign == '+' && isLimitValid(arg) == true)
+		channel->setChannelLimit(strToInt(arg));
 	else if (channel->isLimitModeSet() == true)
 		channel->unsetLimit();
+}
 
-
+void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
+	if (channel->isOperator(client->getNick()) == false) {
+		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
+		return;
+	}
+	c
 }
 // LIMIT 3 modes that require parameter
 /* input /MODE #pepe +k+l-t+i+o koko 8 poter Polly2 

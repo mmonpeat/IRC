@@ -96,9 +96,13 @@ class Server
 		void						channelModes(std::string *params, Client *client);
 		Channel*					getChannelByName(std::string& name);
 		int							ptrLen(std::string *ptr);
+		int							strToInt(std::string arg); 
+		bool						isLimitValid(std::string limit);
 		bool						applyModes(std::string *params, Client *client, Channel* channel);
 		void						modeK(Channel *channel, std::string password, char sign, Client *client);
 		void						modeT(Channel *channel, char sign, Client *client);
+		void						modeL(Channel *channel, std::string arg, char sign, Client *client);
+		void						modeO(Channel *channel, std::string arg, char sign, Client *client);
 
 		
 		//utils join

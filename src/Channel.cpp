@@ -162,7 +162,7 @@ void	Channel::unsetTopic(void) {
 void	Channel::unsetLimit(void) {
 	this->_channel_limit = 0; // standart deafult num is limit if off for irc
 	this->_limit_set = false;
-	std::cout << the Limit of Channel has been lifted << std::endl;
+	std::cout << "the Limit of Channel has been lifted" << std::endl;
 }
 
 //---------------------------------- Class Functions -----------------------------------------
