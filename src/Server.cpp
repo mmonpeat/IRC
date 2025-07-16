@@ -116,6 +116,8 @@ void Server::start()
 		int pollCount = poll(pollFds.data(), pollFds.size(), -1); // wait forever
 		if (pollCount == -1)
 		{
+			if (errno == EINTR)
+				break ;
 			throw Server::specificException("ERROR: poll failed");
 		}
 
@@ -222,6 +224,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 	if (command == -1)
 	{
+		std::cout << "unknown command" << std::endl;
 		sendReply(client->getFd(), errUnknownCommand(client->getNick()));
 		delete[] params;
 		return ;
@@ -391,8 +394,6 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		std::cout << "correct Pass" << std::endl;
-		//std::string reply = ":localhost :Correct password\r\n";
-		//sendReply(client->getFd(), reply);
 		client->setPass(true);
 	}
 	else
@@ -419,8 +420,6 @@ void	Server::nick(std::string *params, Client *client)
 	//check nick characters
 	client->setNick(params[1]);
 	std::cout << "Nick set as " << client->getNick() << std::endl;
-	//std::string	reply = ":localhost :Nick set as " + client->getNick() + "\r\n";
-	//sendReply(client->getFd(), reply);
 	return ;
 }
 
@@ -437,12 +436,8 @@ void	Server::user(std::string *params, Client *client)
 		return ;
 	}
 	client->setUserName(params[1]);
-	//std::string	reply = ":localhost :username set as " + client->getUserName() + "\r\n";
 	std::cout << "user name set as:" << client->getUserName() << "\n";
-	//sendReply(client->getFd(), reply);
-	//reply = ":localhost :real name set as " + client->getRealName() + "\r\n";
 	client->setRealName(params[4]);
-	//sendReply(client->getFd(), reply);
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
@@ -477,7 +472,7 @@ void	Server::addClient(int clientFd) {
 	
 	if (clients.size() >= 10) {
 		std::cout << "Server full :(  " << std::endl;
-		// habra que eliminar este fd y cerrar la conexion
+		removeClient(clientFd);
 	}
 	
 	Client *new_client = createClient(clientFd);

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cstdlib> //EXIT_SUCCESS i EXIT_FALIURE, constants
 #include <cstring> //memset...
+#include <cerrno> //errno
 #include <string>
 #include <stdexcept>
 #include <vector>
