@@ -30,7 +30,6 @@ class Channel
 				
 	public:
 		Channel(std::string name, Client *client);
-		Channel(std::string name, Client *client, std::string password);
 		~Channel(void);
 
 		// Modes settings getters and checkers
