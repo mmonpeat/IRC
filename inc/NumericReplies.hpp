@@ -20,8 +20,8 @@ inline	std::string	rplWelcome(std::string nickname){
 	return (":localhost 001 " + nickname + " :Welcome to our IRC server, " + nickname + ":)\r\n");
 }
 
-inline	std::string errUnknownCommand(std::string nickname){
-	return (":localhost 421 " + nickname + " :Unknown command\r\n");
+inline	std::string errUnknownCommand(std::string client, std::string command){
+	return (":localhost 421 " + client + command + " :Unknown command\r\n");
 }
 
 inline	std::string	errNoNickNameGiven(void){
@@ -45,7 +45,7 @@ inline	std::string errAlreadyRegistered(std::string nickname){
 }
 
 inline	std::string errPassMismatch(void){
-	return (":localhost 464 :Password incorrect\r\n");
+	return ("464 :Password incorrect\r\n");
 }
 
 #endif
