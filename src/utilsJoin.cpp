@@ -52,13 +52,21 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 }
 
 bool Server::isChannelNameUnique(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const {
-    return (channelsExistents.find(channelToCheck) == channelsExistents.end());
+    for (std::map<std::string, Channel*>::const_iterator it = channelsExistents.begin(); 
+         it != channelsExistents.end(); ++it) {
+        if (equalChannels(it->first, channelToCheck)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 std::string Server::getUniqueChannelName(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const {
-    std::map<std::string, Channel*>::const_iterator it = channelsExistents.find(channelToCheck);
-    if (it != channelsExistents.end()) {
-        return (it->first);
+    for (std::map<std::string, Channel*>::const_iterator it = channelsExistents.begin();
+         it != channelsExistents.end(); ++it) {
+        if (equalChannels(it->first, channelToCheck)) {
+            return (it->first); // Devuelve el nombre exacto que está en el mapa
+        }
     }
     return (channelToCheck);
 }

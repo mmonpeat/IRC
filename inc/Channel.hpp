@@ -45,6 +45,7 @@ class Channel
 		std::vector<std::string> 	getClientNicks() const;
 		int 						getChannelLimit(void) const;
 		std::string					getTopic(void) const;
+		size_t 						getClientCount() const { return _clients.size(); }
 
 		//setters
 		void		setChannelLimit(int limit);
@@ -53,6 +54,7 @@ class Channel
 		
 		// Channel functions
 		void		addClient(Client *client);
+		bool 		isClientInChannel(Client* client) const;
 		void		removeClient(Client* client);
 		void		addOperator(Client *new_op);
 		void		removeOperator(Client *op);

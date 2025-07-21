@@ -8,26 +8,32 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 
 Server::~Server()
 {
-	close(serverSocketFd);
+    // Cerrar socket del servidor
+    if (serverSocketFd != -1) {
+        close(serverSocketFd);
+        std::cout << "[Server] Socket closed" << std::endl;
+    }
 
-	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+    // Liberar todos los canales
+    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
     {
         delete it->second;
     }
     channels.clear();
-	// Alliberem tots els clients
-	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
-	{
-		delete it->second;
-	}
-	clients.clear(); // buidem el map
+    
+    // Liberar todos los clientes y cerrar sus sockets
+    for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (it->first != -1) {
+            close(it->first); // Cerrar el socket del cliente
+        }
+        delete it->second;
+    }
+    clients.clear();
 
-	// Netejar pollFds
-	pollFds.clear();
-	std::cout << "[Server] Socket closed" << std::endl;
-
+    // Limpiar pollFds
+    pollFds.clear();
 }
-
 void Server::init()
 {
 	std::cout << "entra init" << std::endl;
@@ -88,7 +94,6 @@ void Server::bindAndListen(sockaddr_in &addr)
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
 }
-
 void Server::mostrarChannels(void)
 {
     int i = 1;
@@ -200,22 +205,74 @@ void Server::handleClientData(int clientFd)
 		}
 }
 
-void Server::removeClient(int clientFd) 
+// void Server::removeClient(int clientFd) 
+// {
+// 	// Delete pollFds
+// 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
+// 		it != pollFds.end(); ++it) 
+// 	{
+// 		if (it->fd == clientFd)
+// 		{
+// 				pollFds.erase(it);
+// 				break;
+// 		}
+// 	}
+// 	std::cout << "Close client with: fd=" << clientFd << std::endl;
+// 	delete clients[clientFd];
+// 	clients.erase(clientFd);
+// 	close(clientFd);
+// }
+void Server::removeClient(int clientFd)
 {
-	// Delete pollFds
-	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
-		it != pollFds.end(); ++it) 
-	{
-		if (it->fd == clientFd)
-		{
-				pollFds.erase(it);
-				break;
-		}
-	}
-	std::cout << "Close client with: fd=" << clientFd << std::endl;
-	delete clients[clientFd];
-	clients.erase(clientFd);
-	close(clientFd);
+    // 1. Encontrar el cliente
+    std::map<int, Client*>::iterator clientIt = clients.find(clientFd);
+    if (clientIt == clients.end()) return;
+
+    Client* client = clientIt->second;
+	if (!client) return;
+    
+    // 2. Crear lista temporal de canales para evitar invalidación de iteradores
+    std::vector<Channel*> clientChannels;
+    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it) {
+        if (it->second->isClientInChannel(client)) {
+            clientChannels.push_back(it->second);
+        }
+    }
+    
+    // 3. Eliminar cliente de los canales
+    for (size_t i = 0; i < clientChannels.size(); ++i) {
+        Channel* channel = clientChannels[i];
+        // Notificar salida a los demás usuarios
+        channel->broadcastMessage(":" + client->getNick() + "!" + client->getUserName() + "@localhost QUIT :Client quit\r\n");
+        
+        // Eliminar cliente del canal
+        channel->removeClient(client);
+
+        // Eliminar canal si queda vacío
+        if (channel->isChannelEmpty()) {
+            std::map<std::string, Channel*>::iterator chanIt = channels.find(channel->getChannelName());
+            if (chanIt != channels.end()) {
+                delete chanIt->second;
+                channels.erase(chanIt);
+            }
+        }
+    }
+    
+    // 4. Eliminar de pollFds
+    for (std::vector<struct pollfd>::iterator it = pollFds.begin(); it != pollFds.end(); ++it) {
+        if (it->fd == clientFd) {
+            pollFds.erase(it);
+            break;
+        }
+    }
+    
+    // 5. Cerrar socket y eliminar cliente
+    //close(clientFd);
+	if (clientFd != -1) {
+        close(clientFd);
+    }
+    delete client;
+    clients.erase(clientIt);
 }
 
 int		Server::getServerPort( void ) const {
@@ -342,7 +399,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			break;
 		default:
 		{
-			std::cout << "Default de COmmand call es:" << std::endl;
+			std::cout << "Default de COmmand call es unknow command" << std::endl;
 			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
 		}
 	}

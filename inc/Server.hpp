@@ -87,7 +87,7 @@ class Server
 
 
 		/*  JOIN  */
-		int 						join(Client& client, std::map<std::string, Channel*> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
+		int 						join(Client& client, std::map<std::string, Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		bool					 	checkChannelNameRules(Client& client, const std::string& channelName);
 		int 						countClientChannels(Client& client, const std::map<std::string, Channel*>& channelsExistents);
 		void						checkModeToAddClient(Client& client, std::map<std::string, Channel*>& channelsExistents, std::string& channelName, std::string& channelPass);

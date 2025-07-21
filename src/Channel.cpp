@@ -133,20 +133,49 @@ void	Channel::addClient(Client *client) {
 	return;
 }
 
-void	Channel::removeClient(Client* client) {
-	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == client->getNick()) {
-			if (isOperator(client->getNick()))
-				removeOperator(client);
-			_clients.erase(it);
-			break;
-		}
-	}
-	// check if it is empty and call break to not print the message
-	std::string	message = "deleted \r\n";
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		send((*it)->getFd(), message.c_str(), message.size(), 0);
-	}
+// void	Channel::removeClient(Client* client) {
+// 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+// 		if ((*it)->getNick() == client->getNick()) {
+// 			if (isOperator(client->getNick()))
+// 				removeOperator(client);
+// 			_clients.erase(it);
+// 			break;
+// 		}
+// 	}
+// 	// check if it is empty and call break to not print the message
+// 	std::string	message = "deleted \r\n";
+// 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+// 		send((*it)->getFd(), message.c_str(), message.size(), 0);
+// 	}
+// }
+
+bool Channel::isClientInChannel(Client* client) const
+{
+    for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if ((*it)->getFd() == client->getFd())
+            return true;
+    }
+    return false;
+}
+
+void Channel::removeClient(Client* client)
+{
+    // Eliminar de clientes normales
+    for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if ((*it)->getFd() == client->getFd()) {
+            _clients.erase(it);
+            break;
+        }
+    }
+    
+    // Eliminar de operadores si lo era
+    for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
+        if ((*it)->getFd() == client->getFd()) {
+            _operators.erase(it);
+            break;
+        }
+    }
 }
 
 void	Channel::removeOperator(Client *op) {
