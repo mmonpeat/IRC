@@ -15,9 +15,9 @@ Server::~Server()
     }
 
     // Liberar todos los canales
-    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+    for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
     {
-        delete it->second;
+        delete *it;
     }
     channels.clear();
     
@@ -93,33 +93,6 @@ void Server::bindAndListen(sockaddr_in &addr)
 		close(serverSocketFd);
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
-}
-void Server::mostrarChannels(void)
-{
-    int i = 1;
-    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it, ++i)
-    {
-        Channel* channel = it->second;
-        std::cout << "------------------------------------------------------------------" << std::endl;
-        std::cout << "Canal #" << i << " -> Nom: " << channel->getChannelName() << std::endl;
-        std::cout << "  Nombre de clients: " << channel->getClientNicks().size() << std::endl;
-
-        if (channel->isPasswordSet())
-            std::cout << "  Mode +k (password) activat" << std::endl;
-        if (channel->isInviteModeSet())
-            std::cout << "  Mode +i (invite-only) activat" << std::endl;
-        if (channel->isLimitModeSet())
-            std::cout << "  Mode +l (limit) activat. Límits: " << channel->getChannelLimit() << std::endl;
-
-        std::cout << "  Membres: ";
-        const std::vector<std::string>& nicks = channel->getClientNicks();
-        for (size_t j = 0; j < nicks.size(); ++j)
-        {
-            std::cout << nicks[j];
-            if (j < nicks.size() - 1) std::cout << ", ";
-        }
-        std::cout << std::endl << std::endl;
-    }
 }
 
 void Server::start()
@@ -204,7 +177,37 @@ void Server::handleClientData(int clientFd)
 			}
 		}
 }
+void Server::mostrarChannels(void)
+{
+    int i = 1;
+    for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it, ++i)
+    {
+        Channel* channel = *it;  // Diferencia clave: se usa *it en lugar de it->second
+        std::cout << "------------------------------------------------------------------" << std::endl;
+        if (!channel) {
+			std::cout << "Canal #" << i << " -> Puntero nulo!" << std::endl;
+			continue;
+		}
+		std::cout << "Canal #" << i << " -> Nom: " << channel->getChannelName() << std::endl;
+        std::cout << "  Nombre de clients: " << channel->getClientNicks().size() << std::endl;
 
+        if (channel->isPasswordSet())
+            std::cout << "  Mode +k (password) activat" << std::endl;
+        if (channel->isInviteModeSet())
+            std::cout << "  Mode +i (invite-only) activat" << std::endl;
+        if (channel->isLimitModeSet())
+            std::cout << "  Mode +l (limit) activat. Límits: " << channel->getChannelLimit() << std::endl;
+
+        std::cout << "  Membres: ";
+        const std::vector<std::string>& nicks = channel->getClientNicks();
+        for (size_t j = 0; j < nicks.size(); ++j)
+        {
+            std::cout << nicks[j];
+            if (j < nicks.size() - 1) std::cout << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
+}
 // void Server::removeClient(int clientFd) 
 // {
 // 	// Delete pollFds
@@ -231,31 +234,24 @@ void Server::removeClient(int clientFd)
     Client* client = clientIt->second;
 	if (!client) return;
     
-    // 2. Crear lista temporal de canales para evitar invalidación de iteradores
-    std::vector<Channel*> clientChannels;
-    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it) {
-        if (it->second->isClientInChannel(client)) {
-            clientChannels.push_back(it->second);
-        }
-    }
-    
     // 3. Eliminar cliente de los canales
-    for (size_t i = 0; i < clientChannels.size(); ++i) {
-        Channel* channel = clientChannels[i];
-        // Notificar salida a los demás usuarios
-        channel->broadcastMessage(":" + client->getNick() + "!" + client->getUserName() + "@localhost QUIT :Client quit\r\n");
-        
-        // Eliminar cliente del canal
-        channel->removeClient(client);
-
-        // Eliminar canal si queda vacío
-        if (channel->isChannelEmpty()) {
-            std::map<std::string, Channel*>::iterator chanIt = channels.find(channel->getChannelName());
-            if (chanIt != channels.end()) {
-                delete chanIt->second;
-                channels.erase(chanIt);
+    for (size_t i = 0; i < channels.size(); ) {
+        Channel* channel = channels[i];
+        if (channel->isClientInChannel(client)) {
+            // Notificar salida
+            channel->broadcastMessage(":" + client->getNick() + " QUIT :Client quit\r\n");
+            
+            // Eliminar cliente
+            channel->removeClient(client);
+            
+            // Eliminar canal si está vacío
+            if (channel->isChannelEmpty()) {
+                delete channel;
+                channels.erase(channels.begin() + i);
+                continue; // No incrementar i ya que hemos eliminado un elemento
             }
         }
+        ++i;
     }
     
     // 4. Eliminar de pollFds

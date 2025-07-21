@@ -49,24 +49,22 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 			return false;
 	}
 	return true;
-}
+} 
 
-bool Server::isChannelNameUnique(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const {
-    for (std::map<std::string, Channel*>::const_iterator it = channelsExistents.begin(); 
-         it != channelsExistents.end(); ++it) {
-        if (equalChannels(it->first, channelToCheck)) {
-            return false;
-        }
-    }
+bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const {
+	for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+    {
+		if (equalChannels((*it)->getChannelName(), channelToCheck))
+			return false;
+	}
     return true;
 }
 
-std::string Server::getUniqueChannelName(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const {
-    for (std::map<std::string, Channel*>::const_iterator it = channelsExistents.begin();
-         it != channelsExistents.end(); ++it) {
-        if (equalChannels(it->first, channelToCheck)) {
-            return (it->first); // Devuelve el nombre exacto que está en el mapa
-        }
-    }
+std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const {
+	for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+    {
+		if (equalChannels((*it)->getChannelName(), channelToCheck))
+			return ((*it)->getChannelName());
+	}
     return (channelToCheck);
 }

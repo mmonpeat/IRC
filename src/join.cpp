@@ -31,15 +31,15 @@ bool Server::checkChannelNameRules(Client& client, const std::string& channelNam
 	return (true);
 }
 
-int Server::countClientChannels(Client& client, const std::map<std::string, Channel*>& channelsExistents)
+int Server::countClientChannels(Client& client, const std::vector<Channel*>& channelsExistents)
 {
 	int count = 0;
     const std::string& clientNick = client.getNick();
     
-    for (std::map<std::string, Channel*>::const_iterator it = channelsExistents.begin(); 
+    for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); 
          it != channelsExistents.end(); ++it) 
     {
-        const std::vector<std::string>& nickList = it->second->getClientNicks();
+        const std::vector<std::string>& nickList = (*it)->getClientNicks();
         if (std::find(nickList.begin(), nickList.end(), clientNick) != nickList.end()) {
             count++;
         }
@@ -47,118 +47,118 @@ int Server::countClientChannels(Client& client, const std::map<std::string, Chan
     return count;
 }
 
-void Server::checkModeToAddClient(Client& client, std::map<std::string, Channel*>& channelsExistents, std::string& channelName, std::string& channelPass)
+void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channelsExistents, std::string& channelName, std::string& channelPass)
 {
-	std::map<std::string, Channel*>::iterator it = channelsExistents.find(channelName);
-	if (it != channelsExistents.end())
-    {
-		Channel* channel = it->second;
-		// Verificación crítica que evita segfaults
-		if (channel->getChannelName() != channelName) {
-			return;
-		}
-		bool canJoin = true;
-
-		// Mode +i (invite-only)
-		if (channel->isInviteModeSet())
+	for (std::vector<Channel*>::iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it) {
+        Channel* channel = *it;
+		if (equalChannels(channel->getChannelName(), channelName)) 
 		{
-			std::string err = "473 ERR_INVITEONLYCHAN " + channelName + " :Cannot join channel (+i)\r\n";
-			sendReply(client.getFd(), err);
-			canJoin = false;
-		}
-
-		// Mode +k (password)
-		if (channel->isPasswordSet())
-		{
-			if (channelPass.empty())
-			{
-				std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
-				sendReply(client.getFd(), err);
-				// std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
-				//ns on haauria d'anar la dde que el passa ja esta setado?
-				//std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
-				canJoin = false;
+			// Verificación crítica que evita segfaults
+			if (channel->getChannelName() != channelName) {
+				return;
 			}
-			else if (!channel->isPasswordValidChannel(channelPass))
+			bool canJoin = true;
+
+			// Mode +i (invite-only)
+			if (channel->isInviteModeSet())
 			{
-				std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
+				std::string err = "473 ERR_INVITEONLYCHAN " + channelName + " :Cannot join channel (+i)\r\n";
 				sendReply(client.getFd(), err);
 				canJoin = false;
 			}
-		}
 
-		// Mode +l (limit)
-		//channel->setChannelLimit(3);
-		//si hi ha lloc i no esta ple +l (Ple: error: 471)
-		//std::cout << "LIMIT: getChannelLimit: " << channel->getChannelLimit() << " numberOfClients: " << channel->numberOfClients(channelsExistents, channelName) << std::endl;
-		if (channel->isLimitModeSet())
-		{
-			int limit = channel->getChannelLimit();
-			int current = channel->numberOfClients();
-			if (current >= limit)
+			// Mode +k (password)
+			if (channel->isPasswordSet())
 			{
-				std::string err = "471 ERR_CHANNELISFULL " + channelName + " :Cannot join channel (+l)\r\n";
-				sendReply(client.getFd(), err);
-				canJoin = false;
-			}
-		}
-		
-		if (canJoin)
-		{
-			// Afegir client al canal
-			channel->addClient(&client);
-
-			// Mensaje JOIN para TODOS incluyendo al nuevo cliente
-			std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
-			channel->broadcastMessage(joinMsg);
-			
-			// 1. JOIN a tots els del canal
-			sendReply(client.getFd(), joinMsg);
-
-			// 2.1 TOPIC Si es el primer usuario, hacerlo operador
-			if (channel->getClientCount() == 1) {
-				channel->addOperator(&client);
-				sendReply(client.getFd(), "MODE " + channelName + " +o " + client.getNick() + "\r\n");
-				
-				// Notificar a todos que es operador
-				channel->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost MODE " + channelName + " +o " + client.getNick() + "\r\n");
-			}
-
-			// Enviar información del canal (TOPIC)
-			if (!channel->getTopic().empty()) {
-				sendReply(client.getFd(), "332 " + client.getNick() + " " + channelName + " :" + channel->getTopic() + "\r\n");
-			} else {
-				sendReply(client.getFd(), "331 " + client.getNick() + " " + channelName + " :No topic is set\r\n");
-			}
-
-			// 3. Llista d'usuaris (NAMREPLY)
-			std::string namesMsg = "353 " + client.getNick() + " = " + channelName + " :";
-			const std::vector<std::string>& nickList = channel->getClientNicks();
-			for (size_t i = 0; i < nickList.size(); ++i) {
-				if (i > 0) namesMsg += " ";
-				if (channel->isOperator(nickList[i])) {
-					namesMsg += "@";
+				if (channelPass.empty())
+				{
+					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
+					sendReply(client.getFd(), err);
+					// std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
+					//ns on haauria d'anar la dde que el passa ja esta setado?
+					//std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
+					canJoin = false;
 				}
-				namesMsg += nickList[i];
+				else if (!channel->isPasswordValidChannel(channelPass))
+				{
+					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
+					sendReply(client.getFd(), err);
+					canJoin = false;
+				}
 			}
-			sendReply(client.getFd(), namesMsg + "\r\n");
-			sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
+
+			// Mode +l (limit)
+			//channel->setChannelLimit(3);
+			//si hi ha lloc i no esta ple +l (Ple: error: 471)
+			//std::cout << "LIMIT: getChannelLimit: " << channel->getChannelLimit() << " numberOfClients: " << channel->numberOfClients(channelsExistents, channelName) << std::endl;
+			if (channel->isLimitModeSet())
+			{
+				int limit = channel->getChannelLimit();
+				int current = channel->numberOfClients();
+				if (current >= limit)
+				{
+					std::string err = "471 ERR_CHANNELISFULL " + channelName + " :Cannot join channel (+l)\r\n";
+					sendReply(client.getFd(), err);
+					canJoin = false;
+				}
+			}
+			
+			if (canJoin)
+			{
+				// Afegir client al canal
+				channel->addClient(&client);
+
+				// Mensaje JOIN para TODOS incluyendo al nuevo cliente
+				std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
+				channel->broadcastMessage(joinMsg);
+				
+				// 1. JOIN a tots els del canal
+				sendReply(client.getFd(), joinMsg);
+
+				// 2.1 TOPIC Si es el primer usuario, hacerlo operador
+				if (channel->getClientCount() == 1) {
+					channel->addOperator(&client);
+					sendReply(client.getFd(), "MODE " + channelName + " +o " + client.getNick() + "\r\n");
+					
+					// Notificar a todos que es operador
+					channel->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost MODE " + channelName + " +o " + client.getNick() + "\r\n");
+				}
+
+				// Enviar información del canal (TOPIC)
+				if (!channel->getTopic().empty()) {
+					sendReply(client.getFd(), "332 " + client.getNick() + " " + channelName + " :" + channel->getTopic() + "\r\n");
+				} else {
+					sendReply(client.getFd(), "331 " + client.getNick() + " " + channelName + " :No topic is set\r\n");
+				}
+
+				// 3. Llista d'usuaris (NAMREPLY)
+				std::string namesMsg = "353 " + client.getNick() + " = " + channelName + " :";
+				const std::vector<std::string>& nickList = channel->getClientNicks();
+				for (size_t i = 0; i < nickList.size(); ++i) {
+					if (i > 0) namesMsg += " ";
+					if (channel->isOperator(nickList[i])) {
+						namesMsg += "@";
+					}
+					namesMsg += nickList[i];
+				}
+				sendReply(client.getFd(), namesMsg + "\r\n");
+				sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
+			}
 		}
 	}
 }
 
-void Server::createNewChannel(Client& client, std::map<std::string, Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass)
+void Server::createNewChannel(Client& client, std::vector<Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass)
 {
     Channel* newChannel = new Channel(channelName, &client);
     newChannel->addClient(&client);
     newChannel->addOperator(&client);
     
-    if (!channelPass.empty())
-    {
+    if (!channelPass.empty()) {
         newChannel->setPassword(channelPass);
         newChannel->setPasswordMode(true);
     }
-    channelsExistents[channelName] = newChannel;
+    channelsExistents.push_back(newChannel);
 	// Notificar al cliente que ha creado el canal
     std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
     sendReply(client.getFd(), joinMsg);
@@ -174,7 +174,7 @@ void Server::createNewChannel(Client& client, std::map<std::string, Channel*>& c
     sendReply(client.getFd(), "MODE " + channelName + " +o " + client.getNick() + "\r\n");
 }
 
-int Server::join(Client& client, std::map<std::string, Channel*> &channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)
+int Server::join(Client& client, std::vector<Channel*>& channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)
 {
 	const int MAX_CHANNELS_PER_CLIENT = 5;//10
 

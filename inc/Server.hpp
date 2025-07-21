@@ -32,7 +32,7 @@ class Server
 		
 	
 		std::map<int, Client*>			clients;
-		std::map<std::string, Channel*> channels;
+		std::vector<Channel*>			channels;
 		std::vector<struct pollfd> 		pollFds;
 
 		//ft_lookup()
@@ -87,19 +87,19 @@ class Server
 
 
 		/*  JOIN  */
-		int 						join(Client& client, std::map<std::string, Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
+		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		bool					 	checkChannelNameRules(Client& client, const std::string& channelName);
-		int 						countClientChannels(Client& client, const std::map<std::string, Channel*>& channelsExistents);
-		void						checkModeToAddClient(Client& client, std::map<std::string, Channel*>& channelsExistents, std::string& channelName, std::string& channelPass);
-		void						createNewChannel(Client& client, std::map<std::string, Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass);
+		int 						countClientChannels(Client& client, const std::vector<Channel*>& channelsExistents);
+		void						checkModeToAddClient(Client& client, std::vector<Channel*>& channelsExistents, std::string& channelName, std::string& channelPass);
+		void						createNewChannel(Client& client, std::vector<Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass);
 		
 		//utils join
 		int							ptrLen(std::string *ptr);
 		void						prepareForJoin(std::string *params, Client *client);
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		bool						equalChannels(std::string new_channel, std::string channel) const;
-		bool						isChannelNameUnique(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const;
-		std::string					getUniqueChannelName(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const;
+		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
+		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
 		//per mostrar borrar
 		void 	mostrarChannels(void);
 		
