@@ -121,6 +121,14 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 				{
 					if (i > 0) names += " ";
 					names += nickList[i];
+					/*
+					 if (i > 0) names += " ";
+					// afegeix @ si és operador!
+					if (it->isOperator(nickList[i]))
+						names += "@" + nickList[i];
+					else
+						names += nickList[i];
+					*/
 				}
 				sendReply(client.getFd(), "353 " + client.getNick() + " = " + channelName + " :" + names + "\r\n");
 				sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
@@ -132,8 +140,8 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel>& channels
 void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass)
 {
 	Channel newChannel(channelName, &client);
-	newChannel.addOperator(&client); // primer usuari = operador
 	newChannel.addClient(&client);
+	newChannel.addOperator(&client); // primer usuari = operador
 
 	if (!channelPass.empty())
 	{
@@ -141,6 +149,7 @@ void Server::createNewChannel(Client& client, std::vector<Channel>& channelsExis
 		newChannel.setPasswordMode(true); // activa mode +k
 	}
 	channelsExistents.push_back(newChannel);
+
 }
 
 int Server::join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> ChannelsNames, std::vector<std::string> ChannelsPasswords)

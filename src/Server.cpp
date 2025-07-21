@@ -334,7 +334,10 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//mode(params, client);
 			break;
 		default:
+		{
+			std::cout << "Default de COmmand call es:" << std::endl;
 			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
+		}
 	}
 	return ;
 }
