@@ -9,15 +9,18 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 Server::~Server()
 {
 	close(serverSocketFd);
+
+	for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+    {
+        delete it->second;
+    }
+    channels.clear();
 	// Alliberem tots els clients
 	for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
 	{
 		delete it->second;
 	}
 	clients.clear(); // buidem el map
-
-	// Netejar canals (no són punters, només netegem el vector)
-	channels.clear();
 
 	// Netejar pollFds
 	pollFds.clear();
@@ -85,31 +88,35 @@ void Server::bindAndListen(sockaddr_in &addr)
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
 }
+
 void Server::mostrarChannels(void)
 {
-	for (size_t i = 0; i < channels.size(); ++i)
-	{
-		std::cout << "------------------------------------------------------------------" << std::endl;
-		std::cout << "Canal #" << i + 1 << " -> Nom: " << channels[i].getChannelName() << std::endl;
-		std::cout << "  Nombre de clients: " << channels[i].getClientNicks().size() << std::endl;
+    int i = 1;
+    for (std::map<std::string, Channel*>::iterator it = channels.begin(); it != channels.end(); ++it, ++i)
+    {
+        Channel* channel = it->second;
+        std::cout << "------------------------------------------------------------------" << std::endl;
+        std::cout << "Canal #" << i << " -> Nom: " << channel->getChannelName() << std::endl;
+        std::cout << "  Nombre de clients: " << channel->getClientNicks().size() << std::endl;
 
-		if (channels[i].isPasswordSet())
-			std::cout << "  Mode +k (password) activat" << std::endl;
-		if (channels[i].isInviteModeSet())
-			std::cout << "  Mode +i (invite-only) activat" << std::endl;
-		if (channels[i].isLimitModeSet())
-			std::cout << "  Mode +l (limit) activat. Límits: " << channels[i].getChannelLimit() << std::endl;
+        if (channel->isPasswordSet())
+            std::cout << "  Mode +k (password) activat" << std::endl;
+        if (channel->isInviteModeSet())
+            std::cout << "  Mode +i (invite-only) activat" << std::endl;
+        if (channel->isLimitModeSet())
+            std::cout << "  Mode +l (limit) activat. Límits: " << channel->getChannelLimit() << std::endl;
 
-		std::cout << "  Membres: ";
-		const std::vector<std::string>& nicks = channels[i].getClientNicks();
-		for (size_t j = 0; j < nicks.size(); ++j)
-		{
-			std::cout << nicks[j];
-			if (j < nicks.size() - 1) std::cout << ", ";
-		}
-		std::cout << std::endl << std::endl;
-	}
+        std::cout << "  Membres: ";
+        const std::vector<std::string>& nicks = channel->getClientNicks();
+        for (size_t j = 0; j < nicks.size(); ++j)
+        {
+            std::cout << nicks[j];
+            if (j < nicks.size() - 1) std::cout << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
 }
+
 void Server::start()
 {
 	std::cout << "comenca..." << std::endl;

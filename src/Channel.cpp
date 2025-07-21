@@ -202,16 +202,8 @@ void	Channel::displayTopic(void) const {
 	return;
 }
 
-int	Channel::numberOfClients(std::vector<Channel>& channelsExistents, std::string& channelName)
-{
-	for(std::vector<Channel>::iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
-	{
-		if(it->getChannelName() == channelName)
-		{
-			return (static_cast<int>(it->_clients.size()));
-		}
-	}
-	return (-1);
+int Channel::numberOfClients() const {
+	return static_cast<int>(_clients.size());
 }
 //---------------------------------- OPs Functions -------------------------------------------
 

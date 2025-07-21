@@ -51,20 +51,14 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 	return true;
 }
 
-bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
-    {
-		if (equalChannels(it->getChannelName(), channelToCheck))
-			return false;
-	}
-    return true;
+bool Server::isChannelNameUnique(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const {
+    return (channelsExistents.find(channelToCheck) == channelsExistents.end());
 }
 
-std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
-    {
-		if (equalChannels(it->getChannelName(), channelToCheck))
-			return (it->getChannelName());
-	}
+std::string Server::getUniqueChannelName(std::string& channelToCheck, const std::map<std::string, Channel*>& channelsExistents) const {
+    std::map<std::string, Channel*>::const_iterator it = channelsExistents.find(channelToCheck);
+    if (it != channelsExistents.end()) {
+        return (it->first);
+    }
     return (channelToCheck);
 }

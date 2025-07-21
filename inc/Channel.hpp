@@ -60,7 +60,7 @@ class Channel
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
-		int			numberOfClients(std::vector<Channel>& channelsExistents, std::string& channelName);
+		int			numberOfClients() const;
 
 		// Channel functions for ops
 		bool		isOperator(std::string nick) const;
