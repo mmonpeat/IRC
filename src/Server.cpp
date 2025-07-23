@@ -399,7 +399,8 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//mode(params, client);
 			break;
 		default:
-      sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
+      		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
+	}
 	return ;
 }
 
