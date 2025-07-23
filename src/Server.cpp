@@ -247,9 +247,9 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 int	Server::checkCommand(std::string parameter)
 {
-	std::string	command[10] = 
+	std::string	command[11] = 
 	{
-		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
+		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE", "PING"
 	};
 	for (int i = 0; i < 10; i++)
 	{
@@ -323,6 +323,8 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			std::cout << "MODE goes here" << std::endl;
 			//mode(params, client);
 			break;
+		case 10:
+			ping(params, client);
 		default:
 			sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	}
@@ -443,6 +445,18 @@ void	Server::user(std::string *params, Client *client)
 	client->setAuth(true);
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
 	std::cout << "auth is " << client->getAuth() << std::endl;
+	return ;
+}
+
+void	Server::ping(std::string *params, Client *client)
+{
+	if (params[1].empty())
+	{
+		sendReply(client->getFd(), errNoOrigin(client->getNick()));
+		return ;
+	}
+	std::string	pong = "PONG localhost\r\n";
+	sendReply(client->getFd(), pong);
 	return ;
 }
 
