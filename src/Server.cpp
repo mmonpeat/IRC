@@ -291,6 +291,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 {
 	switch(command)
 	{
+		case 0:
+			{
+				std::cout << "CAP END received" << std::endl;
+				break ;
+			}
 		case 1:
 			pass(params, client);
 			break ;
