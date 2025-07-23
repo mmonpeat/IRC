@@ -25,6 +25,7 @@ void	Server::prepareForJoin(std::string *params, Client *client)
 	join(*client, this->channels, requestedChannels, passChannels);
 }
 
+
 std::vector<std::string> Server::convertToVector(const std::string& line)
 {
 	std::vector<std::string> result;
@@ -48,22 +49,22 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 			return false;
 	}
 	return true;
-}
+} 
 
-bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const {
+	for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
-		if (equalChannels(it->getChannelName(), channelToCheck))
+		if (equalChannels((*it)->getChannelName(), channelToCheck))
 			return false;
 	}
     return true;
 }
 
-std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const {
+	for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
-		if (equalChannels(it->getChannelName(), channelToCheck))
-			return (it->getChannelName());
+		if (equalChannels((*it)->getChannelName(), channelToCheck))
+			return ((*it)->getChannelName());
 	}
     return (channelToCheck);
 }
