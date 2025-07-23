@@ -295,7 +295,7 @@ void	Server::handleMsg(std::string msg, Client *client)
 	if (command == -1)
 	{
 		std::cout << "unknown command" << std::endl;
-		sendReply(client->getFd(), errUnknownCommand(client->getNick()));
+		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 		delete[] params;
 		return ;
 	}
@@ -361,6 +361,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 {
 	switch(command)
 	{
+		case 0:
+			{
+				std::cout << "CAP END received" << std::endl;
+				break ;
+			}
 		case 1:
 			pass(params, client);
 			break ;
@@ -394,11 +399,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//mode(params, client);
 			break;
 		default:
-		{
-			std::cout << "Default de COmmand call es unknow command" << std::endl;
-			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
-		}
-	}
+      sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	return ;
 }
 
@@ -474,6 +475,7 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		sendReply(client->getFd(), errPassMismatch());
+		//close connection?
 	}
 	return ;
 }

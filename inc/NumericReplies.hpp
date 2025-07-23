@@ -7,6 +7,7 @@
 # define	RPL_WELCOME				001
 
 //error codes
+# define	ERR_NOORIGIN			408
 # define	ERR_UNKNOWNCOMMAND		421
 # define	ERR_NONICKNAMEGIVEN		431
 # define	ERR_NICKNAMEINUSE		433
@@ -20,8 +21,12 @@ inline	std::string	rplWelcome(std::string nickname){
 	return (":localhost 001 " + nickname + " :Welcome to our IRC server, " + nickname + ":)\r\n");
 }
 
-inline	std::string errUnknownCommand(std::string nickname){
-	return (":localhost 421 " + nickname + " :Unknown command\r\n");
+inline	std::string errNoOrigin(std::string nickname){
+	return (":localhost 409 " + nickname + " :No origin specified\r\n");
+}
+
+inline	std::string errUnknownCommand(std::string client, std::string command){
+	return (":localhost 421 " + client + command + " :Unknown command\r\n");
 }
 
 inline	std::string	errNoNickNameGiven(void){
@@ -41,11 +46,11 @@ inline	std::string	errNeedMoreParams(std::string command){
 }
 
 inline	std::string errAlreadyRegistered(std::string nickname){
-	return (":localhost 462 " + nickname + ":You may not reregister\r\n");
+	return (":localhost 462 " + nickname + " :You may not reregister\r\n");
 }
 
 inline	std::string errPassMismatch(void){
-	return (":localhost 464 :Password incorrect\r\n");
+	return ("464 :Password incorrect\r\n");
 }
 
 #endif
