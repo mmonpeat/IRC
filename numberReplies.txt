@@ -203,7 +203,7 @@ JOIN:
                      - Used to indicate the given channel name is invalid.
                      (Se usa para indicar que el nombre del canal dado no es válido.
                      Pero quina seria la rao de no valid? si tenim lérror ERR_BADCHANMASK).
-                     No ho pillo del tot.
+                     No ho pillo del tot. AL FINAL L'HE POSSAT PER SI ES VOL CREAR UN CHANNEL AMB PASSWORD AMB JOIN
 
        332     RPL_TOPIC
                      "<channel> :<topic>"

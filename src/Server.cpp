@@ -8,13 +8,32 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 
 Server::~Server()
 {
-	close(serverSocketFd);
-	// delete all clients if allocated
-	// delete all channels if allocated
-	std::cout << "[Server] Socket closed" << std::endl;
+    // Cerrar socket del servidor
+    if (serverSocketFd != -1) {
+        close(serverSocketFd);
+        std::cout << "[Server] Socket closed" << std::endl;
+    }
 
+    // Liberar todos los canales
+    for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+    {
+        delete *it;
+    }
+    channels.clear();
+    
+    // Liberar todos los clientes y cerrar sus sockets
+    for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (it->first != -1) {
+            close(it->first); // Cerrar el socket del cliente
+        }
+        delete it->second;
+    }
+    clients.clear();
+
+    // Limpiar pollFds
+    pollFds.clear();
 }
-
 void Server::init()
 {
 	std::cout << "entra init" << std::endl;
@@ -78,7 +97,7 @@ void Server::bindAndListen(sockaddr_in &addr)
 
 void Server::start()
 {
-	std::cout << "comencar a acceptar, send, recv, fer poll..." << std::endl;
+	std::cout << "comenca..." << std::endl;
 
 
 	struct pollfd serverPoll;
@@ -92,6 +111,8 @@ void Server::start()
 		int pollCount = poll(pollFds.data(), pollFds.size(), -1); // wait forever
 		if (pollCount == -1)
 		{
+			if (errno == EINTR)
+				break ;
 			throw Server::specificException("ERROR: poll failed");
 		}
 
@@ -138,7 +159,7 @@ void Server::handleClientData(int clientFd)
 	char buffer[512];
     int bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	
-
+	
     if (bytesRead == 0) {
 			std::cout << "CONNECTION closed\n";
         	removeClient(clientFd);  // Desconexión o error
@@ -152,26 +173,102 @@ void Server::handleClientData(int clientFd)
 			while (clients[clientFd]->readBuffer(&msg))
 			{
 				handleMsg(msg, clients[clientFd]);
+				mostrarChannels();
 			}
 		}
 }
-
-void Server::removeClient(int clientFd) 
+void Server::mostrarChannels(void)
 {
-	// Delete pollFds
-	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
-		it != pollFds.end(); ++it) 
-	{
-		if (it->fd == clientFd)
-		{
-				pollFds.erase(it);
-				break;
+    int i = 1;
+    for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it, ++i)
+    {
+        Channel* channel = *it;  // Diferencia clave: se usa *it en lugar de it->second
+        std::cout << "------------------------------------------------------------------" << std::endl;
+        if (!channel) {
+			std::cout << "Canal #" << i << " -> Puntero nulo!" << std::endl;
+			continue;
 		}
-	}
-	std::cout << "Close client with: fd=" << clientFd << std::endl;
-	delete clients[clientFd];
-	clients.erase(clientFd);
-	close(clientFd);
+		std::cout << "Canal #" << i << " -> Nom: " << channel->getChannelName() << std::endl;
+        std::cout << "  Nombre de clients: " << channel->getClientNicks().size() << std::endl;
+
+        if (channel->isPasswordSet())
+            std::cout << "  Mode +k (password) activat" << std::endl;
+        if (channel->isInviteModeSet())
+            std::cout << "  Mode +i (invite-only) activat" << std::endl;
+        if (channel->isLimitModeSet())
+            std::cout << "  Mode +l (limit) activat. Límits: " << channel->getChannelLimit() << std::endl;
+
+        std::cout << "  Membres: ";
+        const std::vector<std::string>& nicks = channel->getClientNicks();
+        for (size_t j = 0; j < nicks.size(); ++j)
+        {
+            std::cout << nicks[j];
+            if (j < nicks.size() - 1) std::cout << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
+}
+// void Server::removeClient(int clientFd) 
+// {
+// 	// Delete pollFds
+// 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
+// 		it != pollFds.end(); ++it) 
+// 	{
+// 		if (it->fd == clientFd)
+// 		{
+// 				pollFds.erase(it);
+// 				break;
+// 		}
+// 	}
+// 	std::cout << "Close client with: fd=" << clientFd << std::endl;
+// 	delete clients[clientFd];
+// 	clients.erase(clientFd);
+// 	close(clientFd);
+// }
+void Server::removeClient(int clientFd)
+{
+    // 1. Encontrar el cliente
+    std::map<int, Client*>::iterator clientIt = clients.find(clientFd);
+    if (clientIt == clients.end()) return;
+
+    Client* client = clientIt->second;
+	if (!client) return;
+    
+    // 3. Eliminar cliente de los canales
+    for (size_t i = 0; i < channels.size(); ) {
+        Channel* channel = channels[i];
+        if (channel->isClientInChannel(client)) {
+            // Notificar salida
+            channel->broadcastMessage(":" + client->getNick() + " QUIT :Client quit\r\n");
+            
+            // Eliminar cliente
+            channel->removeClient(client);
+            
+            // Eliminar canal si está vacío
+            if (channel->isChannelEmpty()) {
+                delete channel;
+                channels.erase(channels.begin() + i);
+                continue; // No incrementar i ya que hemos eliminado un elemento
+            }
+        }
+        ++i;
+    }
+    
+    // 4. Eliminar de pollFds
+    for (std::vector<struct pollfd>::iterator it = pollFds.begin(); it != pollFds.end(); ++it) {
+        if (it->fd == clientFd) {
+            pollFds.erase(it);
+            break;
+        }
+    }
+    
+    // 5. Cerrar socket y eliminar cliente
+    //close(clientFd);
+	if (clientFd != -1) {
+        close(clientFd);
+    }
+    delete client;
+    clients.erase(clientIt);
 }
 
 int		Server::getServerPort( void ) const {
@@ -197,7 +294,8 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 	if (command == -1)
 	{
-		sendReply(client->getFd(), errUnknownCommand(client->getNick()));
+		std::cout << "unknown command" << std::endl;
+		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 		delete[] params;
 		return ;
 	}
@@ -263,6 +361,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 {
 	switch(command)
 	{
+		case 0:
+			{
+				std::cout << "CAP END received" << std::endl;
+				break ;
+			}
 		case 1:
 			pass(params, client);
 			break ;
@@ -296,7 +399,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			channelModes(params, client);
 			break;
 		default:
-			sendReply(client->getFd(), errUnknownCommand(client->getNick()));
+      		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	}
 	return ;
 }
@@ -367,8 +470,6 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		std::cout << "correct Pass" << std::endl;
-		//std::string reply = ":localhost :Correct password\r\n";
-		//sendReply(client->getFd(), reply);
 		client->setPass(true);
 	}
 	else
@@ -376,6 +477,7 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		sendReply(client->getFd(), errPassMismatch());
+		//close connection?
 	}
 	return ;
 }
@@ -395,8 +497,6 @@ void	Server::nick(std::string *params, Client *client)
 	//check nick characters
 	client->setNick(params[1]);
 	std::cout << "Nick set as " << client->getNick() << std::endl;
-	//std::string	reply = ":localhost :Nick set as " + client->getNick() + "\r\n";
-	//sendReply(client->getFd(), reply);
 	return ;
 }
 
@@ -413,12 +513,8 @@ void	Server::user(std::string *params, Client *client)
 		return ;
 	}
 	client->setUserName(params[1]);
-	//std::string	reply = ":localhost :username set as " + client->getUserName() + "\r\n";
 	std::cout << "user name set as:" << client->getUserName() << "\n";
-	//sendReply(client->getFd(), reply);
-	//reply = ":localhost :real name set as " + client->getRealName() + "\r\n";
 	client->setRealName(params[4]);
-	//sendReply(client->getFd(), reply);
 	std::cout << "real name set as: " << client->getRealName() << std::endl;
 	client->setAuth(true);
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
@@ -453,7 +549,7 @@ void	Server::addClient(int clientFd) {
 	
 	if (clients.size() >= 10) {
 		std::cout << "Server full :(  " << std::endl;
-		// habra que eliminar este fd y cerrar la conexion
+		removeClient(clientFd);
 	}
 	
 	Client *new_client = createClient(clientFd);
