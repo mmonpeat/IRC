@@ -33,16 +33,6 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
     return;
 }
 
-Channel::Channel(std::string name, Client *client, std::string password) :  _name(name), _topic("No topic is set"), _password(password) {
-	 addOperator(client);
-	_limit_set = false;
-	_invite_set = false;
-	_topic_set = true;
-	_password_set = true;
-    std::cout << "Channel " << this->_name << " constructor with password has been called" << std::endl;
-    return;
-}
-
 
 Channel::~Channel(void) {
     // check if there are allocated memory and delete it before destruction!!!
@@ -143,20 +133,49 @@ void	Channel::addClient(Client *client) {
 	return;
 }
 
-void	Channel::removeClient(Client* client) {
-	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == client->getNick()) {
-			if (isOperator(client->getNick()))
-				removeOperator(client);
-			_clients.erase(it);
-			break;
-		}
-	}
-	// check if it is empty and call break to not print the message
-	std::string	message = "deleted \r\n";
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		send((*it)->getFd(), message.c_str(), message.size(), 0);
-	}
+// void	Channel::removeClient(Client* client) {
+// 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+// 		if ((*it)->getNick() == client->getNick()) {
+// 			if (isOperator(client->getNick()))
+// 				removeOperator(client);
+// 			_clients.erase(it);
+// 			break;
+// 		}
+// 	}
+// 	// check if it is empty and call break to not print the message
+// 	std::string	message = "deleted \r\n";
+// 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+// 		send((*it)->getFd(), message.c_str(), message.size(), 0);
+// 	}
+// }
+
+bool Channel::isClientInChannel(Client* client) const
+{
+    for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if ((*it)->getFd() == client->getFd())
+            return true;
+    }
+    return false;
+}
+
+void Channel::removeClient(Client* client)
+{
+    // Eliminar de clientes normales
+    for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+        if ((*it)->getFd() == client->getFd()) {
+            _clients.erase(it);
+            break;
+        }
+    }
+    
+    // Eliminar de operadores si lo era
+    for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
+        if ((*it)->getFd() == client->getFd()) {
+            _operators.erase(it);
+            break;
+        }
+    }
 }
 
 void	Channel::removeOperator(Client *op) {
@@ -212,16 +231,8 @@ void	Channel::displayTopic(void) const {
 	return;
 }
 
-int	Channel::numberOfClients(std::vector<Channel>& channelsExistents, std::string& channelName)
-{
-	for(std::vector<Channel>::iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
-	{
-		if(it->getChannelName() == channelName)
-		{
-			return (static_cast<int>(it->_clients.size()));
-		}
-	}
-	return (-1);
+int Channel::numberOfClients() const {
+	return static_cast<int>(_clients.size());
 }
 //---------------------------------- OPs Functions -------------------------------------------
 

@@ -8,13 +8,32 @@ Server::Server(int port, const std::string &pass): serverPort(port), serverPass(
 
 Server::~Server()
 {
-	close(serverSocketFd);
-	// delete all clients if allocated
-	// delete all channels if allocated
-	std::cout << "[Server] Socket closed" << std::endl;
+    // Cerrar socket del servidor
+    if (serverSocketFd != -1) {
+        close(serverSocketFd);
+        std::cout << "[Server] Socket closed" << std::endl;
+    }
 
+    // Liberar todos los canales
+    for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+    {
+        delete *it;
+    }
+    channels.clear();
+    
+    // Liberar todos los clientes y cerrar sus sockets
+    for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (it->first != -1) {
+            close(it->first); // Cerrar el socket del cliente
+        }
+        delete it->second;
+    }
+    clients.clear();
+
+    // Limpiar pollFds
+    pollFds.clear();
 }
-
 void Server::init()
 {
 	std::cout << "entra init" << std::endl;
@@ -75,31 +94,7 @@ void Server::bindAndListen(sockaddr_in &addr)
 		throw Server::specificException("ERROR: Failed to listen on socket" );
 	}
 }
-void Server::mostrarChannels(void)
-{
-	for (size_t i = 0; i < channels.size(); ++i)
-	{
-		std::cout << "------------------------------------------------------------------" << std::endl;
-		std::cout << "Canal #" << i + 1 << " -> Nom: " << channels[i].getChannelName() << std::endl;
-		std::cout << "  Nombre de clients: " << channels[i].getClientNicks().size() << std::endl;
 
-		if (channels[i].isPasswordSet())
-			std::cout << "  Mode +k (password) activat" << std::endl;
-		if (channels[i].isInviteModeSet())
-			std::cout << "  Mode +i (invite-only) activat" << std::endl;
-		if (channels[i].isLimitModeSet())
-			std::cout << "  Mode +l (limit) activat. Límits: " << channels[i].getChannelLimit() << std::endl;
-
-		std::cout << "  Membres: ";
-		const std::vector<std::string>& nicks = channels[i].getClientNicks();
-		for (size_t j = 0; j < nicks.size(); ++j)
-		{
-			std::cout << nicks[j];
-			if (j < nicks.size() - 1) std::cout << ", ";
-		}
-		std::cout << std::endl << std::endl;
-	}
-}
 void Server::start()
 {
 	std::cout << "comenca..." << std::endl;
@@ -182,23 +177,98 @@ void Server::handleClientData(int clientFd)
 			}
 		}
 }
-
-void Server::removeClient(int clientFd) 
+void Server::mostrarChannels(void)
 {
-	// Delete pollFds
-	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
-		it != pollFds.end(); ++it) 
-	{
-		if (it->fd == clientFd)
-		{
-				pollFds.erase(it);
-				break;
+    int i = 1;
+    for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it, ++i)
+    {
+        Channel* channel = *it;  // Diferencia clave: se usa *it en lugar de it->second
+        std::cout << "------------------------------------------------------------------" << std::endl;
+        if (!channel) {
+			std::cout << "Canal #" << i << " -> Puntero nulo!" << std::endl;
+			continue;
 		}
-	}
-	std::cout << "Close client with: fd=" << clientFd << std::endl;
-	delete clients[clientFd];
-	clients.erase(clientFd);
-	close(clientFd);
+		std::cout << "Canal #" << i << " -> Nom: " << channel->getChannelName() << std::endl;
+        std::cout << "  Nombre de clients: " << channel->getClientNicks().size() << std::endl;
+
+        if (channel->isPasswordSet())
+            std::cout << "  Mode +k (password) activat" << std::endl;
+        if (channel->isInviteModeSet())
+            std::cout << "  Mode +i (invite-only) activat" << std::endl;
+        if (channel->isLimitModeSet())
+            std::cout << "  Mode +l (limit) activat. Límits: " << channel->getChannelLimit() << std::endl;
+
+        std::cout << "  Membres: ";
+        const std::vector<std::string>& nicks = channel->getClientNicks();
+        for (size_t j = 0; j < nicks.size(); ++j)
+        {
+            std::cout << nicks[j];
+            if (j < nicks.size() - 1) std::cout << ", ";
+        }
+        std::cout << std::endl << std::endl;
+    }
+}
+// void Server::removeClient(int clientFd) 
+// {
+// 	// Delete pollFds
+// 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
+// 		it != pollFds.end(); ++it) 
+// 	{
+// 		if (it->fd == clientFd)
+// 		{
+// 				pollFds.erase(it);
+// 				break;
+// 		}
+// 	}
+// 	std::cout << "Close client with: fd=" << clientFd << std::endl;
+// 	delete clients[clientFd];
+// 	clients.erase(clientFd);
+// 	close(clientFd);
+// }
+void Server::removeClient(int clientFd)
+{
+    // 1. Encontrar el cliente
+    std::map<int, Client*>::iterator clientIt = clients.find(clientFd);
+    if (clientIt == clients.end()) return;
+
+    Client* client = clientIt->second;
+	if (!client) return;
+    
+    // 3. Eliminar cliente de los canales
+    for (size_t i = 0; i < channels.size(); ) {
+        Channel* channel = channels[i];
+        if (channel->isClientInChannel(client)) {
+            // Notificar salida
+            channel->broadcastMessage(":" + client->getNick() + " QUIT :Client quit\r\n");
+            
+            // Eliminar cliente
+            channel->removeClient(client);
+            
+            // Eliminar canal si está vacío
+            if (channel->isChannelEmpty()) {
+                delete channel;
+                channels.erase(channels.begin() + i);
+                continue; // No incrementar i ya que hemos eliminado un elemento
+            }
+        }
+        ++i;
+    }
+    
+    // 4. Eliminar de pollFds
+    for (std::vector<struct pollfd>::iterator it = pollFds.begin(); it != pollFds.end(); ++it) {
+        if (it->fd == clientFd) {
+            pollFds.erase(it);
+            break;
+        }
+    }
+    
+    // 5. Cerrar socket y eliminar cliente
+    //close(clientFd);
+	if (clientFd != -1) {
+        close(clientFd);
+    }
+    delete client;
+    clients.erase(clientIt);
 }
 
 int		Server::getServerPort( void ) const {
@@ -329,8 +399,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//mode(params, client);
 			break;
 		default:
-			sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
-	}
+      sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	return ;
 }
 
