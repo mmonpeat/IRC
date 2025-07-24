@@ -7,7 +7,9 @@
 # define	RPL_WELCOME				001
 
 //error codes
-# define	ERR_NOORIGIN			408
+# define	ERR_NOORIGIN			409
+# define	ERR_NORECIPIENT			411
+# define	ERR_NOTEXTTOSEND		412
 # define	ERR_UNKNOWNCOMMAND		421
 # define	ERR_NONICKNAMEGIVEN		431
 # define	ERR_NICKNAMEINUSE		433
@@ -23,6 +25,14 @@ inline	std::string	rplWelcome(std::string nickname){
 
 inline	std::string errNoOrigin(std::string nickname){
 	return (":localhost 409 " + nickname + " :No origin specified\r\n");
+}
+
+inline	std::string errNoRecipient(std::string nickname){
+	return (":localhost 411 " + nickname + " :No recipient given\r\n");
+}
+
+inline	std::string errNoTextToSend(std::string nickname){
+	return (":localhost 412 " + nickname + " :No text to send\r\n");
 }
 
 inline	std::string errUnknownCommand(std::string client, std::string command){
