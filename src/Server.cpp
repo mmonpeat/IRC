@@ -528,7 +528,7 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoRecipient(client->getNick()));
 		return ;
 	}
-	if (params[2].empty)
+	if (params[2].empty())
 	{
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
@@ -537,6 +537,7 @@ void	Server::privmsg(std::string *params, Client *client)
 	//	if channel check if client can send to channel
 	//separate targets if there're more than one
 }
+
 //------------------------------- Reply Functions ------------------------------
 void	Server::sendReply(int client_fd, std::string reply)
 {
