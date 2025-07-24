@@ -379,7 +379,6 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			prepareForJoin(params, client);
 			break;
 		case 5:
-			std::cout << "PRIVMSG goes here" << std::endl;
 			//privmsg(params, client);
 			break;
 		case 6:
@@ -521,6 +520,10 @@ void	Server::user(std::string *params, Client *client)
 	return ;
 }
 
+void	Server::privmsg(std::string *params, Client *client)
+{
+	std::cout << "PRIVMSG goes here" << std::endl;
+}
 //------------------------------- Reply Functions ------------------------------
 void	Server::sendReply(int client_fd, std::string reply)
 {

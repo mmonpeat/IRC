@@ -64,6 +64,7 @@ class Server
 		void	pass(std::string *params, Client* client);		
 		void	nick(std::string *params, Client* client);		
 		void	user(std::string *params, Client* client);
+		void	privmsg(std::string *params, Client* client);
 
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
