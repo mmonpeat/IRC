@@ -86,6 +86,8 @@ class Server
 				specificException(const std::string &msg);
 		};
 
+		//other commands utils
+		bool	isNickValid(std::string nick);
 
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);

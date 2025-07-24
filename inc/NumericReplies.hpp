@@ -12,6 +12,7 @@
 # define	ERR_NOTEXTTOSEND		412
 # define	ERR_UNKNOWNCOMMAND		421
 # define	ERR_NONICKNAMEGIVEN		431
+# define	ERR_ERRONEUSENICKNAME	432
 # define	ERR_NICKNAMEINUSE		433
 # define	ERR_NOTREGISTERED		451
 # define	ERR_NEEDMOREPARAMS		461
@@ -43,6 +44,10 @@ inline	std::string	errNoNickNameGiven(void){
 	return (":localhost 431 :No nickname given\r\n"); //might need to be changed
 } 
 
+inline	std::string	errOneUseNickname(void){
+	return (":localhost 432 :Erroneous nickname\r\n");
+}
+ 
 inline	std::string	errNickNameInUse(std::string nickname, std::string nick){
 	return (":localhost 433 " + nickname + " " + nick + " :Nickname is already in use\r\n");
 }

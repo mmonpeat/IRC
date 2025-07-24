@@ -492,9 +492,13 @@ void	Server::nick(std::string *params, Client *client)
 		sendReply(client->getFd(), errNickNameInUse(client->getNick(), params[1]));
 		return ;
 	}
-	//check nick characters
-	client->setNick(params[1]);
-	std::cout << "Nick set as " << client->getNick() << std::endl;
+	if (isNickValid(params[1]) == true)
+	{
+		client->setNick(params[1]);
+		std::cout << "Nick set as " << client->getNick() << std::endl;
+	}
+	else
+		sendReply(client->getFd(), errOneUseNickname());
 	return ;
 }
 
