@@ -523,6 +523,19 @@ void	Server::user(std::string *params, Client *client)
 void	Server::privmsg(std::string *params, Client *client)
 {
 	std::cout << "PRIVMSG goes here" << std::endl;
+	if (params[1].empty())
+	{
+		sendReply(client->getFd(), errNoRecipient(client->getNick()));
+		return ;
+	}
+	if (params[2].empty)
+	{
+		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
+		return ;
+	}
+	//check if it's a channel or not
+	//	if channel check if client can send to channel
+	//separate targets if there're more than one
 }
 //------------------------------- Reply Functions ------------------------------
 void	Server::sendReply(int client_fd, std::string reply)
