@@ -33,16 +33,6 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
     return;
 }
 
-Channel::Channel(std::string name, Client *client, std::string password) :  _name(name), _topic("No topic is set"), _password(password) {
-	 addOperator(client);
-	_limit_set = false;
-	_invite_set = false;
-	_topic_set = true;
-	_password_set = true;
-    std::cout << "Channel " << this->_name << " constructor with password has been called" << std::endl;
-    return;
-}
-
 
 Channel::~Channel(void) {
     // check if there are allocated memory and delete it before destruction!!!
@@ -117,6 +107,7 @@ std::string	Channel::getTopic(void) const {
 }
 
 //---------------------------------- Setters -------------------------------------------------
+
 void	Channel::setChannelLimit(int limit) {
 	this->_channel_limit = limit;
     this->_limit_set = true;
@@ -129,10 +120,6 @@ void Channel::setPassword(const std::string& password)
 	//send message to the group
 }
 
-void Channel::setPasswordMode(bool mode)
-{
-	this->_password_set = mode;
-}
 
 void	Channel::setTopicMode(void) {
 	this->_topic_set = true;
@@ -160,7 +147,7 @@ void	Channel::unsetTopic(void) {
 }
 
 void	Channel::unsetLimit(void) {
-	this->_channel_limit = 0; // standart deafult num is limit if off for irc
+	this->_channel_limit = 0;
 	this->_limit_set = false;
 	std::cout << "the Limit of Channel has been lifted" << std::endl;
 }
@@ -215,6 +202,16 @@ void	Channel::addOperator(Client *new_op) {
 bool	Channel::isClient(Client *client) {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		if ((*it)->getNick() == client->getNick())
+			return true;
+	}
+	return false;
+}
+
+bool	Channel::isClientByNick(std::string nick){
+	if (nick.empty())
+		return false;
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == nick)
 			return true;
 	}
 	return false;

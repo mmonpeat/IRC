@@ -30,7 +30,6 @@ class Channel
 				
 	public:
 		Channel(std::string name, Client *client);
-		Channel(std::string name, Client *client, std::string password);
 		~Channel(void);
 
 		// Modes settings getters and checkers
@@ -50,7 +49,6 @@ class Channel
 		//setters
 		void		setChannelLimit(int limit);
 		void		setPassword(const std::string& password);
-		void		setPasswordMode(bool mode);
 		void		setTopicMode(void);
 
 		//unsetters
@@ -64,6 +62,7 @@ class Channel
 		void		addOperator(Client *new_op);
 		void		removeOperator(Client *op);
 		bool		isClient(Client* client);
+		bool		isClientByNick(std::string nick);
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;

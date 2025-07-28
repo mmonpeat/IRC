@@ -148,7 +148,9 @@ void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client)
 		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
 		return;
 	}
-	c
+	if (channel->isClientByNick(arg) == false)
+		return;
+	channel->addOperator()
 }
 // LIMIT 3 modes that require parameter
 /* input /MODE #pepe +k+l-t+i+o koko 8 poter Polly2 
