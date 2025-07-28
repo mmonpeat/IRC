@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cstdlib> //EXIT_SUCCESS i EXIT_FALIURE, constants
 #include <cstring> //memset...
+#include <cerrno> //errno
 #include <string>
 #include <stdexcept>
 #include <vector>
@@ -30,9 +31,9 @@ class Server
 		
 		
 	
-		std::map<int, Client*>		clients;
-		std::vector<Channel>		channels;
-		std::vector<struct pollfd> 	pollFds;
+		std::map<int, Client*>			clients;
+		std::vector<Channel*>			channels;
+		std::vector<struct pollfd> 		pollFds;
 
 		//ft_lookup()
 		void 	acceptNewConnection();
@@ -63,7 +64,7 @@ class Server
 		void	pass(std::string *params, Client* client);		
 		void	nick(std::string *params, Client* client);		
 		void	user(std::string *params, Client* client);
-		
+
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
 	
@@ -86,7 +87,7 @@ class Server
 
 
 		/*  JOIN  */
-		int 						join(Client& client, std::vector<Channel> &channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
+		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		bool					 	checkChannelNameRules(Client& client, const std::string& channelName);
 		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
 		void						checkModeToAddClient(Client& client, std::vector<Channel>& channelsExistents, std::string& channelName, std::string& channelPass);
@@ -107,13 +108,14 @@ class Server
 
 		
 		//utils join
+		int							ptrLen(std::string *ptr);
 		void						prepareForJoin(std::string *params, Client *client);
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		bool						equalChannels(std::string new_channel, std::string channel) const;
-		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
-		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const;
-		//default constructor per a provar join, borrrar despres
-		//Server();
+		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
+		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
+		//per mostrar borrar
+		void 	mostrarChannels(void);
 		
 };
 

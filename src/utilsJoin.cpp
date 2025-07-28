@@ -2,15 +2,29 @@
 
 void	Server::prepareForJoin(std::string *params, Client *client)
 {
-	std::vector<std::string> requestedChannels = convertToVector(params[1]);
+	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
-	if (params->size() == 2)
+	
+	if (params[0].empty())
 	{
+		std::string err = "461 ERR_NEEDMOREPARAMS " + client->getNick() + " :Not enough parameters\r\n";
+		sendReply(client->getFd(), err);
+	}
+	if (!params[3].empty())
+	{
+		std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
+		sendReply(client->getFd(), err);
+	}
+	if (!params[1].empty())
+		requestedChannels = convertToVector(params[1]);
+
+	// Comprova si hi ha password (no accedeixis fora límits)
+	if (!params[2].empty())
 		passChannels = convertToVector(params[2]);
-	} 
 
 	join(*client, this->channels, requestedChannels, passChannels);
 }
+
 
 std::vector<std::string> Server::convertToVector(const std::string& line)
 {
@@ -35,22 +49,22 @@ bool	Server::equalChannels(std::string new_channel, std::string channel) const {
 			return false;
 	}
 	return true;
-}
+} 
 
-bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+bool	Server::isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const {
+	for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
-		if (equalChannels(it->getChannelName(), channelToCheck))
+		if (equalChannels((*it)->getChannelName(), channelToCheck))
 			return false;
 	}
     return true;
 }
 
-std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel>& channelsExistents) const {
-	for (std::vector<Channel>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
+std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const {
+	for (std::vector<Channel*>::const_iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it)
     {
-		if (equalChannels(it->getChannelName(), channelToCheck))
-			return (it->getChannelName());
+		if (equalChannels((*it)->getChannelName(), channelToCheck))
+			return ((*it)->getChannelName());
 	}
     return (channelToCheck);
 }

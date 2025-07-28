@@ -45,6 +45,7 @@ class Channel
 		std::vector<std::string> 	getClientNicks() const;
 		int 						getChannelLimit(void) const;
 		std::string					getTopic(void) const;
+		size_t 						getClientCount() const { return _clients.size(); }
 
 		//setters
 		void		setChannelLimit(int limit);
@@ -58,6 +59,7 @@ class Channel
 		
 		// Channel functions
 		void		addClient(Client *client);
+		bool 		isClientInChannel(Client* client) const;
 		void		removeClient(Client* client);
 		void		addOperator(Client *new_op);
 		void		removeOperator(Client *op);
@@ -66,7 +68,7 @@ class Channel
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
-		int			numberOfClients(std::vector<Channel>& channelsExistents, std::string& channelName);
+		int			numberOfClients() const;
 
 		// Channel functions for ops
 		bool		isOperator(std::string nick) const;
