@@ -89,26 +89,25 @@ class Server
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		bool					 	checkChannelNameRules(Client& client, const std::string& channelName);
-		int 						countClientChannels(Client& client, const std::vector<Channel>& channelsExistents);
-		void						checkModeToAddClient(Client& client, std::vector<Channel>& channelsExistents, std::string& channelName, std::string& channelPass);
-		void						createNewChannel(Client& client, std::vector<Channel>& channelsExistents, const std::string& channelName, const std::string& channelPass);
+		int 						countClientChannels(Client& client, const std::vector<Channel*>& channelsExistents);
+		void						checkModeToAddClient(Client& client, std::vector<Channel*>& channelsExistents, std::string& channelName, std::string& channelPass);
+		void						createNewChannel(Client& client, std::vector<Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass);
 
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);
 		Channel*					getChannelByName(std::string& name);
-		Client*						getClientByNick(std::string& nick);
+		//Client*						getClientByNick(std::string& nick);
 		int							ptrLen(std::string *ptr);
-		int							strToInt(std::string arg); 
-		bool						isLimitValid(std::string limit);
+		//int							strToInt(std::string arg); 
+		//bool						isLimitValid(std::string limit);
 		bool						applyModes(std::string *params, Client *client, Channel* channel);
-		void						modeK(Channel *channel, std::string password, char sign, Client *client);
-		void						modeT(Channel *channel, char sign, Client *client);
-		void						modeL(Channel *channel, std::string arg, char sign, Client *client);
-		void						modeO(Channel *channel, std::string arg, char sign, Client *client);
+		//void						modeK(Channel *channel, std::string password, char sign, Client *client);
+		//void						modeT(Channel *channel, char sign, Client *client);
+		//void						modeL(Channel *channel, std::string arg, char sign, Client *client);
+		//void						modeO(Channel *channel, std::string arg, char sign, Client *client);
 
 		
 		//utils join
-		int							ptrLen(std::string *ptr);
 		void						prepareForJoin(std::string *params, Client *client);
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		bool						equalChannels(std::string new_channel, std::string channel) const;

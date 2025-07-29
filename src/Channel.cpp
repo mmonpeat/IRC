@@ -120,7 +120,6 @@ void Channel::setPassword(const std::string& password)
 	//send message to the group
 }
 
-
 void	Channel::setTopicMode(void) {
 	this->_topic_set = true;
 	return;

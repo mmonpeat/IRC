@@ -22,13 +22,20 @@ void	Server::channelModes(std::string *params, Client *client) {
 	int 		len = ptrLen(params);
 	Channel*	channel;
 
+
+	std::cout << "!!!!!!!!!!!!!!!!!he entrado en modes!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 	for (int i = 0; i < len; i++) {
 		if (i == 1) {
 			channel = getChannelByName(params[1]);
 			if (channel == NULL) {
-				std::cout << "This channel does not exist." << std::endl; // tiene que ir al cliente
+				sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
 				return;
 			}
+			if (channel->isOperator(client->getNick()) == false) {
+				sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
+				return;
+			}
+		
 		}
 		if (i == 2) {
 			if (applyModes(params, client, channel) == false) { // maybe better void
@@ -36,11 +43,9 @@ void	Server::channelModes(std::string *params, Client *client) {
 			}
 		}
 	}
-	//if there are no 2 error message maybe?
+	// handdle if there is only /MODE #channel that does exist (if you are an op, if you are a part of that channel and if you are not part of that channel)
 	return;
 }
-
-
 
 
 bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
@@ -85,12 +90,9 @@ bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
 	return true;
 }
 
+/*
 //461 ERR_NEEDMOREPARAMS if no parameter for k
 void	Server::modeK(Channel *channel, std::string password, char sign, Client *client) {
-	if (channel->isOperator(client->getNick()) == false) {
-		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
-		return;
-	}
 	if (channel->isPasswordSet() == false && sign == '+') {
 		channel->setPassword(password);
 	}
@@ -102,10 +104,6 @@ void	Server::modeK(Channel *channel, std::string password, char sign, Client *cl
 }
 
 void	Server::modeT(Channel *channel, char sign, Client *client) {
-	if (channel->isOperator(client->getNick()) == false) {
-		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
-		return;
-	}
 	if (channel->isTopicModeSet() == false && sign == '+')
 		channel->setTopicMode();
 	else if (channel->isTopicModeSet() == true && sign == '-')
@@ -133,10 +131,6 @@ int		Server::strToInt(std::string arg) {
 }
 
 void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client) {
-	if (channel->isOperator(client->getNick()) == false) {
-		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
-		return;
-	}
 	if (sign == '+' && isLimitValid(arg) == true)
 		channel->setChannelLimit(strToInt(arg));
 	else if (channel->isLimitModeSet() == true)
@@ -144,14 +138,12 @@ void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client)
 }
 
 void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
-	if (channel->isOperator(client->getNick()) == false) {
-		std::cout << client->getNick() << "is not operator" << std::endl; //should go only to client fds
-		return;
-	}
 	if (channel->isClientByNick(arg) == false)
 		return;
 	channel->addOperator()
-}
+}*/
+
+
 // LIMIT 3 modes that require parameter
 /* input /MODE #pepe +k+l-t+i+o koko 8 poter Polly2 
  no msg for too many parameters but only executes 3 modes that requiere parameters
