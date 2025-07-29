@@ -174,7 +174,9 @@ void Server::handleClientData(int clientFd)
 			{
 				handleMsg(msg, clients[clientFd]);
 				mostrarChannels();
-			}
+					}
+			if (clients[clientFd]->getEnd() == true)
+				removeClient(clientFd);
 		}
 }
 void Server::mostrarChannels(void)
@@ -344,8 +346,7 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 			break ;
 		case 2:
 			if (client->getPass() == true)
-				nick(params, client);
-				
+				nick(params, client);	
 			break ;
 		case 3:
 			if (client->getPass() == true && client->getNick().empty() == false)
@@ -370,7 +371,6 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			pass(params, client);
 			break ;
 		case 2:
-			nick(params, client); 
 			break ;
 		case 3:
 			user(params, client);
@@ -379,7 +379,6 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			prepareForJoin(params, client);
 			break;
 		case 5:
-			std::cout << "PRIVMSG goes here" << std::endl;
 			//privmsg(params, client);
 			break;
 		case 6:
@@ -477,7 +476,7 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		sendReply(client->getFd(), errPassMismatch());
-		//close connection?
+		client->setEnd(true);
 	}
 	return ;
 }
@@ -494,9 +493,16 @@ void	Server::nick(std::string *params, Client *client)
 		sendReply(client->getFd(), errNickNameInUse(client->getNick(), params[1]));
 		return ;
 	}
-	//check nick characters
-	client->setNick(params[1]);
-	std::cout << "Nick set as " << client->getNick() << std::endl;
+	if (isNickValid(params[1]) == true)
+	{
+		client->setNick(params[1]);
+		std::cout << "Nick set as " << client->getNick() << std::endl;
+	}
+	else
+	{
+		sendReply(client->getFd(), errOneUseNickname());
+		client->setEnd(true);
+	}
 	return ;
 }
 
@@ -520,6 +526,24 @@ void	Server::user(std::string *params, Client *client)
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
 	std::cout << "auth is " << client->getAuth() << std::endl;
 	return ;
+}
+
+void	Server::privmsg(std::string *params, Client *client)
+{
+	std::cout << "PRIVMSG goes here" << std::endl;
+	if (params[1].empty())
+	{
+		sendReply(client->getFd(), errNoRecipient(client->getNick()));
+		return ;
+	}
+	if (params[2].empty())
+	{
+		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
+		return ;
+	}
+	//check if it's a channel or not
+	//	if channel check if client can send to channel
+	//separate targets if there're more than one
 }
 
 //------------------------------- Reply Functions ------------------------------

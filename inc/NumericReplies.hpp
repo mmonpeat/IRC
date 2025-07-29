@@ -7,9 +7,12 @@
 # define	RPL_WELCOME				001
 
 //error codes
-# define	ERR_NOORIGIN			408
+# define	ERR_NOORIGIN			409
+# define	ERR_NORECIPIENT			411
+# define	ERR_NOTEXTTOSEND		412
 # define	ERR_UNKNOWNCOMMAND		421
 # define	ERR_NONICKNAMEGIVEN		431
+# define	ERR_ERRONEUSENICKNAME	432
 # define	ERR_NICKNAMEINUSE		433
 # define	ERR_NOTREGISTERED		451
 # define	ERR_NEEDMOREPARAMS		461
@@ -25,6 +28,14 @@ inline	std::string errNoOrigin(std::string nickname){
 	return (":localhost 409 " + nickname + " :No origin specified\r\n");
 }
 
+inline	std::string errNoRecipient(std::string nickname){
+	return (":localhost 411 " + nickname + " :No recipient given\r\n");
+}
+
+inline	std::string errNoTextToSend(std::string nickname){
+	return (":localhost 412 " + nickname + " :No text to send\r\n");
+}
+
 inline	std::string errUnknownCommand(std::string client, std::string command){
 	return (":localhost 421 " + client + command + " :Unknown command\r\n");
 }
@@ -33,6 +44,10 @@ inline	std::string	errNoNickNameGiven(void){
 	return (":localhost 431 :No nickname given\r\n"); //might need to be changed
 } 
 
+inline	std::string	errOneUseNickname(void){
+	return (":localhost 432 :Erroneous nickname\r\n");
+}
+ 
 inline	std::string	errNickNameInUse(std::string nickname, std::string nick){
 	return (":localhost 433 " + nickname + " " + nick + " :Nickname is already in use\r\n");
 }
