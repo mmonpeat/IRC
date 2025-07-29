@@ -6,14 +6,14 @@
 #    By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/02 13:22:55 by kkoval            #+#    #+#              #
-#    Updated: 2025/07/24 18:52:34 by amagnell         ###   ########.fr        #
+#    Updated: 2025/07/29 18:42:48 by kkoval           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 NAME = ircserv
 INC = inc/
-SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/join.cpp src/utilsJoin.cpp src/command_utils.cpp
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/join.cpp src/utilsJoin.cpp src/command_utils.cpp src/modes.cpp
 
 BUILD = .build
 OBJ = $(SRC:%.cpp=$(BUILD)/%.o)

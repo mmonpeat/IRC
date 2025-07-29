@@ -89,6 +89,20 @@ class Server
 		//other commands utils
 		bool	isNickValid(std::string nick);
 
+		/*  MODE  */
+		void						channelModes(std::string *params, Client *client);
+		Channel*					getChannelByName(std::string& name);
+		//Client*						getClientByNick(std::string& nick);
+		int							ptrLen(std::string *ptr);
+		//int							strToInt(std::string arg); 
+		//bool						isLimitValid(std::string limit);
+		bool						applyModes(std::string *params, Client *client, Channel* channel);
+		//void						modeK(Channel *channel, std::string password, char sign, Client *client);
+		//void						modeT(Channel *channel, char sign, Client *client);
+		//void						modeL(Channel *channel, std::string arg, char sign, Client *client);
+		//void						modeO(Channel *channel, std::string arg, char sign, Client *client);
+
+
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
 		bool					 	checkChannelNameRules(Client& client, const std::string& channelName);
