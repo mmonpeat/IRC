@@ -3,7 +3,8 @@
 int		Server::ptrLen(std::string *ptr) {
 	int	len = 0;
 
-	while (ptr && ptr != '\0')
+
+	while (ptr[len] != "\0")
 		len++;
 	return len;
 }
