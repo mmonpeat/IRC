@@ -9,9 +9,9 @@ int		Server::ptrLen(std::string *ptr) {
 }
 
 Channel*	Server::getChannelByName(std::string& name) {
-	for (std::vector<Channel>::iterator it = channels.begin(); it != channels.end(); it++) {
-		if (equalNicks(it->getChannelName(), name) == true) // check it it works
-			return &(*it);
+	for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
+		if (equalNicks((*it)->getChannelName(), name) == true) // check it it works
+			return (*it);
 	}
 	return NULL;
 }
