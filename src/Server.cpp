@@ -410,7 +410,7 @@ std::string*	Server::returnParams(std::string msg)
 	unsigned long	n = countParams(msg);
 	std::string	*params;
 
-	params = new std::string[n];
+	params = new std::string[n + 1];
 	std::string::size_type	pos = msg.find(' ');
 	while (i < n)
 	{
@@ -425,6 +425,7 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos + 1);
 		pos = msg.find(' ');
 	}
+	params[i] = '\0';
 	return (params) ;
 }
 
@@ -490,6 +491,7 @@ void	Server::nick(std::string *params, Client *client)
 	if(isNickUnique(params[1]) == false)
 	{
 		sendReply(client->getFd(), errNickNameInUse(client->getNick(), params[1]));
+		client->setEnd(true);
 		return ;
 	}
 	if (isNickValid(params[1]) == true)
