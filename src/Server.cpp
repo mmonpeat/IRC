@@ -490,6 +490,7 @@ void	Server::nick(std::string *params, Client *client)
 	if(isNickUnique(params[1]) == false)
 	{
 		sendReply(client->getFd(), errNickNameInUse(client->getNick(), params[1]));
+		client->setEnd(true);
 		return ;
 	}
 	if (isNickValid(params[1]) == true)
