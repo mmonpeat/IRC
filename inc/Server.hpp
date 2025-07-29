@@ -96,6 +96,7 @@ class Server
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);
 		Channel*					getChannelByName(std::string& name);
+		Client*						getClientByNick(std::string& nick);
 		int							ptrLen(std::string *ptr);
 		int							strToInt(std::string arg); 
 		bool						isLimitValid(std::string limit);

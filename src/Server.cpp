@@ -597,6 +597,10 @@ bool	Server::isNickUnique(std::string nickToCheck) const {
     return true;
 }
 
+Client*					Server::getClientByNick(std::string& nick){
+	
+}
+
 Server::specificException::specificException(const std::string &msg): std::range_error(msg) {}
 
 
