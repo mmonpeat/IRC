@@ -64,6 +64,7 @@ class Server
 		void	pass(std::string *params, Client* client);		
 		void	nick(std::string *params, Client* client);		
 		void	user(std::string *params, Client* client);
+		void	privmsg(std::string *params, Client* client);
 
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
@@ -85,6 +86,8 @@ class Server
 				specificException(const std::string &msg);
 		};
 
+		//other commands utils
+		bool	isNickValid(std::string nick);
 
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
