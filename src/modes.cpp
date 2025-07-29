@@ -5,7 +5,10 @@ int		Server::ptrLen(std::string *ptr) {
 
 
 	while (ptr[len] != "\0")
+	{
+		std::cout << ptr[len] << std::endl;
 		len++;
+	}
 	return len;
 }
 
@@ -19,37 +22,29 @@ Channel*	Server::getChannelByName(std::string& name) {
 
 
 void	Server::channelModes(std::string *params, Client *client) {
-std::cout << "!!!!!!!!!!!!!!!!!he entrado en modes!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 	int 		len = ptrLen(params);
 	Channel*	channel;
 
-
-	std::cout << "!!!!!!!!!!!!!!!!!he entrado en modes!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-	for (int i = 0; i < len; i++) {
-		if (i == 1) {
-			channel = getChannelByName(params[1]);
-			if (channel == NULL) {
-				sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
-				return;
-			}
-			if (channel->isOperator(client->getNick()) == false) {
-				sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
-				return;
-			}
-		
-		}
-		if (i == 2) {
-			if (applyModes(params, client, channel) == false) { // maybe better void
-				return;
-			}
-		}
+	if (len < 2) //handdle later
+		return;
+	channel = getChannelByName(params[1]);
+	if (channel == NULL) {
+		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
+		return;
 	}
-	// handdle if there is only /MODE #channel that does exist (if you are an op, if you are a part of that channel and if you are not part of that channel)
+	if (channel->isOperator(client->getNick()) == false) {
+		sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
+		return;
+	}
+	applyModes(params, client, channel); // maybe better void
+	// if len == 2
+	// handdle /MODE #channel that does exist (if you are an op, if you are a part of that channel and if you are not part of that channel)
 	return;
 }
 
+//  /MODE #chanelName +ok-l Borja password 
 
-bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
+void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 {
 	std::cout << "Modes parameters are: " << params[2] << std::endl; //delete later
 	
@@ -57,41 +52,49 @@ bool	Server::applyModes(std::string *params, Client *client, Channel* channel)
 	size_t			found_param = 0;
 	char			currentSign = 0;
 	std::string 	validModes = "itkol";
+	int				param_len = ptrLen(params);
+	int				arg_i = 3;
 
 	for (size_t i = 0; i < params[2].size(); ++i)
 	{
 		char c = params[2][i];
 
 		if (c == '+' || c == '-')
-		{
 			currentSign = c;
-			continue;
-		}
-		if (validModes.find(c) == std::string::npos)
-		{
+		else if (validModes.find(c) == std::string::npos || currentSign == 0)
 			std::cout << "Error: invalid mode character '" << c << "'" << std::endl;
-			return false;
-			// later just itterate
-		}
-
-		if ((c == 'k' && (currentSign == '+' || currentSign == '-')) || (c == 'l' && currentSign == '+') ||
-			(c == 'o')
-		)
+		else if (c == 'k' || (c == 'l' && currentSign == '+') || c == 'o')
 		{
 			found_param++;
 			if (found_param > max_param_num)
-			{
 				std::cout << "Error: too many parameter-requiring modes" << std::endl; //delete later
-				return false;
-			}
+			else if (arg_i >= param_len) 
+				std::cout << "Error: too many parameter-requiring modes" << std::endl; //delete later
+			else 
+				execMode(currentSign, c, params[arg_i++], client, channel);
 		}
+		else 
+			execMode(currentSign, c, "empty", client, channel);
 	}
-	(void) client;
-	(void) channel;
-	return true;
+	return;
 }
 
-/*
+void	Server::execMode(char sign, char c, std::string param, Client* client, Channel *channel){
+	if (c == 'k')
+		modeK(channel, param, sign, client);
+	//else if (c = 'o')
+		//modeO()
+	else if (c == 'l')
+		modeL(channel, param, sign, client);
+	else if (c == 't')
+		modeT(channel, sign, client);
+	else if (c == 'i')
+		std::cout << "Function to be written" << std::endl;
+	return;
+
+}
+
+
 //461 ERR_NEEDMOREPARAMS if no parameter for k
 void	Server::modeK(Channel *channel, std::string password, char sign, Client *client) {
 	if (channel->isPasswordSet() == false && sign == '+') {
@@ -101,6 +104,7 @@ void	Server::modeK(Channel *channel, std::string password, char sign, Client *cl
 	else if (channel->isPasswordSet() == true && sign == '-') {
 		channel->unsetPassword(password);
 	}
+	(void) client;
 	return;
 }
 
@@ -110,6 +114,7 @@ void	Server::modeT(Channel *channel, char sign, Client *client) {
 	else if (channel->isTopicModeSet() == true && sign == '-')
 		channel->unsetTopic();
 	return;
+	(void) client; // check if needed
 }
 
 bool	Server::isLimitValid(std::string limit) {
@@ -136,9 +141,11 @@ void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client)
 		channel->setChannelLimit(strToInt(arg));
 	else if (channel->isLimitModeSet() == true)
 		channel->unsetLimit();
+	(void) client;
+	return;
 }
 
-void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
+/*void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
 	if (channel->isClientByNick(arg) == false)
 		return;
 	channel->addOperator()

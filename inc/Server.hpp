@@ -94,12 +94,13 @@ class Server
 		Channel*					getChannelByName(std::string& name);
 		//Client*						getClientByNick(std::string& nick);
 		int							ptrLen(std::string *ptr);
-		//int							strToInt(std::string arg); 
-		//bool						isLimitValid(std::string limit);
-		bool						applyModes(std::string *params, Client *client, Channel* channel);
-		//void						modeK(Channel *channel, std::string password, char sign, Client *client);
-		//void						modeT(Channel *channel, char sign, Client *client);
-		//void						modeL(Channel *channel, std::string arg, char sign, Client *client);
+		int							strToInt(std::string arg); 
+		bool						isLimitValid(std::string limit);
+		void						applyModes(std::string *params, Client *client, Channel* channel);
+		void						execMode(char sign, char c, std::string param, Client* client, Channel *channel);
+		void						modeK(Channel *channel, std::string password, char sign, Client *client);
+		void						modeT(Channel *channel, char sign, Client *client);
+		void						modeL(Channel *channel, std::string arg, char sign, Client *client);
 		//void						modeO(Channel *channel, std::string arg, char sign, Client *client);
 
 

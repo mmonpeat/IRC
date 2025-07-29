@@ -1,25 +1,3 @@
-/* MODES EXPLAINED - DELETE LATER
-	[] - i – Invite-only channel, only users who have been invited can join. 
-		 We need to store a list of invited users (e.g., nicknames or fds)
-		 Default: off 
-	[] - t – Topic settable only by channel operators Prevents non-operators from changing the topic.
-		 Default: on (+t)
-	[] - k – Channel key (password) Users must provide a key (password) to join.  We need to store a std::string _key.
-		 +k <key> sets the key, -k removes it.
-		 Default: off
-	[] - o – Give/take operator privilege. Used to promote (+o) or demote (-o) a user to/from channel operator.
-		 You’ll be managing _operators (probably std::vector<Client*>)
-		 Note: This mode applies to a user, not globally.
-	[] - l – Set/remove user limit. Sets how many users can be in the channel.
-		You need an int _userLimit, active only when +l is set. +l <number> sets limit, -l removes it.
-		Default: off (no limit)
-*/
-
-/* Numeric replies for channel
-	403 - trying to change topic and not being an operator when mode is resctricted
-
-*/
-
 #include "Channel.hpp"
 
 //set modes to default
@@ -106,7 +84,8 @@ std::string	Channel::getTopic(void) const {
 	return this->_topic;
 }
 
-//---------------------------------- setters  ------------
+//---------------------------------- Setters -------------------------------------------------
+
 void	Channel::setChannelLimit(int limit) {
 	this->_channel_limit = limit;
     this->_limit_set = true;
@@ -116,6 +95,38 @@ void Channel::setPassword(const std::string& password)
 {
 	this->_password = password;
 	this->_password_set = true;
+	//send message to the group
+}
+
+void	Channel::setTopicMode(void) {
+	this->_topic_set = true;
+	return;
+}
+
+
+//---------------------------------- Unsetters -----------------------------------------------
+
+void	Channel::unsetPassword(const std::string& password) {
+	if (this->_password == password) {
+		this->_password.clear();
+		this->_password_set = false;
+		//send message to the group
+	}
+	else 
+		std::cout << "The password in wrong" << std::endl;
+	return;
+}
+
+void	Channel::unsetTopic(void) {
+	this->_topic_set = false;
+	std::cout << "Topic mode has been unset" << std::endl; //change it to group message
+	return;
+}
+
+void	Channel::unsetLimit(void) {
+	this->_channel_limit = 0;
+	this->_limit_set = false;
+	std::cout << "the Limit of Channel has been lifted" << std::endl;
 }
 
 //---------------------------------- Class Functions -----------------------------------------
@@ -197,6 +208,16 @@ void	Channel::addOperator(Client *new_op) {
 bool	Channel::isClient(Client *client) {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		if ((*it)->getNick() == client->getNick())
+			return true;
+	}
+	return false;
+}
+
+bool	Channel::isClientByNick(std::string nick){
+	if (nick.empty())
+		return false;
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == nick)
 			return true;
 	}
 	return false;
