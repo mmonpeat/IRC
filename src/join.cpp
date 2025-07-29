@@ -156,7 +156,6 @@ void Server::createNewChannel(Client& client, std::vector<Channel*>& channelsExi
     
     if (!channelPass.empty()) {
         newChannel->setPassword(channelPass);
-        newChannel->setPasswordMode(true);
     }
     channelsExistents.push_back(newChannel);
 	// Notificar al cliente que ha creado el canal

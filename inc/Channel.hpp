@@ -1,305 +1,83 @@
-/* MODES EXPLAINED - DELETE LATER
-	[] - i – Invite-only channel, only users who have been invited can join. 
-		 We need to store a list of invited users (e.g., nicknames or fds)
-		 Default: off 
-	[] - t – Topic settable only by channel operators Prevents non-operators from changing the topic.
-		 Default: on (+t)
-	[] - k – Channel key (password) Users must provide a key (password) to join.  We need to store a std::string _key.
-		 +k <key> sets the key, -k removes it.
-		 Default: off
-	[] - o – Give/take operator privilege. Used to promote (+o) or demote (-o) a user to/from channel operator.
-		 You’ll be managing _operators (probably std::vector<Client*>)
-		 Note: This mode applies to a user, not globally.
-	[] - l – Set/remove user limit. Sets how many users can be in the channel.
-		You need an int _userLimit, active only when +l is set. +l <number> sets limit, -l removes it.
-		Default: off (no limit)
-*/
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
 
-/* Numeric replies for channel
-	403 - trying to change topic and not being an operator when mode is resctricted
+#include <string>
+#include <iostream>
+#include <vector>
+#include <sys/socket.h>
+#include "Client.hpp"
 
-*/
+class Client;
 
-#include "Channel.hpp"
-
-//set modes to default
-Channel::Channel(std::string name, Client* client) : _name(name), _topic("No topic is set"){
-    addOperator(client);
-	_limit_set = false;
-	_invite_set = false;
-	_topic_set = true;
-	_password_set = false;
-    std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
-    return;
-}
-
-
-Channel::~Channel(void) {
-    // check if there are allocated memory and delete it before destruction!!!
-    std::cout << "Channel " << this->_name << " destructor has been called" << std::endl;
-    return;
-}
-
-
-
-//---------------------------------- Modes setting getters and checkers -----------------------------------
-
-bool	Channel::isLimitModeSet(void) const {
-	if (this->_limit_set == true)
-		return true;
-	return false;
-}
-
-bool	Channel::isInviteModeSet(void) const {
-	if (this->_invite_set == true)
-		return true;
-	return false;
-}
-
-bool	Channel::isTopicModeSet(void) const {
-	if (this->_topic_set == true)
-		return true;
-	return false;
-}
-
-bool	Channel::isPasswordSet(void) const {
-	if (this->_password_set == true)
-		return true;
-	return false;
-}
-
-bool	Channel::isPasswordValidChannel(std::string password) const {
-	if (!password.empty() && !this->_password.empty() && (password == this->_password))
-		return true;
-	return false;
-}
-
-bool	Channel::isClientInvited(Client* client) const {
-	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
-		if (*it == client->getNick())
-			return true;
-	}
-	return false;
-}
-
-
-//---------------------------------- Vriables getters -----------------------------------
-
-std::string	Channel::getChannelName(void) const{
-	return this->_name;
-}
-std::vector<std::string> Channel::getClientNicks() const
+class Channel
 {
-	std::vector<std::string> nicks;
+	private:
+		std::string					_name;
+		std::string					_topic;
+		std::vector<Client*>		_operators;
+		std::vector<Client*>		_clients;
+	
+		// Mode control 
+		bool						_limit_set;
+		bool						_invite_set;
+		bool						_topic_set;
+		bool						_password_set;
 
-	for (size_t i = 0; i < _clients.size(); ++i) {
-		nicks.push_back(_clients[i]->getNick());
-	}
-	return nicks;
-}
+		// Mode variables -- solo activos si el modo esta seteado
+		int							_channel_limit;
+		std::vector<std::string>	_invited_clients;
+		std::string					_password;
+				
+	public:
+		Channel(std::string name, Client *client);
+		~Channel(void);
 
-int 	Channel::getChannelLimit(void) const {
-    return this->_channel_limit;
-}
+		// Modes settings getters and checkers
+		bool		isLimitModeSet(void) const;
+		bool		isInviteModeSet(void) const;
+		bool		isTopicModeSet(void) const;
+		bool		isPasswordSet(void) const;
+		bool		isPasswordValidChannel(std::string password) const;
+		bool		isClientInvited(Client* client) const; //puede ser nick
 
-std::string	Channel::getTopic(void) const {
-	return this->_topic;
-}
+		// Variable getters
+		std::string					getChannelName(void) const;
+		std::vector<std::string> 	getClientNicks() const;
+		int 						getChannelLimit(void) const;
+		std::string					getTopic(void) const;
+		size_t 						getClientCount() const { return _clients.size(); }
 
-//---------------------------------- Setters -------------------------------------------------
+		//setters
+		void		setChannelLimit(int limit);
+		void		setPassword(const std::string& password);
+		void		setTopicMode(void);
 
-void	Channel::setChannelLimit(int limit) {
-	this->_channel_limit = limit;
-    this->_limit_set = true;
-}
+		//unsetters
+		void		unsetPassword(const std::string& password);
+		void		unsetTopic(void);
+		void		unsetLimit(void);
+		
+		// Channel functions
+		void		addClient(Client *client);
+		bool 		isClientInChannel(Client* client) const;
+		void		removeClient(Client* client);
+		void		addOperator(Client *new_op);
+		void		removeOperator(Client *op);
+		bool		isClient(Client* client);
+		bool		isClientByNick(std::string nick);
+		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
+		void		displayTopic(void) const;
+		void 		broadcastMessage(std::string message) const;
+		int			numberOfClients() const;
 
-void Channel::setPassword(const std::string& password)
-{
-	this->_password = password;
-	this->_password_set = true;
-	//send message to the group
-}
+		// Channel functions for ops
+		bool		isOperator(std::string nick) const;
+		void		changeTopic(std::string topic, Client* client);
+		void		kickUser(Client* kicker, Client* target);
 
-void	Channel::setTopicMode(void) {
-	this->_topic_set = true;
-	return;
-}
+		//void	changeMode(Client* client, std::string command);
 
-
-//---------------------------------- Unsetters -----------------------------------------------
-
-void	Channel::unsetPassword(const std::string& password) {
-	if (this->_password == password) {
-		this->_password.clear();
-		this->_password_set = false;
-		//send message to the group
-	}
-	else 
-		std::cout << "The password in wrong" << std::endl;
-	return;
-}
-
-void	Channel::unsetTopic(void) {
-	this->_topic_set = false;
-	std::cout << "Topic mode has been unset" << std::endl; //change it to group message
-	return;
-}
-
-void	Channel::unsetLimit(void) {
-	this->_channel_limit = 0;
-	this->_limit_set = false;
-	std::cout << "the Limit of Channel has been lifted" << std::endl;
-}
-
-//---------------------------------- Class Functions -----------------------------------------
-void	Channel::addClient(Client *client) {
-	this->_clients.push_back(client);
-	std::string	message = client->getNick() + " (" + client->getRealName() + ") has joined \r\n";
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		send((*it)->getFd(), message.c_str(), message.size(), 0);
-	}
-	return;
-}
-
-// void	Channel::removeClient(Client* client) {
-// 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		if ((*it)->getNick() == client->getNick()) {
-// 			if (isOperator(client->getNick()))
-// 				removeOperator(client);
-// 			_clients.erase(it);
-// 			break;
-// 		}
-// 	}
-// 	// check if it is empty and call break to not print the message
-// 	std::string	message = "deleted \r\n";
-// 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		send((*it)->getFd(), message.c_str(), message.size(), 0);
-// 	}
-// }
-
-bool Channel::isClientInChannel(Client* client) const
-{
-    for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
-    {
-        if ((*it)->getFd() == client->getFd())
-            return true;
-    }
-    return false;
-}
-
-void Channel::removeClient(Client* client)
-{
-    // Eliminar de clientes normales
-    for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if ((*it)->getFd() == client->getFd()) {
-            _clients.erase(it);
-            break;
-        }
-    }
-    
-    // Eliminar de operadores si lo era
-    for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
-        if ((*it)->getFd() == client->getFd()) {
-            _operators.erase(it);
-            break;
-        }
-    }
-}
-
-void	Channel::removeOperator(Client *op) {
-	for (std::vector<Client*>::iterator it = _operators.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == op->getNick())
-		{
-			_operators.erase(it);
-			break;
-		}
-	}
-}
-
-void	Channel::addOperator(Client *new_op) {
-	this->_operators.push_back(new_op);
-	std::string	message = new_op->getNick() + " (" + new_op->getRealName() + ") has become operator \r\n"; //falta decir en que grup
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
-	{
-		send((*it)->getFd(), message.c_str(), message.size(), 0);
-	}
-	return;
-}
+};
 
 
-bool	Channel::isClient(Client *client) {
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == client->getNick())
-			return true;
-	}
-	return false;
-}
-
-bool	Channel::isClientByNick(std::string nick){
-	if (nick.empty())
-		return false;
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == nick)
-			return true;
-	}
-	return false;
-}
-
-bool	Channel::isChannelEmpty(void) const {
-	bool	isEmpty = true;
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		isEmpty = false;
-	}
-	return (isEmpty);
-
-}
-
-void 	Channel::broadcastMessage(std::string message) const {
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
-		if (*it)
-			send((*it)->getFd(), message.c_str(), message.size(), 0);
-	 }
-	return;
-}
-
-void	Channel::displayTopic(void) const {
-	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
-		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
-	}
-	return;
-}
-
-int Channel::numberOfClients() const {
-	return static_cast<int>(_clients.size());
-}
-//---------------------------------- OPs Functions -------------------------------------------
-
-bool    Channel::isOperator(std::string nick) const {
-	for (std::vector<Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it)
-	{
-		if (*it && (*it)->getNick() == nick)
-			return true;
-	}
-	return false;
-}
-
-void Channel::changeTopic(const std::string new_topic, Client* client) {
-	if (isOperator(client->getNick()) || isTopicModeSet() == false) {
-		_topic = new_topic;
-		std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
-		broadcastMessage(message);
-		return;
-	}
-	return;
-}
-
-//operators can kick other operators
-void	Channel::kickUser(Client* kicker, Client* target) {
-	if (isOperator(kicker->getNick()) == false) {
-		std::string message = " have no rights to kick users from this channel \r\n";
-		broadcastMessage(message);
-		return;
-	}
-	removeClient(target);
-	return;
-}
+#endif

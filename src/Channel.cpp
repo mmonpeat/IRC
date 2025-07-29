@@ -118,11 +118,6 @@ void Channel::setPassword(const std::string& password)
 	this->_password_set = true;
 }
 
-void Channel::setPasswordMode(bool mode)
-{
-	this->_password_set = mode;
-}
-
 //---------------------------------- Class Functions -----------------------------------------
 void	Channel::addClient(Client *client) {
 	this->_clients.push_back(client);

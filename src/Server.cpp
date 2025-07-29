@@ -394,9 +394,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//topic(params, client);
 			break;
 		case 9:
-			std::cout << "MODE goes here" << std::endl;
-			//mode(params, client);
+		{
+			std::cout << "hola?\n";
+			channelModes(params, client);
 			break;
+		}
 		default:
       		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	}
