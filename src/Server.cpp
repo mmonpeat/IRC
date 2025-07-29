@@ -174,7 +174,9 @@ void Server::handleClientData(int clientFd)
 			{
 				handleMsg(msg, clients[clientFd]);
 				mostrarChannels();
-			}
+					}
+			if (clients[clientFd]->getEnd() == true)
+				removeClient(clientFd);
 		}
 }
 void Server::mostrarChannels(void)
@@ -344,8 +346,7 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 			break ;
 		case 2:
 			if (client->getPass() == true)
-				nick(params, client);
-				
+				nick(params, client);	
 			break ;
 		case 3:
 			if (client->getPass() == true && client->getNick().empty() == false)
@@ -370,7 +371,6 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			pass(params, client);
 			break ;
 		case 2:
-			nick(params, client); 
 			break ;
 		case 3:
 			user(params, client);
@@ -475,7 +475,7 @@ void	Server::pass(std::string *params, Client *client)
 		std::cout << serverPass << "\n";
 		std::cout << params[1] << "\n";
 		sendReply(client->getFd(), errPassMismatch());
-		//close connection?
+		client->setEnd(true);
 	}
 	return ;
 }
@@ -498,7 +498,10 @@ void	Server::nick(std::string *params, Client *client)
 		std::cout << "Nick set as " << client->getNick() << std::endl;
 	}
 	else
+	{
 		sendReply(client->getFd(), errOneUseNickname());
+		client->setEnd(true);
+	}
 	return ;
 }
 

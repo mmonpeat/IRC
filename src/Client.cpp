@@ -6,6 +6,7 @@ Client::Client(int fd): _fd(fd) {
 	std::cout << "Client constructor called" << std::endl;
 	_pass = false;
 	_auth = false; // hasta que el cliente tenga todos los campos registrados
+	_end_connection = false; //flag raised to end connection
 	return;
 	}
 
@@ -41,6 +42,10 @@ void		Client::setPass(bool status){
 	this->_pass = status;
 }
 
+void		Client::setEnd(bool status){
+	this->_end_connection = status;
+}
+
 //------------------------------ Getters -----------------------------------------
 
 std::string	Client::getNick(void) const {
@@ -67,7 +72,9 @@ bool		Client::getAuth(void) const {
 	return (this->_auth);
 }
 
-
+bool		Client::getEnd(void) const {
+	return (this->_end_connection);
+}
 //------------------------------ Functions -----------------------------------------
 
 void	Client::addToBuffer(char *buffer)
