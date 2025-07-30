@@ -544,9 +544,15 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
 	}
-	//check if it's a channel or not
-	//	if channel check if client can send to channel
 	//separate targets if there're more than one
+	
+	//loop to send all messages
+		//check if username or channel exists
+			//if not err_nosuchnick or err_nosuchchannel
+		//if channel and cant send to channel
+		//		err_cannotsendtochan
+		//else
+		//		send msg
 }
 
 void	Server::quit(Client* client)
