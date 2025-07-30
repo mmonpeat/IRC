@@ -5,16 +5,15 @@ void	Server::prepareForJoin(std::string *params, Client *client)
 	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
 	
-	if (params[0].empty())
+	if (params[1].empty())
 	{
-		std::string err = "461 ERR_NEEDMOREPARAMS " + client->getNick() + " :Not enough parameters\r\n";
-		sendReply(client->getFd(), err);
+		sendReply(client->getFd(), errNeedMoreParams("JOIN"));
 	}
-	if (!params[3].empty())
-	{
-		std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
-		sendReply(client->getFd(), err);
-	}
+	// if (!params[3].empty())
+	// {
+	// 	std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
+	// 	sendReply(client->getFd(), err);
+	// }
 	if (!params[1].empty())
 		requestedChannels = convertToVector(params[1]);
 

@@ -5,8 +5,14 @@
 //might not use the numbers but for now i'm leaving them here
 //command codes
 # define	RPL_WELCOME				001
+# define	RPL_NOTOPICSET			331
+# define	RPL_TOPICSET			332
 
+# define	RPL_NAMESMSG			353
+# define	RPL_ENDNAMELIST			366
 //error codes
+# define	ERR_NOSUCHCHANNEL		403
+# define	ERR_TOOMANYCHANNELS		405
 # define	ERR_NOORIGIN			409
 # define	ERR_NORECIPIENT			411
 # define	ERR_NOTEXTTOSEND		412
@@ -18,10 +24,38 @@
 # define	ERR_NEEDMOREPARAMS		461
 # define	ERR_ALREADYREGISTERED	462
 # define	ERR_PASSMISMATCH		464
+# define	ERR_CHANNELISFULL		471
+# define	ERR_INVITEONLYCHAN		473
+# define	ERR_BADCHANNELKEY		475
+# define	ERR_BADCHANMASK			476
 
 //Messages
 inline	std::string	rplWelcome(std::string nickname){
 	return (":localhost 001 " + nickname + " :Welcome to our IRC server, " + nickname + ":)\r\n");
+}
+
+inline	std::string	rplNamesMsg(std::string namesMsg){
+	return (namesMsg + "\r\n");
+}
+
+inline	std::string	rplNoTopicSet(std::string nickname, std::string channelName){
+	return (":localhost 331 " + nickname + " " + channelName + " :No topic is set\r\n");
+}
+
+inline	std::string	rplTopicSet(std::string nickname, std::string channelName, std::string topic){
+	return (":localhost 332 " + nickname + " " + channelName + " :" + topic + "\r\n");
+}
+
+inline	std::string	rplEndNameList(std::string nickname, std::string channelName){
+	return (":localhost 366 " + nickname + " " + channelName + " :End of /NAMES list\r\n");
+}
+
+inline	std::string errNoSuchChannel(std::string channelName){
+	return (":localhost 403 " + channelName + " :Channel must be created without key. Set +k via MODE after joining\r\n");
+}
+
+inline	std::string errToManyChannels(std::string nickname, std::string channelName){
+	return (":localhost 405 " + nickname + " " + channelName + " :You have joined too many channels\r\n");
 }
 
 inline	std::string errNoOrigin(std::string nickname){
@@ -66,6 +100,22 @@ inline	std::string errAlreadyRegistered(std::string nickname){
 
 inline	std::string errPassMismatch(void){
 	return ("localhost 464 :Password incorrect\r\n");
+}
+
+inline	std::string errChannelIsFull(std::string channelName){
+	return (":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n");
+}
+
+inline	std::string errInviteOnlyChan(std::string channelName){
+	return (":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n");
+}
+
+inline	std::string errBadChannelKey(std::string channelName){
+	return (":localhost 475 " + channelName + " :Cannot join channel (+k)\r\n");
+}
+
+inline	std::string errBadChannelMask(std::string channelName){
+	return (":localhost 476 " + channelName + " :Bad Channel Mask\r\n");
 }
 
 #endif
