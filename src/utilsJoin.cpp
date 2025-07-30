@@ -5,7 +5,7 @@ int		Server::ptrLen(std::string *ptr) {
 
 	while (ptr[len] != "\0")
 	{
-		std::cout << "->>>" << ptr[len] << "<<<<" << std::endl;
+		//std::cout << ">>>" << ptr[len] << "<<<<" << std::endl;
 		len++;
 	}
 	return len;
@@ -18,24 +18,14 @@ void	Server::prepareForJoin(std::string *params, Client *client)
 	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
 
-
-	std::cout << "Len aarray params: " << len << std::endl;
-	if (params[0].empty())
+	if (len == 1)
+		sendReply(client->getFd(), errNeedMoreParams("JOIN"));
+	if (len >= 3)
 	{
-		std::string err = "461 ERR_NEEDMOREPARAMS " + client->getNick() + " :Not enough parameters\r\n";
-		sendReply(client->getFd(), err);
-	}
-	if (!params[3].empty())
-	{
-		std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
-		sendReply(client->getFd(), err);
-	}
-	if (!params[1].empty())
 		requestedChannels = convertToVector(params[1]);
-
-	// Comprova si hi ha password (no accedeixis fora límits)
-	if (!params[2].empty())
 		passChannels = convertToVector(params[2]);
+	} else if (len == 2)
+		requestedChannels = convertToVector(params[1]);
 
 	join(*client, this->channels, requestedChannels, passChannels);
 }

@@ -64,6 +64,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 
 			// Mode +k (password)
+			channel->setPassword("1234");
 			if (channel->isPasswordSet())
 			{
 				if (channelPass.empty())
