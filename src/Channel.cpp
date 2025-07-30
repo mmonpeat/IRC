@@ -204,6 +204,16 @@ void	Channel::addOperator(Client *new_op) {
 	return;
 }
 
+void	Channel::addOperatorByNick(const std::string& new_op) {
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), new_op) == true) {
+			addOperator(*it);
+			return;
+		}
+	}
+	return;
+}
+
 
 bool	Channel::isClient(Client *client) {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {

@@ -20,7 +20,6 @@ Channel*	Server::getChannelByName(std::string& name) {
 	return NULL;
 }
 
-
 void	Server::channelModes(std::string *params, Client *client) {
 	int 		len = ptrLen(params);
 	Channel*	channel;
@@ -42,7 +41,6 @@ void	Server::channelModes(std::string *params, Client *client) {
 	return;
 }
 
-//  /MODE #chanelName +ok-l Borja password 
 
 void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 {
@@ -145,11 +143,16 @@ void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client)
 	return;
 }
 
-/*void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
-	if (channel->isClientByNick(arg) == false)
+void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
+	if (channel->isClientByNick(arg) == false) {
+		sendReply(client->getFd(), errUserNotInChannel(client->getNick(), channel->getChannelName()));
 		return;
-	channel->addOperator()
-}*/
+	}
+	channel->addOperatorByNick(arg);
+	//mensage para el grupo
+	
+	return;
+}
 
 
 // LIMIT 3 modes that require parameter

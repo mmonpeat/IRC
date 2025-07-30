@@ -80,4 +80,8 @@ inline	std::string	errChannelNotExist(const std::string& clientNick, const std::
 	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel\r\n");
 }
 
+inline	std::string	errUserNotInChannel(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel\r\n");
+}
+
 #endif

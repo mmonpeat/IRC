@@ -92,7 +92,6 @@ class Server
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);
 		Channel*					getChannelByName(std::string& name);
-		//Client*						getClientByNick(std::string& nick);
 		int							ptrLen(std::string *ptr);
 		int							strToInt(std::string arg); 
 		bool						isLimitValid(std::string limit);
@@ -101,7 +100,7 @@ class Server
 		void						modeK(Channel *channel, std::string password, char sign, Client *client);
 		void						modeT(Channel *channel, char sign, Client *client);
 		void						modeL(Channel *channel, std::string arg, char sign, Client *client);
-		//void						modeO(Channel *channel, std::string arg, char sign, Client *client);
+		void						modeO(Channel *channel, std::string arg, char sign, Client *client);
 
 
 		/*  JOIN  */

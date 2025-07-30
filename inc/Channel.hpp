@@ -62,6 +62,7 @@ class Channel
 		bool 		isClientInChannel(Client* client) const;
 		void		removeClient(Client* client);
 		void		addOperator(Client *new_op);
+		void		addOperatorByNick(const std::string& new_op);
 		void		removeOperator(Client *op);
 		bool		isClient(Client* client);
 		bool		isClientByNick(std::string nick);
