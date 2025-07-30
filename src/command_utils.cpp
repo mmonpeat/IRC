@@ -6,10 +6,8 @@ bool	Server::isNickValid(std::string nick)
 	std::string	forbidden[6] = {",", "*" , "?", "!", "@", "."};
 	for (int i = 0; i < 6; i++)
 	{
-		std::cout << forbidden[i] << std::endl;
 		if (nick.find(forbidden[i]) != std::string::npos)
 		{
-			std::cout << "oops found :" << forbidden[i] << std::endl;
 			return(false);
 		}
 	}
