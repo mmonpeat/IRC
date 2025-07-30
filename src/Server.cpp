@@ -319,9 +319,9 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 int	Server::checkCommand(std::string parameter)
 {
-	std::string	command[10] = 
+	std::string	command[11] = 
 	{
-		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
+		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE", "QUIT"
 	};
 	for (int i = 0; i < 10; i++)
 	{
@@ -397,6 +397,8 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			std::cout << "MODE goes here" << std::endl;
 			//mode(params, client);
 			break;
+		case 10:
+			quit(client); //add the message part?
 		default:
       		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	}
@@ -545,6 +547,12 @@ void	Server::privmsg(std::string *params, Client *client)
 	//check if it's a channel or not
 	//	if channel check if client can send to channel
 	//separate targets if there're more than one
+}
+
+void	Server::quit(Client* client)
+{
+		client->setEnd(true);
+		return ;
 }
 
 //------------------------------- Reply Functions ------------------------------
