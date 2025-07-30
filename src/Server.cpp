@@ -376,8 +376,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			user(params, client);
 			break ;
 		case 4:
+		{
+			//ptrLen(params);
 			prepareForJoin(params, client);
 			break;
+		}
 		case 5:
 			//privmsg(params, client);
 			break;

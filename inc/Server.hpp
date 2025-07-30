@@ -97,7 +97,7 @@ class Server
 		void						createNewChannel(Client& client, std::vector<Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass);
 		
 		//utils join
-		int							ptrLenJoin(std::string *ptr);
+		int							ptrLen(std::string *ptr);
 		void						prepareForJoin(std::string *params, Client *client);
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		bool						equalChannels(std::string new_channel, std::string channel) const;
