@@ -424,7 +424,9 @@ std::string*	Server::returnParams(std::string msg)
 		}
 		params[i++] = msg.substr(0, pos);
 		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
-		msg.erase(0, pos + 1);
+		while (msg[pos] == ' ')
+			pos++;
+		msg.erase(0, pos);
 		pos = msg.find(' ');
 	}
 	params[i] = '\0';
@@ -544,8 +546,12 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
 	}
-	//separate targets if there're more than one
+	//if (params[1].find(','))
+	//{
+	//	separate_targets(params[1]);
+	//}
 	
+	//while () //targets to reach	
 	//loop to send all messages
 		//check if username or channel exists
 			//if not err_nosuchnick or err_nosuchchannel

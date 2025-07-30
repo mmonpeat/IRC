@@ -16,3 +16,9 @@ bool	Server::isNickValid(std::string nick)
 		return (false);
 	return (true);
 }
+/*
+Server::separate_targets(std::params[1])
+{
+	vector<std::string>	targets;
+	return (targets);
+}*/
