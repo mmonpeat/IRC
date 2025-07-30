@@ -20,7 +20,7 @@ OBJ = $(SRC:%.cpp=$(BUILD)/%.o)
 DEP = $(OBJ:%.o=%.d)
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address
 
 all: $(NAME)
 
