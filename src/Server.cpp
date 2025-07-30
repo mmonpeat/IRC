@@ -164,7 +164,7 @@ void Server::handleClientData(int clientFd)
 			std::cout << "CONNECTION closed\n";
         	removeClient(clientFd);  // Desconexión o error
 	} else if (bytesRead < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-		std::cout << "RECV error\n";
+		std::cout << "RECV error: " << errno << std::endl;
 	} else {
      		buffer[bytesRead] = '\0';
 			clients[clientFd]->addToBuffer(buffer);
