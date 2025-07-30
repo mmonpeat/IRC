@@ -163,8 +163,8 @@ void Server::handleClientData(int clientFd)
     if (bytesRead == 0) {
 			std::cout << "CONNECTION closed\n";
         	removeClient(clientFd);  // Desconexión o error
-	} else if (bytesRead < 0) {
-		std::cout << "RECV error\n";
+	} else if (bytesRead < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+		std::cout << "RECV error: " << errno << std::endl;
 	} else {
      		buffer[bytesRead] = '\0';
 			clients[clientFd]->addToBuffer(buffer);
@@ -319,9 +319,9 @@ void	Server::handleMsg(std::string msg, Client *client)
 
 int	Server::checkCommand(std::string parameter)
 {
-	std::string	command[10] = 
+	std::string	command[11] = 
 	{
-		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE"
+		"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG", "KICK", "INVITE", "TOPIC", "MODE", "QUIT"
 	};
 	for (int i = 0; i < 10; i++)
 	{
@@ -397,6 +397,8 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			std::cout << "MODE goes here" << std::endl;
 			//mode(params, client);
 			break;
+		case 10:
+			quit(client); //add the message part?
 		default:
       		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	}
@@ -422,7 +424,9 @@ std::string*	Server::returnParams(std::string msg)
 		}
 		params[i++] = msg.substr(0, pos);
 		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
-		msg.erase(0, pos + 1);
+		while (msg[pos] == ' ')
+			pos++;
+		msg.erase(0, pos);
 		pos = msg.find(' ');
 	}
 	params[i] = '\0';
@@ -542,9 +546,25 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
 	}
-	//check if it's a channel or not
-	//	if channel check if client can send to channel
-	//separate targets if there're more than one
+	//if (params[1].find(','))
+	//{
+	//	separate_targets(params[1]);
+	//}
+	
+	//while () //targets to reach	
+	//loop to send all messages
+		//check if username or channel exists
+			//if not err_nosuchnick or err_nosuchchannel
+		//if channel and cant send to channel
+		//		err_cannotsendtochan
+		//else
+		//		send msg
+}
+
+void	Server::quit(Client* client)
+{
+		client->setEnd(true);
+		return ;
 }
 
 //------------------------------- Reply Functions ------------------------------
