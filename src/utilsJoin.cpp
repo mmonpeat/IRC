@@ -14,32 +14,30 @@ int		Server::ptrLen(std::string *ptr) {
 
 void	Server::prepareForJoin(std::string *params, Client *client)
 {
+	int len = ptrLen(params);
 	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
-	int len = ptrLen(params);
+
 
 	std::cout << "Len aarray params: " << len << std::endl;
-	// if (params[1].empty())
-	// {
-	// 	sendReply(client->getFd(), errNeedMoreParams("JOIN"));
-	// }
-	// if (!params[3].empty())
-	// {
-	// 	std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
-	// 	sendReply(client->getFd(), err);
-	// }
-	// if (!params[1].empty())
-	// {
-	// 	std::cout << "!params[1].empty(): " << len << std::endl;
-	// 	//requestedChannels = convertToVector(params[1]);
-	// }
+	if (params[0].empty())
+	{
+		std::string err = "461 ERR_NEEDMOREPARAMS " + client->getNick() + " :Not enough parameters\r\n";
+		sendReply(client->getFd(), err);
+	}
+	if (!params[3].empty())
+	{
+		std::string err = "JOIN :Too many parameters. Use JOIN <channel> [key]\r\n";
+		sendReply(client->getFd(), err);
+	}
+	if (!params[1].empty())
+		requestedChannels = convertToVector(params[1]);
+
 	// Comprova si hi ha password (no accedeixis fora límits)
-	// if (!params[2].empty())
-	// {
-	// 	std::cout << "!params[2].empty(): " << len << std::endl;
-	// 	//passChannels = convertToVector(params[2]);
-	// }
-	//join(*client, this->channels, requestedChannels, passChannels);
+	if (!params[2].empty())
+		passChannels = convertToVector(params[2]);
+
+	join(*client, this->channels, requestedChannels, passChannels);
 }
 
 
