@@ -82,8 +82,8 @@ void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 void	Server::execMode(char sign, char c, std::string param, Client* client, Channel *channel){
 	if (c == 'k')
 		modeK(channel, param, sign, client);
-	//else if (c = 'o')
-		//modeO()
+	else if (c == 'o')
+		modeO(channel, param, sign, client);
 	else if (c == 'l')
 		modeL(channel, param, sign, client);
 	else if (c == 't')
@@ -146,15 +146,17 @@ void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client)
 }
 
 void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client) {
-	if (channel->isClientByNick(arg) == false) {
+	if (channel->isClientByNick(arg) == false)
 		sendReply(client->getFd(), errUserNotInChannel(client->getNick(), channel->getChannelName()));
-		return;
-	}
-	if (sign == '+') {
+	else if (sign == '+') {
 		channel->addOperatorByNick(arg);
-		//mensage para el grupo
+		std::string	message = ":" + client->getNick() + " MODE " + channel->getChannelName() + " +o " + arg + "/r/n"; //ask for host name
+		channel->broadcastMessage(message);
 	}
-	//else channel remove operator y el mensaje para el grupo
+	else if (sign == '-') {
+		std::string	message = ":" + client->getNick() + " MODE " + channel->getChannelName() + " -o " + arg + "/r/n";
+		channel->removeOperatorByNick(arg); //maybe sent a message?
+	}
 	return;
 }
 

@@ -192,6 +192,17 @@ void	Channel::removeOperator(Client *op) {
 			break;
 		}
 	}
+	return;
+}
+
+void	Channel::removeOperatorByNick(std::string& ex_op) {
+	for (std::vector<Client*>::iterator it = _operators.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), ex_op) == true) {
+			removeOperator(*it);
+			return;
+		}
+	}
+	return;
 }
 
 void	Channel::addOperator(Client *new_op) {
