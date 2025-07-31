@@ -24,8 +24,14 @@ void	Server::channelModes(std::string *params, Client *client) {
 	int 		len = ptrLen(params);
 	Channel*	channel;
 
-	if (len < 2) //handdle later
+	if (len == 1) {
+		sendReply(client->getFd(), errNotEnoughParams(client->getNick()));
 		return;
+	}
+	if (len == 2) { //print info
+
+	}
+		
 	channel = getChannelByName(params[1]);
 	if (channel == NULL) {
 		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
@@ -36,8 +42,6 @@ void	Server::channelModes(std::string *params, Client *client) {
 		return;
 	}
 	applyModes(params, client, channel); // maybe better void
-	// if len == 2
-	// handdle /MODE #channel that does exist (if you are an op, if you are a part of that channel and if you are not part of that channel)
 	return;
 }
 

@@ -43,20 +43,12 @@ class Channel
 
 		// Variable getters
 		std::string					getChannelName(void) const;
-		std::vector<std::string> 	getClientNicks() const;
+		std::vector<std::string>	getClientNicks() const;
 		int 						getChannelLimit(void) const;
 		std::string					getTopic(void) const;
 		size_t 						getClientCount() const { return _clients.size(); }
 
-		//setters
-		void		setChannelLimit(int limit);
-		void		setPassword(const std::string& password);
-		void		setTopicMode(void);
-
-		//unsetters
-		void		unsetPassword(const std::string& password);
-		void		unsetTopic(void);
-		void		unsetLimit(void);
+	
 		
 		// Channel functions
 		void		addClient(Client *client);
@@ -66,20 +58,27 @@ class Channel
 		void		addOperatorByNick(const std::string& new_op);
 		void		removeOperator(Client *op);
 		void		removeOperatorByNick(std::string& ex_op);
-
 		bool		isClient(Client* client);
 		bool		isClientByNick(std::string nick);
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
-		int			numberOfClients() const;
+		int			numberOfClients(void) const;
+		std::string	returnModes(void) const;
 
 		// Channel functions for ops
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
 		void		kickUser(Client* kicker, Client* target);
+		            //setters
+		void		setChannelLimit(int limit);
+		void		setPassword(const std::string& password);
+		void		setTopicMode(void);
+		            //unsetters
+		void		unsetPassword(const std::string& password);
+		void		unsetTopic(void);
+		void		unsetLimit(void);
 
-		//void	changeMode(Client* client, std::string command);
 
 };
 

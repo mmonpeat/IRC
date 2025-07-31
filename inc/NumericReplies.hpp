@@ -84,4 +84,17 @@ inline	std::string	errUserNotInChannel(const std::string& clientNick, const std:
 	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel\r\n");
 }
 
+inline	std::string	errNotEnoughParams(const std::string& clientNick) {
+	return (":localhost 461 " + clientNick + " MODE :Not enough parameters\r\n");
+}
+
+inline	std::string RPL_CHANNELMODEIS(const std::string& clientNick, const std::string& channelName, const std::string modes) {
+	return (":localhost 324 " + clientNick + " " + channelName + " " + modes + "\r\n");
+}
+
+inline	std::string (const std::string& clientNick, const std::string& channelName){
+	return (":localhost 329 " + clientNick + " " );
+}
+//:server.name 329 <nick> #channel <creation_time>
+
 #endif

@@ -226,7 +226,7 @@ void	Channel::addOperatorByNick(const std::string& new_op) {
 }
 
 
-bool	Channel::isClient(Client *client) {
+bool		Channel::isClient(Client *client) {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		if ((*it)->getNick() == client->getNick())
 			return true;
@@ -234,7 +234,7 @@ bool	Channel::isClient(Client *client) {
 	return false;
 }
 
-bool	Channel::isClientByNick(std::string nick){
+bool		Channel::isClientByNick(std::string nick){
 	if (nick.empty())
 		return false;
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
@@ -244,7 +244,7 @@ bool	Channel::isClientByNick(std::string nick){
 	return false;
 }
 
-bool	Channel::isChannelEmpty(void) const {
+bool		Channel::isChannelEmpty(void) const {
 	bool	isEmpty = true;
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		isEmpty = false;
@@ -253,7 +253,7 @@ bool	Channel::isChannelEmpty(void) const {
 
 }
 
-void 	Channel::broadcastMessage(std::string message) const {
+void 		Channel::broadcastMessage(std::string message) const {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
 		if (*it)
 			send((*it)->getFd(), message.c_str(), message.size(), 0);
@@ -261,16 +261,26 @@ void 	Channel::broadcastMessage(std::string message) const {
 	return;
 }
 
-void	Channel::displayTopic(void) const {
+void		Channel::displayTopic(void) const {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
 		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
 	}
 	return;
 }
 
-int Channel::numberOfClients() const {
+int 		Channel::numberOfClients() const {
 	return static_cast<int>(_clients.size());
 }
+
+std::string	Channel::returnModes(void) const {
+	std::string	modes = "+";
+
+	if 
+
+
+}
+
+
 //---------------------------------- OPs Functions -------------------------------------------
 
 bool    Channel::isOperator(std::string nick) const {
