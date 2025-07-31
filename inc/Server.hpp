@@ -75,8 +75,6 @@ class Server
 		void	addClient(int clientFd);
 		Client*	getClient(int clientFd);
 
-		char	foldChar(char c) const;
-		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE
 
 		/* Exeptions Classes */
@@ -120,5 +118,8 @@ class Server
 		void 	mostrarChannels(void);
 		
 };
+
+char	foldChar(char c);
+bool	equalNicks(std::string new_nick, std::string client);
 
 #endif

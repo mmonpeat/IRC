@@ -6,6 +6,7 @@
 #include <vector>
 #include <sys/socket.h>
 #include "Client.hpp"
+#include "Server.hpp"
 
 class Client;
 
@@ -79,6 +80,5 @@ class Channel
 		//void	changeMode(Client* client, std::string command);
 
 };
-
 
 #endif

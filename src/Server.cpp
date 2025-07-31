@@ -590,7 +590,7 @@ Client*	Server::getClient(int clientFd)
 	return (it->second);
 }
 
-char Server::foldChar(char c) const {
+char	foldChar(char c) {
     if (c >= 'A' && c <= 'Z')
         return c + 32;
     if (c == '[') return '{';
@@ -600,7 +600,7 @@ char Server::foldChar(char c) const {
     return c;
 }
 
-bool	Server::equalNicks(std::string new_nick, std::string client) const {
+bool	equalNicks(std::string new_nick, std::string client) {
 	if (new_nick == client)
 		return true;
 	if (new_nick.size() != client.size())

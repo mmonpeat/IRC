@@ -64,10 +64,12 @@ void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 		else if (c == 'k' || (c == 'l' && currentSign == '+') || c == 'o')
 		{
 			found_param++;
-			if (found_param > max_param_num)
+			if (found_param > max_param_num){
 				std::cout << "Error: too many parameter-requiring modes" << std::endl; //delete later
+				return;
+			}
 			else if (arg_i >= param_len) 
-				std::cout << "Error: too many parameter-requiring modes" << std::endl; //delete later
+				std::cout << "Argument not found" << std::endl; //proper error handelling
 			else 
 				execMode(currentSign, c, params[arg_i++], client, channel);
 		}
@@ -148,9 +150,11 @@ void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client)
 		sendReply(client->getFd(), errUserNotInChannel(client->getNick(), channel->getChannelName()));
 		return;
 	}
-	channel->addOperatorByNick(arg);
-	//mensage para el grupo
-	
+	if (sign == '+') {
+		channel->addOperatorByNick(arg);
+		//mensage para el grupo
+	}
+	//else channel remove operator y el mensaje para el grupo
 	return;
 }
 
