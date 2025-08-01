@@ -379,7 +379,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			prepareForJoin(params, client);
 			break;
 		case 5:
-			//privmsg(params, client);
+			privmsg(params, client);
 			break;
 		case 6:
 			std::cout << "KICK goes here" << std::endl;
