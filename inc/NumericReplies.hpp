@@ -7,6 +7,8 @@
 # define	RPL_WELCOME				001
 
 //error codes
+# define	ERR_NOSUCHNICK			401
+# define	ERR_NOSUCHCHANNEL		403
 # define	ERR_NOORIGIN			409
 # define	ERR_NORECIPIENT			411
 # define	ERR_NOTEXTTOSEND		412
@@ -22,6 +24,14 @@
 //Messages
 inline	std::string	rplWelcome(std::string nickname){
 	return (":localhost 001 " + nickname + " :Welcome to our IRC server, " + nickname + ":)\r\n");
+}
+
+inline	std::string errNoSuchNick(std::string nickname, std::string target){
+	return (":localhost 401 " + nickname + target + " :No such nick\r\n");
+}
+
+inline	std::string errNoSuchChannel(std::string nickname, std::string channel_name){
+	return (":localhost 403 " + nickname + channel_name + " :No such channel\r\n");
 }
 
 inline	std::string errNoOrigin(std::string nickname){
