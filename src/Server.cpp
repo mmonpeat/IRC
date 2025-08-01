@@ -566,7 +566,7 @@ void	Server::privmsg_channel(Client *sender, std::string target, std:string msg)
 		sendReply(client->getFd(), errNoSuchChannel(client->getNick(), target));
 	else
 	{
-		Channel	channel = //get channel
+		Channel*	channel = findChannel(target);
 		channel.broadcastMessage(msg);
 	}
 	return ;
@@ -578,8 +578,8 @@ void	Server::privmsg_user(Client *sender, std::string target, std:string msg)
 		sendReply(client->getFd(), errNoSuchNick(client->getNick(), target))
 	else
 	{
-		//iterate clients to return right fd
-		//send message
+		int	fd = findClient(target);
+		sendReply(fd, msg);
 	}
 	return ;
 }

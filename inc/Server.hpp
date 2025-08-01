@@ -35,7 +35,6 @@ class Server
 		std::vector<Channel*>			channels;
 		std::vector<struct pollfd> 		pollFds;
 
-		//ft_lookup()
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
@@ -88,7 +87,9 @@ class Server
 		};
 
 		//other commands utils
-		bool	isNickValid(std::string nick);
+		bool		isNickValid(std::string nick);
+		int			findClient(std::string nick); //returns fd
+		Channel*	findChannel(std::string channel_name); //returns Channel
 
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
