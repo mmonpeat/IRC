@@ -23,7 +23,8 @@ int			Server::findClient(std::string nick)
 	{
 		if (nick.compare(it->second->getNick()) == 0)
 			return (it->second->getFd());
-	}	
+	}
+	return (-1);	
 }
 
 Channel*	Server::findChannel(std::string channel_name)
@@ -32,5 +33,6 @@ Channel*	Server::findChannel(std::string channel_name)
 	{
 		if (channel_name.compare(channels[i]->getChannelName()) == 0)
 			return (channels[i]);
-	}	
+	}
+	return (NULL);	
 }

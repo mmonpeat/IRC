@@ -64,6 +64,8 @@ class Server
 		void	nick(std::string *params, Client* client);		
 		void	user(std::string *params, Client* client);
 		void	privmsg(std::string *params, Client* client);
+		void	privmsg_channel(Client *sender, std::string target, std::string msg);
+		void	privmsg_user(Client *sender, std::string target, std::string msg);
 		void	quit(Client* client);
 
 		//reply functions

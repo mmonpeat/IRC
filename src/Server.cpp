@@ -551,7 +551,7 @@ void	Server::privmsg(std::string *params, Client *client)
 	size_t	i = 0;
 	while (i < targets.size())
 	{
-		if (targets[i].begin() == '#')
+		if (targets[i][0] == '#')
 			privmsg_channel(client, targets[i], params[2]);
 		else
 			privmsg_user(client, targets[i], params[2]);
@@ -560,22 +560,21 @@ void	Server::privmsg(std::string *params, Client *client)
 	return ;
 }
 
-void	Server::privmsg_channel(Client *sender, std::string target, std:string msg)
+void	Server::privmsg_channel(Client *sender, std::string target, std::string msg)
 {
-	if (ChannelExists() == false)
-		sendReply(client->getFd(), errNoSuchChannel(client->getNick(), target));
+	Channel*	channel = findChannel(target);
+		
+	if (channel == NULL)
+		sendReply(sender->getFd(), errNoSuchChannel(sender->getNick(), target));
 	else
-	{
-		Channel*	channel = findChannel(target);
-		channel.broadcastMessage(msg);
-	}
+		channel->broadcastMessage(msg);
 	return ;
 }
 
-void	Server::privmsg_user(Client *sender, std::string target, std:string msg)
+void	Server::privmsg_user(Client *sender, std::string target, std::string msg)
 {
 	if (isNickUnique(target) == true)
-		sendReply(client->getFd(), errNoSuchNick(client->getNick(), target))
+		sendReply(sender->getFd(), errNoSuchNick(sender->getNick(), target));
 	else
 	{
 		int	fd = findClient(target);
