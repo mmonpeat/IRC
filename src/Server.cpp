@@ -563,7 +563,7 @@ void	Server::privmsg(std::string *params, Client *client)
 void	Server::privmsg_channel(Client *sender, std::string target, std:string msg)
 {
 	if (ChannelExists() == false)
-		//err_chandoesnt exist
+		sendReply(client->getFd(), errNoSuchChannel(client->getNick(), target));
 	else
 	{
 		Channel	channel = //get channel
@@ -575,7 +575,7 @@ void	Server::privmsg_channel(Client *sender, std::string target, std:string msg)
 void	Server::privmsg_user(Client *sender, std::string target, std:string msg)
 {
 	if (isNickUnique(target) == true)
-		//err_nosuchnickname
+		sendReply(client->getFd(), errNoSuchNick(client->getNick(), target))
 	else
 	{
 		//iterate clients to return right fd
