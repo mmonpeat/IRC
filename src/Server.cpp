@@ -546,19 +546,42 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
 	}
-	//if (params[1].find(','))
-	//{
-	//	separate_targets(params[1]);
-	//}
+	std::vector<std::string>	targets = convertToVector(params[1]);
 	
-	//while () //targets to reach	
-	//loop to send all messages
-		//check if username or channel exists
-			//if not err_nosuchnick or err_nosuchchannel
-		//if channel and cant send to channel
-		//		err_cannotsendtochan
-		//else
-		//		send msg
+	size_t	i = 0;
+	while (i < targets.size())
+	{
+		if (targets[i].begin() == '#')
+			privmsg_channel(client, targets[i], params[2]);
+		else
+			privmsg_user(client, targets[i], params[2]);
+		i++;
+	}
+	return ;
+}
+
+void	Server::privmsg_channel(Client *sender, std::string target, std:string msg)
+{
+	if (ChannelExists() == false)
+		//err_chandoesnt exist
+	else
+	{
+		Channel	channel = //get channel
+		channel.broadcastMessage(msg);
+	}
+	return ;
+}
+
+void	Server::privmsg_user(Client *sender, std::string target, std:string msg)
+{
+	if (isNickUnique(target) == true)
+		//err_nosuchnickname
+	else
+	{
+		//iterate clients to return right fd
+		//send message
+	}
+	return ;
 }
 
 void	Server::quit(Client* client)
