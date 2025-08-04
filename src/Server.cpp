@@ -382,7 +382,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			break;
 		}
 		case 5:
-			//privmsg(params, client);
+			privmsg(params, client);
 			break;
 		case 6:
 			std::cout << "KICK goes here" << std::endl;
@@ -549,19 +549,41 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
 	}
-	//if (params[1].find(','))
-	//{
-	//	separate_targets(params[1]);
-	//}
+	std::vector<std::string>	targets = convertToVector(params[1]);
 	
-	//while () //targets to reach	
-	//loop to send all messages
-		//check if username or channel exists
-			//if not err_nosuchnick or err_nosuchchannel
-		//if channel and cant send to channel
-		//		err_cannotsendtochan
-		//else
-		//		send msg
+	size_t	i = 0;
+	while (i < targets.size())
+	{
+		if (targets[i][0] == '#')
+			privmsg_channel(client, targets[i], params[2]);
+		else
+			privmsg_user(client, targets[i], params[2]);
+		i++;
+	}
+	return ;
+}
+
+void	Server::privmsg_channel(Client *sender, std::string target, std::string msg)
+{
+	Channel*	channel = findChannel(target);
+		
+	if (channel == NULL)
+		sendReply(sender->getFd(), errNoSuchChannel(sender->getNick(), target));
+	else
+		channel->broadcastMessage(msg);
+	return ;
+}
+
+void	Server::privmsg_user(Client *sender, std::string target, std::string msg)
+{
+	if (isNickUnique(target) == true)
+		sendReply(sender->getFd(), errNoSuchNick(sender->getNick(), target));
+	else
+	{
+		int	fd = findClient(target);
+		sendReply(fd, msg);
+	}
+	return ;
 }
 
 void	Server::quit(Client* client)
