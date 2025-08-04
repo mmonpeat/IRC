@@ -376,8 +376,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			user(params, client);
 			break ;
 		case 4:
+		{
+			//ptrLen(params);
 			prepareForJoin(params, client);
 			break;
+		}
 		case 5:
 			privmsg(params, client);
 			break;
@@ -429,7 +432,7 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos);
 		pos = msg.find(' ');
 	}
-	params[i] = '\0';
+	params[i] = "\0";
 	return (params) ;
 }
 
