@@ -432,7 +432,11 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos);
 		pos = msg.find(' ');
 	}
+<<<<<<< HEAD
 	params[i] = "\0";
+=======
+	params[n + 1] = ".";
+>>>>>>> 82853c7 (urgh)
 	return (params) ;
 }
 
@@ -549,15 +553,18 @@ void	Server::privmsg(std::string *params, Client *client)
 		sendReply(client->getFd(), errNoTextToSend(client->getNick()));
 		return ;
 	}
+	std::cout << params[2] << std::endl;
+	std::string	msg = ":" + client->getNick() + " " + params[0] + " :" + params[2] + "\r\n";
+	std::cout << "GONNA SEND: " << msg << std::endl;
 	std::vector<std::string>	targets = convertToVector(params[1]);
 	
 	size_t	i = 0;
 	while (i < targets.size())
 	{
 		if (targets[i][0] == '#')
-			privmsg_channel(client, targets[i], params[2]);
+			privmsg_channel(client, targets[i], msg);
 		else
-			privmsg_user(client, targets[i], params[2]);
+			privmsg_user(client, targets[i], msg);
 		i++;
 	}
 	return ;
@@ -581,7 +588,10 @@ void	Server::privmsg_user(Client *sender, std::string target, std::string msg)
 	if (fd == -1)
 		sendReply(sender->getFd(), errNoSuchNick(sender->getNick(), target));
 	else
+	{
+		std::cout << "sending message to target" << std::endl;
 		sendReply(fd, msg);
+	}
 	return ;
 }
 
