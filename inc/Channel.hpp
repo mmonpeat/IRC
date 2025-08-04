@@ -68,7 +68,7 @@ class Channel
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
 		int			numberOfClients(void) const;
-		std::string	returnModes(void) ;
+		std::string	returnModes(std::string nick);
 
 		// Channel functions for ops
 		bool		isOperator(std::string nick) const;

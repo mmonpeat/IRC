@@ -279,18 +279,27 @@ int 		Channel::numberOfClients() const {
 	return static_cast<int>(_clients.size());
 }
 
-std::string	Channel::returnModes(void) {
-	std::string	modes = "+";
-
+std::string	Channel::returnModes(std::string nick) {
+	std::string	modes;
+	std::string	args;
+	
 	if (isInviteModeSet())
 		modes += "i";
 	if (isTopicModeSet())
 		modes += "t";
-	if (isPasswordSet())
+	if (isPasswordSet()) {
 		modes += "k";
-	if (isLimitModeSet())
+		args += " " + _password;
+	}
+	if (isLimitModeSet()) {
 		modes += "l";
-	return modes;
+		std::ostringstream oss;
+		oss << _channel_limit;
+		args += " " + oss.str();
+	}
+	if (isClientByNick(nick) == false)
+		return modes.empty() ? "" : "+" + modes;
+	return "+" + modes + args;
 }
 
 

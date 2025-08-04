@@ -36,7 +36,7 @@ void	Server::channelModes(std::string *params, Client *client) {
 	}
 
 	if (len == 2) {
-		sendReply(client->getFd(), RPL_CHANNELMODEIS(client->getNick(), channel->getChannelName(), channel->returnModes()));
+		sendReply(client->getFd(), RPL_CHANNELMODEIS(client->getNick(), channel->getChannelName(), channel->returnModes(client->getNick())));
 		sendReply(client->getFd(), RPL_CREATIONTIME(client->getNick(), channel->getChannelName(), channel->getChannelCreationTime()));
 		return;
 	}
@@ -190,7 +190,7 @@ void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client)
 
 /*
 Code	Name	When it's used
-324	RPL_CHANNELMODEIS	Sent in response to a MODE request, shows current modes (including +k)
+
 467	ERR_KEYSET	Sent when trying to set +k but a key is already set (optional behavior)
 441	ERR_USERNOTINCHANNEL	If trying to modify modes related to a user not in the channel
 442	ERR_NOTONCHANNEL	If the client is not on the channel

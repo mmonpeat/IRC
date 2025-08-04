@@ -76,6 +76,7 @@ inline	std::string	errNotOperator(const std::string& clientNick, const std::stri
 	return (":localhost 482 "  + clientNick + " " + channelName + " :You're not channel operator\r\n");
 }
 
+
 inline	std::string	errChannelNotExist(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel\r\n");
 }
