@@ -576,13 +576,12 @@ void	Server::privmsg_channel(Client *sender, std::string target, std::string msg
 
 void	Server::privmsg_user(Client *sender, std::string target, std::string msg)
 {
-	if (isNickUnique(target) == true)
+	int	fd = findClient(target);
+
+	if (fd == -1)
 		sendReply(sender->getFd(), errNoSuchNick(sender->getNick(), target));
 	else
-	{
-		int	fd = findClient(target);
 		sendReply(fd, msg);
-	}
 	return ;
 }
 
