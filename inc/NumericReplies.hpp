@@ -11,6 +11,8 @@
 # define	RPL_NAMESMSG			353
 # define	RPL_ENDNAMELIST			366
 //error codes
+
+# define	ERR_NOSUCHNICK			401
 # define	ERR_NOSUCHCHANNEL		403
 # define	ERR_TOOMANYCHANNELS		405
 # define	ERR_NOORIGIN			409
@@ -34,6 +36,7 @@ inline	std::string	rplWelcome(std::string nickname){
 	return (":localhost 001 " + nickname + " :Welcome to our IRC server, " + nickname + ":)\r\n");
 }
 
+
 inline	std::string	rplNamesMsg(std::string namesMsg){
 	return (namesMsg + "\r\n");
 }
@@ -48,6 +51,10 @@ inline	std::string	rplTopicSet(std::string nickname, std::string channelName, st
 
 inline	std::string	rplEndNameList(std::string nickname, std::string channelName){
 	return (":localhost 366 " + nickname + " " + channelName + " :End of /NAMES list\r\n");
+}
+
+inline	std::string errNoSuchNick(std::string nickname, std::string target){
+	return (":localhost 401 " + nickname + target + " :No such nick\r\n");
 }
 
 inline	std::string errNoSuchChannel(std::string channelName){

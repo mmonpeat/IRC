@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-bool	Server::isNickValid(std::string nick)
+bool		Server::isNickValid(std::string nick)
 {
 	// must not have: ',' '*' '?' '!' '@' also should not '.'
 	std::string	forbidden[6] = {",", "*" , "?", "!", "@", "."};
@@ -16,9 +16,23 @@ bool	Server::isNickValid(std::string nick)
 		return (false);
 	return (true);
 }
-/*
-Server::separate_targets(std::params[1])
+
+int			Server::findClient(std::string nick)
 {
-	vector<std::string>	targets;
-	return (targets);
-}*/
+	for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); it++)
+	{
+		if (nick.compare(it->second->getNick()) == 0)
+			return (it->second->getFd());
+	}
+	return (-1);	
+}
+
+Channel*	Server::findChannel(std::string channel_name)
+{
+	for (size_t i = 0; i < channels.size(); i++)
+	{
+		if (channel_name.compare(channels[i]->getChannelName()) == 0)
+			return (channels[i]);
+	}
+	return (NULL);	
+}
