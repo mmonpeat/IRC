@@ -7,6 +7,7 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
 	_invite_set = false;
 	_topic_set = true;
 	_password_set = false;
+	_creationTime = time(NULL);
     std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
     return;
 }
@@ -76,7 +77,7 @@ std::vector<std::string> Channel::getClientNicks() const
 	return nicks;
 }
 
-int 	Channel::getChannelLimit(void) const {
+int 		Channel::getChannelLimit(void) const {
     return this->_channel_limit;
 }
 
@@ -84,6 +85,12 @@ std::string	Channel::getTopic(void) const {
 	return this->_topic;
 }
 
+std::string	Channel::getChannelCreationTime(void) {
+	std::ostringstream oss;
+	oss << _creationTime;
+	std::string time = oss.str(); 
+	return time;
+}
 //---------------------------------- Setters -------------------------------------------------
 
 void	Channel::setChannelLimit(int limit) {
@@ -272,12 +279,18 @@ int 		Channel::numberOfClients() const {
 	return static_cast<int>(_clients.size());
 }
 
-std::string	Channel::returnModes(void) const {
+std::string	Channel::returnModes(void) {
 	std::string	modes = "+";
 
-	if 
-
-
+	if (isInviteModeSet())
+		modes += "i";
+	if (isTopicModeSet())
+		modes += "t";
+	if (isPasswordSet())
+		modes += "k";
+	if (isLimitModeSet())
+		modes += "l";
+	return modes;
 }
 
 

@@ -28,20 +28,23 @@ void	Server::channelModes(std::string *params, Client *client) {
 		sendReply(client->getFd(), errNotEnoughParams(client->getNick()));
 		return;
 	}
-	if (len == 2) { //print info
 
-	}
-		
 	channel = getChannelByName(params[1]);
 	if (channel == NULL) {
 		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
+		return;
+	}
+
+	if (len == 2) {
+		sendReply(client->getFd(), RPL_CHANNELMODEIS(client->getNick(), channel->getChannelName(), channel->returnModes()));
+		sendReply(client->getFd(), RPL_CREATIONTIME(client->getNick(), channel->getChannelName(), channel->getChannelCreationTime()));
 		return;
 	}
 	if (channel->isOperator(client->getNick()) == false) {
 		sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
 		return;
 	}
-	applyModes(params, client, channel); // maybe better void
+	applyModes(params, client, channel);
 	return;
 }
 
@@ -95,7 +98,6 @@ void	Server::execMode(char sign, char c, std::string param, Client* client, Chan
 	else if (c == 'i')
 		std::cout << "Function to be written" << std::endl;
 	return;
-
 }
 
 

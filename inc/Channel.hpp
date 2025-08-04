@@ -2,6 +2,7 @@
 #define CHANNEL_HPP
 
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <sys/socket.h>
@@ -17,6 +18,8 @@ class Channel
 		std::string					_topic;
 		std::vector<Client*>		_operators;
 		std::vector<Client*>		_clients;
+		time_t						_creationTime;
+
 	
 		// Mode control 
 		bool						_limit_set;
@@ -47,6 +50,7 @@ class Channel
 		int 						getChannelLimit(void) const;
 		std::string					getTopic(void) const;
 		size_t 						getClientCount() const { return _clients.size(); }
+		std::string					getChannelCreationTime(void);
 
 	
 		
@@ -64,7 +68,7 @@ class Channel
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
 		int			numberOfClients(void) const;
-		std::string	returnModes(void) const;
+		std::string	returnModes(void) ;
 
 		// Channel functions for ops
 		bool		isOperator(std::string nick) const;

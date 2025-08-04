@@ -92,9 +92,9 @@ inline	std::string RPL_CHANNELMODEIS(const std::string& clientNick, const std::s
 	return (":localhost 324 " + clientNick + " " + channelName + " " + modes + "\r\n");
 }
 
-inline	std::string (const std::string& clientNick, const std::string& channelName){
-	return (":localhost 329 " + clientNick + " " );
+inline	std::string RPL_CREATIONTIME(const std::string& clientNick, const std::string& channelName, const std::string& timeStamp) {
+	return (":localhost 329 " + clientNick + " " + channelName + " " + timeStamp + "\r\n" );
 }
-//:server.name 329 <nick> #channel <creation_time>
+
 
 #endif
