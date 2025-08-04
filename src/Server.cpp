@@ -432,11 +432,7 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos);
 		pos = msg.find(' ');
 	}
-<<<<<<< HEAD
-	params[i] = "\0";
-=======
-	params[n + 1] = ".";
->>>>>>> 82853c7 (urgh)
+	params[n] = "\0";
 	return (params) ;
 }
 
@@ -575,7 +571,7 @@ void	Server::privmsg_channel(Client *sender, std::string target, std::string msg
 	Channel*	channel = findChannel(target);
 		
 	if (channel == NULL)
-		sendReply(sender->getFd(), errNoSuchChannel(sender->getNick(), target));
+		sendReply(sender->getFd(), errNoSuchChannel(target));
 	else
 		channel->broadcastMessage(msg);
 	return ;

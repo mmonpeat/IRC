@@ -6,7 +6,7 @@
 #    By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/02 13:22:55 by kkoval            #+#    #+#              #
-#    Updated: 2025/07/24 18:52:34 by amagnell         ###   ########.fr        #
+#    Updated: 2025/08/04 18:44:47 by amagnell         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ OBJ = $(SRC:%.cpp=$(BUILD)/%.o)
 DEP = $(OBJ:%.o=%.d)
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address
 
 all: $(NAME)
 
