@@ -550,7 +550,7 @@ void	Server::privmsg(std::string *params, Client *client)
 		return ;
 	}
 	std::cout << params[2] << std::endl;
-	std::string	msg = ":" + client->getNick() + " " + params[0] + " :" + params[2] + "\r\n";
+	std::string	msg = ":" + client->getNick() + " " + params[0] + " : " + params[2] + "\r\n";
 	std::cout << "GONNA SEND: " << msg << std::endl;
 	std::vector<std::string>	targets = convertToVector(params[1]);
 	
