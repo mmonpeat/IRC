@@ -571,7 +571,12 @@ void	Server::privmsg_channel(Client *sender, std::string target, std::string msg
 	Channel*	channel = findChannel(target);
 		
 	if (channel == NULL)
+	{
 		sendReply(sender->getFd(), errNoSuchChannel(target));
+		return ;
+	}
+	if (channel->isClientInChannel(sender) == false)
+		sendReply(sender->getFd(), errCannotSendToChan(sender->getNick(), target));
 	else
 		channel->msgtoChannel(msg, sender->getFd());
 	return ;
