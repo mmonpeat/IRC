@@ -103,6 +103,5 @@ int main(int argc, char **argv)
 		std::cerr << "Server exception caught: " << e.what() << std::endl;
 		return (EXIT_FAILURE);
 	}
-	std::cout << "despres start" << std::endl;
 	return (EXIT_SUCCESS);
 }

@@ -422,11 +422,11 @@ std::string*	Server::returnParams(std::string msg)
 		if (msg[0] == ':')
 		{
 			params[i] = msg.substr(1, msg.length());
-			std::cout << "param " << i << " is " << params[i] << std::endl;
+		//	std::cout << "param " << i << " is " << params[i] << std::endl;
 			break ;
 		}
 		params[i++] = msg.substr(0, pos);
-		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
+		//std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
 		while (msg[pos] == ' ')
 			pos++;
 		msg.erase(0, pos);
@@ -459,7 +459,6 @@ int	Server::countParams(std::string msg)
 
 void	Server::pass(std::string *params, Client *client)
 {
-	std::cout << "do PASS command" << std::endl;
 	if (client->getPass() == true)
 	{
 		sendReply(client->getFd(), errAlreadyRegistered(client->getNick()));
@@ -467,21 +466,16 @@ void	Server::pass(std::string *params, Client *client)
 	}
 	if (params[1].empty())
 	{
-		std::cout << "TEST" << std::endl;
 		sendReply(client->getFd(), errNeedMoreParams(params[0]));
 		return ;
 	}
 	if(this->serverPass.compare(params[1]) == 0)
 	{
-		std::cout << serverPass << "\n";
-		std::cout << params[1] << "\n";
-		std::cout << "correct Pass" << std::endl;
+		std::cout << "Correct Pass" << std::endl;
 		client->setPass(true);
 	}
 	else
 	{
-		std::cout << serverPass << "\n";
-		std::cout << params[1] << "\n";
 		sendReply(client->getFd(), errPassMismatch());
 		client->setEnd(true);
 	}
@@ -504,7 +498,6 @@ void	Server::nick(std::string *params, Client *client)
 	if (isNickValid(params[1]) == true)
 	{
 		client->setNick(params[1]);
-		std::cout << "Nick set as " << client->getNick() << std::endl;
 	}
 	else
 	{
@@ -529,16 +522,14 @@ void	Server::user(std::string *params, Client *client)
 	client->setUserName(params[1]);
 	std::cout << "user name set as:" << client->getUserName() << "\n";
 	client->setRealName(params[4]);
-	std::cout << "real name set as: " << client->getRealName() << std::endl;
+	std::cout << "real name set as:" << client->getRealName() << std::endl;
 	client->setAuth(true);
 	sendReply(client->getFd(), rplWelcome(client->getNick()));
-	std::cout << "auth is " << client->getAuth() << std::endl;
 	return ;
 }
 
 void	Server::privmsg(std::string *params, Client *client)
 {
-	std::cout << "PRIVMSG goes here" << std::endl;
 	if (params[1].empty())
 	{
 		sendReply(client->getFd(), errNoRecipient(client->getNick()));
@@ -550,13 +541,14 @@ void	Server::privmsg(std::string *params, Client *client)
 		return ;
 	}
 	std::cout << params[2] << std::endl;
-	std::string	msg = ":" + client->getNick() + " " + params[0] + " " + params[1] + " : " + params[2] + "\r\n";
-	std::cout << "GONNA SEND: " << msg << std::endl;
+	std::string	premsg = ":" + client->getNick() + " " + params[0] + " ";
 	std::vector<std::string>	targets = convertToVector(params[1]);
 	
 	size_t	i = 0;
 	while (i < targets.size())
 	{
+		std::string	msg = premsg + targets[i] + " : " + params[2] + "\r\n";
+	//	std::cout << "GONNA SEND: " << msg << std::endl;
 		if (targets[i][0] == '#')
 			privmsg_channel(client, targets[i], msg);
 		else
@@ -571,7 +563,12 @@ void	Server::privmsg_channel(Client *sender, std::string target, std::string msg
 	Channel*	channel = findChannel(target);
 		
 	if (channel == NULL)
+	{
 		sendReply(sender->getFd(), errNoSuchChannel(target));
+		return ;
+	}
+	if (channel->isClientInChannel(sender) == false)
+		sendReply(sender->getFd(), errCannotSendToChan(sender->getNick(), target));
 	else
 		channel->msgtoChannel(msg, sender->getFd());
 	return ;
@@ -584,10 +581,7 @@ void	Server::privmsg_user(Client *sender, std::string target, std::string msg)
 	if (fd == -1)
 		sendReply(sender->getFd(), errNoSuchNick(sender->getNick(), target));
 	else
-	{
-		std::cout << "sending message to target" << std::endl;
 		sendReply(fd, msg);
-	}
 	return ;
 }
 
