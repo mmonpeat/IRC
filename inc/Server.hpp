@@ -92,7 +92,7 @@ class Server
 		Channel*					getChannelByName(std::string& name);
 		int							ptrLen(std::string *ptr);
 		int							strToInt(std::string arg); 
-		bool						isLimitValid(std::string limit);
+		bool						isLimitValid(const std::string& limit);
 		void						applyModes(std::string *params, Client *client, Channel* channel);
 		void						execMode(char sign, char c, std::string param, Client* client, Channel *channel);
 		void						modeK(Channel *channel, std::string password, char sign, Client *client);

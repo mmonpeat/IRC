@@ -67,16 +67,19 @@ void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 		if (c == '+' || c == '-')
 			currentSign = c;
 		else if (validModes.find(c) == std::string::npos || currentSign == 0)
-			std::cout << "Error: invalid mode character '" << c << "'" << std::endl;
-		else if (c == 'k' || (c == 'l' && currentSign == '+') || c == 'o')
+			sendReply(client->getFd(), errNotKnownMode(client->getNick(), c));
+		else if (((c == 'k' || c == 'l') && currentSign == '+') || c == 'o')
 		{
 			found_param++;
 			if (found_param > max_param_num){
-				std::cout << "Error: too many parameter-requiring modes" << std::endl; //delete later
+				std::string message = ":localhost " + client->getNick() + " MODE :Too many parameter-requiring modes in one command\r\n";
+				sendReply(client->getFd(), message);
 				return;
 			}
-			else if (arg_i >= param_len) 
-				std::cout << "Argument not found" << std::endl; //proper error handelling
+			else if (arg_i >= param_len) {
+				sendReply(client->getFd(),errNotEnoughParams(client->getNick())); // lack of parameter
+				return;
+			}
 			else 
 				execMode(currentSign, c, params[arg_i++], client, channel);
 		}
@@ -100,54 +103,66 @@ void	Server::execMode(char sign, char c, std::string param, Client* client, Chan
 	return;
 }
 
-
-//461 ERR_NEEDMOREPARAMS if no parameter for k
 void	Server::modeK(Channel *channel, std::string password, char sign, Client *client) {
-	if (channel->isPasswordSet() == false && sign == '+') {
-		channel->setPassword(password);
+	// write another function for password checking
+	if (password.empty() || password.size() > 32) { // not aked by the protocol but prevents problems
+		std::string	message = ":" + client->getNick() + " :Password must be 1-32 characters long\r\n";
+		sendReply(client->getFd(), message);
+		return;
 	}
-	// check what happens in real servers if mode is on and another +k comes and same for -k
-	else if (channel->isPasswordSet() == true && sign == '-') {
-		channel->unsetPassword(password);
-	}
-	(void) client;
+	if (sign == '+')
+		channel->setPasswordM(client, password);
+	else if (channel->isPasswordSet() == true && sign == '-')
+		channel->unsetPassword(client->getNick());
 	return;
 }
 
 void	Server::modeT(Channel *channel, char sign, Client *client) {
 	if (channel->isTopicModeSet() == false && sign == '+')
-		channel->setTopicMode();
+		channel->setTopicMode(client->getNick());
 	else if (channel->isTopicModeSet() == true && sign == '-')
-		channel->unsetTopic();
+		channel->unsetTopic(client->getNick());
 	return;
-	(void) client; // check if needed
 }
 
-bool	Server::isLimitValid(std::string limit) {
-	if (limit.empty() == true || limit.length() > 9)
-		return false;
-	size_t i = 0;
-	if (limit[0] == '+')
-		i = 1;
-	for (; i < limit.length(); i++) {
-		if (!std::isdigit(limit[i]))
-			return false;
-	}
-	return true;
+bool Server::isLimitValid(const std::string& limit) {
+    if (limit.empty() || limit.length() > 5)
+        return false;
+    for (size_t i = 0; i < limit.length(); i++) {
+        if (!std::isdigit(limit[i]))
+            return false;
+    }
+    // no leading zeros
+    if (limit.length() > 1 && limit[0] == '0')
+        return false;
+    return true;
 }
+
 
 int		Server::strToInt(std::string arg) {
-	if (arg == "0")
-		return 0;
 	return atoi(arg.c_str());
 }
 
 void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client) {
-	if (sign == '+' && isLimitValid(arg) == true)
-		channel->setChannelLimit(strToInt(arg));
-	else if (channel->isLimitModeSet() == true)
-		channel->unsetLimit();
-	(void) client;
+	if (sign == '+') {
+		if (isLimitValid(arg)) {
+			int limit = strToInt(arg);
+			if (limit > 0)
+				channel->setChannelLimit(limit, arg, client->getNick());
+			else {
+				std::string	message = ":" + client->getNick() + " :Limit should be a positive number\r\n";
+				sendReply(client->getFd(), message);
+				return;
+			}
+		}
+		else {
+			std::string	message = ":" + client->getNick() + " :Limit is not acceptable\r\n";
+			sendReply(client->getFd(), message);
+			return;
+		}
+	}
+	else if (sign == '-' && channel->isLimitModeSet() == true)
+		channel->unsetLimit(client->getNick());
 	return;
 }
 

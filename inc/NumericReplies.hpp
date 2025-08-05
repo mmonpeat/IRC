@@ -72,30 +72,35 @@ inline	std::string errPassMismatch(void){
 // --------------------------------------- Mode Replies-------------------------------------------
 
 
-inline	std::string	errNotOperator(const std::string& clientNick, const std::string& channelName) {
+inline std::string	errNotOperator(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 482 "  + clientNick + " " + channelName + " :You're not channel operator\r\n");
 }
 
 
-inline	std::string	errChannelNotExist(const std::string& clientNick, const std::string& channelName) {
+inline std::string	errChannelNotExist(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel\r\n");
 }
 
-inline	std::string	errUserNotInChannel(const std::string& clientNick, const std::string& channelName) {
+inline std::string	errUserNotInChannel(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel\r\n");
 }
 
-inline	std::string	errNotEnoughParams(const std::string& clientNick) {
+inline std::string	errNotEnoughParams(const std::string& clientNick) {
 	return (":localhost 461 " + clientNick + " MODE :Not enough parameters\r\n");
 }
 
-inline	std::string RPL_CHANNELMODEIS(const std::string& clientNick, const std::string& channelName, const std::string modes) {
+inline std::string	RPL_CHANNELMODEIS(const std::string& clientNick, const std::string& channelName, const std::string modes) {
 	return (":localhost 324 " + clientNick + " " + channelName + " " + modes + "\r\n");
 }
 
-inline	std::string RPL_CREATIONTIME(const std::string& clientNick, const std::string& channelName, const std::string& timeStamp) {
+inline std::string	RPL_CREATIONTIME(const std::string& clientNick, const std::string& channelName, const std::string& timeStamp) {
 	return (":localhost 329 " + clientNick + " " + channelName + " " + timeStamp + "\r\n" );
 }
+
+inline std::string	errNotKnownMode(const std::string& clientNick, const char& modeChar) {
+	return (":localhost 472 " + clientNick + " " + modeChar + " :is unknown mode char to me\r\n");
+}
+
 
 
 #endif

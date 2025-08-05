@@ -67,6 +67,7 @@ bool	Channel::isClientInvited(Client* client) const {
 std::string	Channel::getChannelName(void) const{
 	return this->_name;
 }
+
 std::vector<std::string> Channel::getClientNicks() const
 {
 	std::vector<std::string> nicks;
@@ -93,47 +94,65 @@ std::string	Channel::getChannelCreationTime(void) {
 }
 //---------------------------------- Setters -------------------------------------------------
 
-void	Channel::setChannelLimit(int limit) {
-	this->_channel_limit = limit;
-    this->_limit_set = true;
-}
-
-void Channel::setPassword(const std::string& password)
+void 	Channel::setPassword(const std::string& password)
 {
 	this->_password = password;
 	this->_password_set = true;
-	//send message to the group
-}
-
-void	Channel::setTopicMode(void) {
-	this->_topic_set = true;
 	return;
 }
+
+void		Channel::setPasswordM(Client* op, const std::string& password) {
+	this->_password = password;
+	this->_password_set = true;
+	passwordSetBroadcast(op);
+	return;
+}
+
+void	Channel::setTopicMode(const std::string& op_nick) {
+	this->_topic_set = true;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + "+t\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::setChannelLimit(int limit, const std::string& limit_str, const std::string& op_nick) {
+	this->_channel_limit = limit;
+    this->_limit_set = true;
+	
+	std::string message = ":" + op_nick + " MODE " + _name + " +l " + limit_str + "\r\n";
+	broadcastMessage(message);
+	return;
+}
+
 
 
 //---------------------------------- Unsetters -----------------------------------------------
 
-void	Channel::unsetPassword(const std::string& password) {
-	if (this->_password == password) {
-		this->_password.clear();
-		this->_password_set = false;
-		//send message to the group
-	}
-	else 
-		std::cout << "The password in wrong" << std::endl;
+void	Channel::unsetPassword(const std::string& op_nick) {
+	this->_password.clear();
+	this->_password_set = false;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -k\r\n";
+	broadcastMessage(message);
 	return;
 }
 
-void	Channel::unsetTopic(void) {
+void	Channel::unsetTopic(const std::string& op_nick) {
 	this->_topic_set = false;
-	std::cout << "Topic mode has been unset" << std::endl; //change it to group message
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -t\r\n";
+	broadcastMessage(message);
 	return;
 }
 
-void	Channel::unsetLimit(void) {
+void	Channel::unsetLimit(const std::string& op_nick) {
 	this->_channel_limit = 0;
 	this->_limit_set = false;
-	std::cout << "the Limit of Channel has been lifted" << std::endl;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -l\r\n";
+	broadcastMessage(message);
+	return;
 }
 
 //---------------------------------- Class Functions -----------------------------------------
@@ -264,6 +283,19 @@ void 		Channel::broadcastMessage(std::string message) const {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
 		if (*it)
 			send((*it)->getFd(), message.c_str(), message.size(), 0);
+	 }
+	return;
+}
+
+void		Channel::passwordSetBroadcast(Client* client) {
+std::string	client_message =  ":" + client->getNick() + " MODE " + _name + " +k\r\n";
+std::string	op_message = ":" + client->getNick() + " MODE " + _name + " +k "  + _password + "\r\n";
+
+for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
+		if (*it && (*it)->getNick() == client->getNick())
+			send((*it)->getFd(), op_message.c_str(), op_message.size(), 0);
+		else
+			send((*it)->getFd(), client_message.c_str(), client_message.size(), 0);
 	 }
 	return;
 }

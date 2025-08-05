@@ -67,6 +67,7 @@ class Channel
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
+		void		passwordSetBroadcast(Client* client);
 		int			numberOfClients(void) const;
 		std::string	returnModes(std::string nick);
 
@@ -74,14 +75,17 @@ class Channel
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
 		void		kickUser(Client* kicker, Client* target);
-		            //setters
-		void		setChannelLimit(int limit);
-		void		setPassword(const std::string& password);
-		void		setTopicMode(void);
-		            //unsetters
-		void		unsetPassword(const std::string& password);
-		void		unsetTopic(void);
-		void		unsetLimit(void);
+
+		            //mode setters
+		void		setPassword(const std::string& password); // preguntar Maria si borrarlo
+		void		setPasswordM(Client* op, const std::string& password);
+		void		setTopicMode(const std::string& op_nick);
+		void		setChannelLimit(int limit, const std::string& limit_str, const std::string& op_nick);
+
+		            //mode unsetters
+		void		unsetPassword(const std::string& op_nick);
+		void		unsetTopic(const std::string& op_nick);
+		void		unsetLimit(const std::string& op_nick);
 
 
 };
