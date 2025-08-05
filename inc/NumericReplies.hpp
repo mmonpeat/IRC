@@ -59,7 +59,7 @@ inline	std::string errNoSuchNick(std::string nickname, std::string target){
 }
 
 inline	std::string errNoSuchChannel(std::string channelName){
-	return (":localhost 403 " + channelName + " :Channel must be created without key. Set +k via MODE after joining\r\n");
+	return (":localhost 403 " + channelName + " :Channel doesnt exit or can't be created.\nChannel must be created without key. Set +k via MODE after joining\r\n");
 }
 
 inline	std::string errCannotSendToChan(std::string nickname, std::string channelName){
