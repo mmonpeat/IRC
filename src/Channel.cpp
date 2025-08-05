@@ -55,7 +55,7 @@ bool	Channel::isPasswordValidChannel(std::string password) const {
 
 bool	Channel::isClientInvited(Client* client) const {
 	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
-		if (*it == client->getNick())
+		if (equalNicks(*it, client->getNick()) == true)
 			return true;
 	}
 	return false;
@@ -116,7 +116,7 @@ void	Channel::setTopicMode(const std::string& op_nick) {
 	return;
 }
 
-void	Channel::setChannelLimit(int limit, const std::string& limit_str, const std::string& op_nick) {
+void	Channel::setLimitMode(int limit, const std::string& limit_str, const std::string& op_nick) {
 	this->_channel_limit = limit;
     this->_limit_set = true;
 	
@@ -125,11 +125,20 @@ void	Channel::setChannelLimit(int limit, const std::string& limit_str, const std
 	return;
 }
 
+void	Channel::setInviteMode(const std::string& op_nick) {
+	this->_invite_set = true;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " +i\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+
 
 
 //---------------------------------- Unsetters -----------------------------------------------
 
-void	Channel::unsetPassword(const std::string& op_nick) {
+void	Channel::unsetPasswordMode(const std::string& op_nick) {
 	this->_password.clear();
 	this->_password_set = false;
 
@@ -138,7 +147,7 @@ void	Channel::unsetPassword(const std::string& op_nick) {
 	return;
 }
 
-void	Channel::unsetTopic(const std::string& op_nick) {
+void	Channel::unsetTopicMode(const std::string& op_nick) {
 	this->_topic_set = false;
 
 	std::string	message = ":" + op_nick + " MODE " + _name + " -t\r\n";
@@ -146,11 +155,20 @@ void	Channel::unsetTopic(const std::string& op_nick) {
 	return;
 }
 
-void	Channel::unsetLimit(const std::string& op_nick) {
+void	Channel::unsetLimitMode(const std::string& op_nick) {
 	this->_channel_limit = 0;
 	this->_limit_set = false;
 
 	std::string	message = ":" + op_nick + " MODE " + _name + " -l\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::unsetInviteMode(const std::string& op_nick) {
+	this->_invite_set = false;
+	_invited_clients.clear();
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -i\r\n";
 	broadcastMessage(message);
 	return;
 }

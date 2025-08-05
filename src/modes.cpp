@@ -99,7 +99,7 @@ void	Server::execMode(char sign, char c, std::string param, Client* client, Chan
 	else if (c == 't')
 		modeT(channel, sign, client);
 	else if (c == 'i')
-		std::cout << "Function to be written" << std::endl;
+		modeI(channel, sign, client);
 	return;
 }
 
@@ -113,7 +113,7 @@ void	Server::modeK(Channel *channel, std::string password, char sign, Client *cl
 	if (sign == '+')
 		channel->setPasswordM(client, password);
 	else if (channel->isPasswordSet() == true && sign == '-')
-		channel->unsetPassword(client->getNick());
+		channel->unsetPasswordMode(client->getNick());
 	return;
 }
 
@@ -121,7 +121,7 @@ void	Server::modeT(Channel *channel, char sign, Client *client) {
 	if (channel->isTopicModeSet() == false && sign == '+')
 		channel->setTopicMode(client->getNick());
 	else if (channel->isTopicModeSet() == true && sign == '-')
-		channel->unsetTopic(client->getNick());
+		channel->unsetTopicMode(client->getNick());
 	return;
 }
 
@@ -148,7 +148,7 @@ void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client)
 		if (isLimitValid(arg)) {
 			int limit = strToInt(arg);
 			if (limit > 0)
-				channel->setChannelLimit(limit, arg, client->getNick());
+				channel->setLimitMode(limit, arg, client->getNick());
 			else {
 				std::string	message = ":" + client->getNick() + " :Limit should be a positive number\r\n";
 				sendReply(client->getFd(), message);
@@ -162,7 +162,7 @@ void	Server::modeL(Channel *channel, std::string arg, char sign, Client *client)
 		}
 	}
 	else if (sign == '-' && channel->isLimitModeSet() == true)
-		channel->unsetLimit(client->getNick());
+		channel->unsetLimitMode(client->getNick());
 	return;
 }
 
@@ -188,14 +188,10 @@ void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client)
 	return;
 }
 
-//invite only mode
-
-
-
-/*
-Code	Name	When it's used
-
-441	ERR_USERNOTINCHANNEL	If trying to modify modes related to a user not in the channel
-443	ERR_USERONCHANNEL	If trying to give mode to a user already with it
-
-*/
+void	Server::modeI(Channel *channel, char sign, Client *client) {
+	if (sign == '+') // add checker is +i is already on optional
+		channel->setInviteMode(client->getNick());
+	else if (sign == '-') //add checker if -i is already on optional
+		channel->unsetInviteMode(client->getNick());
+	return;
+}

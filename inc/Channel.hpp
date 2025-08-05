@@ -80,12 +80,14 @@ class Channel
 		void		setPassword(const std::string& password); // preguntar Maria si borrarlo
 		void		setPasswordM(Client* op, const std::string& password);
 		void		setTopicMode(const std::string& op_nick);
-		void		setChannelLimit(int limit, const std::string& limit_str, const std::string& op_nick);
+		void		setLimitMode(int limit, const std::string& limit_str, const std::string& op_nick);
+		void		setInviteMode(const std::string& op_nick);
 
 		            //mode unsetters
-		void		unsetPassword(const std::string& op_nick);
-		void		unsetTopic(const std::string& op_nick);
-		void		unsetLimit(const std::string& op_nick);
+		void		unsetPasswordMode(const std::string& op_nick);
+		void		unsetTopicMode(const std::string& op_nick);
+		void		unsetLimitMode(const std::string& op_nick);
+		void		unsetInviteMode(const std::string& op_nick);
 
 
 };

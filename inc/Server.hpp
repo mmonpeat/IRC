@@ -99,6 +99,7 @@ class Server
 		void						modeT(Channel *channel, char sign, Client *client);
 		void						modeL(Channel *channel, std::string arg, char sign, Client *client);
 		void						modeO(Channel *channel, std::string arg, char sign, Client *client);
+		void						modeI(Channel *channel, char sign, Client *client);
 
 
 		/*  JOIN  */
