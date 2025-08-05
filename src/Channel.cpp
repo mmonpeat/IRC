@@ -211,7 +211,7 @@ void Channel::removeClient(Client* client)
 }
 
 void	Channel::removeOperator(Client *op) {
-	for (std::vector<Client*>::iterator it = _operators.begin(); it != _clients.end(); ++it) {
+	for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
 		if ((*it)->getNick() == op->getNick())
 		{
 			_operators.erase(it);
@@ -222,7 +222,7 @@ void	Channel::removeOperator(Client *op) {
 }
 
 void	Channel::removeOperatorByNick(std::string& ex_op) {
-	for (std::vector<Client*>::iterator it = _operators.begin(); it != _clients.end(); it++) {
+	for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); it++) {
 		if (equalNicks((*it)->getNick(), ex_op) == true) {
 			removeOperator(*it);
 			return;
@@ -337,14 +337,15 @@ std::string	Channel::returnModes(std::string nick) {
 
 //---------------------------------- OPs Functions -------------------------------------------
 
-bool    Channel::isOperator(std::string nick) const {
-	for (std::vector<Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it)
-	{
-		if (*it && (*it)->getNick() == nick)
+
+bool Channel::isOperator(std::string nick) const {
+	for (std::vector<Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it) {
+		if (*it && equalNicks((*it)->getNick(), nick))
 			return true;
 	}
 	return false;
 }
+
 
 void Channel::changeTopic(const std::string new_topic, Client* client) {
 	if (isOperator(client->getNick()) || isTopicModeSet() == false) {
