@@ -550,13 +550,14 @@ void	Server::privmsg(std::string *params, Client *client)
 		return ;
 	}
 	std::cout << params[2] << std::endl;
-	std::string	msg = ":" + client->getNick() + " " + params[0] + " " + params[1] + " : " + params[2] + "\r\n";
-	std::cout << "GONNA SEND: " << msg << std::endl;
+	std::string	premsg = ":" + client->getNick() + " " + params[0] + " ";
 	std::vector<std::string>	targets = convertToVector(params[1]);
 	
 	size_t	i = 0;
 	while (i < targets.size())
 	{
+		std::string	msg = premsg + targets[i] + " : " + params[2] + "\r\n";
+		std::cout << "GONNA SEND: " << msg << std::endl;
 		if (targets[i][0] == '#')
 			privmsg_channel(client, targets[i], msg);
 		else
