@@ -101,6 +101,22 @@ inline std::string	errNotKnownMode(const std::string& clientNick, const char& mo
 	return (":localhost 472 " + clientNick + " " + modeChar + " :is unknown mode char to me\r\n");
 }
 
+// --------------------------------------- Topic Replies-------------------------------------------
 
+inline std::string	RPL_NOTOPIC(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 331 " + clientNick + " " + channelName + " :No topic is set\r\n");
+}
+
+inline std::string	RPL_TOPIC(const std::string& clientNick, const std::string& channelName, const std::string& topic) {
+	return (":localhost 332 " + clientNick + " " + channelName + " :" + topic + "\r\n");
+}
+
+inline std::string RPL_TOPICWHOTIME(const std::string& clientNick, const std::string& channelName, const std::string& topicSetter, time_t topicSetTime) {
+	return (":localhost 333 " + clientNick + " " + channelName + " " + topicSetter + " " + std::to_string(topicSetTime) + "\r\n");
+}
+
+inline std::string	errNotOnChannel(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 442 " + clientNick + " " + channelName + " :You're not on that channel\r\n");
+}
 
 #endif

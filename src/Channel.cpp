@@ -7,6 +7,7 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
 	_invite_set = false;
 	_topic_set = true;
 	_password_set = false;
+	_topic_init = false;
 	_creationTime = time(NULL);
     std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
     return;
@@ -84,6 +85,12 @@ int 		Channel::getChannelLimit(void) const {
 
 std::string	Channel::getTopic(void) const {
 	return this->_topic;
+}
+
+bool		Channel::getTopicInit(void) const {
+	if (_topic_init == true)
+		return true;
+	return false;
 }
 
 std::string	Channel::getChannelCreationTime(void) {

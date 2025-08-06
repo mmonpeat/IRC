@@ -101,6 +101,10 @@ class Server
 		void						modeO(Channel *channel, std::string arg, char sign, Client *client);
 		void						modeI(Channel *channel, char sign, Client *client);
 
+		/*  TOPIC  */
+
+		void						topic(std::string *params, Client *client);
+
 
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);

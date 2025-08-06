@@ -16,6 +16,7 @@ class Channel
 	private:
 		std::string					_name;
 		std::string					_topic;
+		bool						_topic_init;
 		std::vector<Client*>		_operators;
 		std::vector<Client*>		_clients;
 		time_t						_creationTime;
@@ -49,6 +50,7 @@ class Channel
 		std::vector<std::string>	getClientNicks() const;
 		int 						getChannelLimit(void) const;
 		std::string					getTopic(void) const;
+		bool						getTopicInit(void) const;
 		size_t 						getClientCount() const { return _clients.size(); }
 		std::string					getChannelCreationTime(void);
 
