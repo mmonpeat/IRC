@@ -291,14 +291,13 @@ void	Server::handleMsg(std::string msg, Client *client)
 	if (msg.empty())
 		return ;
 	
-	std::string	*params = returnParams(msg);
+	std::vector<std::string>	params = returnParams(msg);
 	int	command = checkCommand(params[0]);
 
 	if (command == -1)
 	{
 		std::cout << "unknown command" << std::endl;
 		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
-		delete[] params;
 		return ;
 	}
 	if (client->getAuth() == false)//client is not authorized
@@ -306,14 +305,12 @@ void	Server::handleMsg(std::string msg, Client *client)
 		if (command > 3)
 		{
 			sendReply(client->getFd(), errNotRegistered());
-			delete[] params;
 			return ;
 		}
 		ServerHandshake(params, client, command);
 	}
 	else
 		CommandCall(params, client, command);
-	delete[] params;
 	return ;
 }
 
@@ -411,48 +408,16 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 //Returns an allocated array, delete after use
 std::string*	Server::returnParams(std::string msg)
 {
-	unsigned long	i = 0;
-	unsigned long	n = countParams(msg);
-	std::string	*params;
+	std::vector<std::string>	params;
+	std::stringstream			ss(msg);
+	std::string					str;
 
-	params = new std::string[n + 1];
-	std::string::size_type	pos = msg.find(' ');
-	while (i < n)
+	while (std::getline(ss, str, ' '))
 	{
-		if (msg[0] == ':')
-		{
-			params[i] = msg.substr(1, msg.length());
-		//	std::cout << "param " << i << " is " << params[i] << std::endl;
-			break ;
-		}
-		params[i++] = msg.substr(0, pos);
-		//std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
-		while (msg[pos] == ' ')
-			pos++;
-		msg.erase(0, pos);
-		pos = msg.find(' ');
+		if(!str.empty())
+			params.push_back(str);
 	}
-	params[n] = "\0";
 	return (params) ;
-}
-
-int	Server::countParams(std::string msg)
-{
-	int				n = 1;
-	unsigned long	i = 0;
-	bool			last = false;
-	
-	while (i < msg.size())
-	{
-		while (msg[i++] == ' ')
-		{
-			if (msg[i] != ' ' && !last)
-				n++;
-			if (msg[i] == ':')
-				last = true;
-		}
-	}
-	return (n);
 }
 
 //------------------------------- Command Functions ------------------------------

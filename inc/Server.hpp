@@ -52,12 +52,11 @@ class Server
 		void	start();
 
 		//parser msg functions
-		void			handleMsg(std::string msg, Client* client);
-		int				checkCommand(std::string param);
-		void			ServerHandshake(std::string *params, Client* client, int command);
-		void			CommandCall(std::string *params, Client* client, int command);
-		std::string*	returnParams(std::string msg);
-		int				countParams(std::string msg);
+		void						handleMsg(std::string msg, Client* client);
+		int							checkCommand(std::string param);
+		void						ServerHandshake(std::string *params, Client* client, int command);
+		void						CommandCall(std::string *params, Client* client, int command);
+		std::vector<std::string>	returnParams(std::string msg);
 	
 		//command functions
 		void	pass(std::string *params, Client* client);		
