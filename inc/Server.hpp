@@ -104,6 +104,8 @@ class Server
 		/*  TOPIC  */
 
 		void						topic(std::string *params, Client *client);
+		void						showTopic(Channel* channel, Client* client);
+		void						setTopic(Channel *channel, Client *client, const std::string& topic);
 
 
 		/*  JOIN  */
