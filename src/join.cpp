@@ -69,9 +69,6 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 				if (channelPass.empty())
 				{
 					sendReply(client.getFd(), errBadChannelKey(channelName));
-					// std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
-					//ns on haauria d'anar la dde que el passa ja esta setado?
-					//std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
 					canJoin = false;
 				}
 				else if (!channel->isPasswordValidChannel(channelPass))
@@ -82,9 +79,6 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 
 			// Mode +l (limit)
-			//channel->setChannelLimit(3);
-			//si hi ha lloc i no esta ple +l (Ple: error: 471)
-			//std::cout << "LIMIT: getChannelLimit: " << channel->getChannelLimit() << " numberOfClients: " << channel->numberOfClients(channelsExistents, channelName) << std::endl;
 			if (channel->isLimitModeSet())
 			{
 				int limit = channel->getChannelLimit();
@@ -148,9 +142,9 @@ void Server::createNewChannel(Client& client, std::vector<Channel*>& channelsExi
     newChannel->addOperator(&client);
     
     if (!channelPass.empty()) {
-        newChannel->setPassword(channelPass);
-        newChannel->setPasswordMode(true);
+        sendReply(client.getFd(), errNoSuchChannel(channelName));
     }
+
     channelsExistents.push_back(newChannel);
 	// Notificar al cliente que ha creado el canal
     std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
@@ -207,17 +201,6 @@ int Server::join(Client& client, std::vector<Channel*>& channelsExistents, std::
             std::string actualName = getUniqueChannelName(channelName, channelsExistents);
             checkModeToAddClient(client, channelsExistents, actualName, channelPass);
         }
-		// if (isChannelNameUnique(channelName, channelsExistents) == true && channelPass.empty()) {
-		// 	//std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << " :hauria de ser null " << std::endl;
-		// 	createNewChannel(client, channelsExistents, channelName, channelPass);
-		// } else if (isChannelNameUnique(channelName, channelsExistents) != true) {
-		// 	channelName = getUniqueChannelName(channelName, channelsExistents);
-		// 	checkModeToAddClient(client, channelsExistents, channelName, channelPass);
-		// } else {
-		// 	// No permetre crear canals amb password
-		// 	std::string err = "403 ERR_NOSUCHCHANNEL " + channelName + " :Channel must be created without key. Set +k via MODE after joining\r\n";
-		// 	sendReply(client.getFd(), err);
-		// }
 	}
 	ChannelsNames.clear();
 	ChannelsPasswords.clear();

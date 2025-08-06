@@ -210,23 +210,7 @@ void Server::mostrarChannels(void)
         std::cout << std::endl << std::endl;
     }
 }
-// void Server::removeClient(int clientFd) 
-// {
-// 	// Delete pollFds
-// 	for (std::vector<struct pollfd>::iterator it = pollFds.begin(); 
-// 		it != pollFds.end(); ++it) 
-// 	{
-// 		if (it->fd == clientFd)
-// 		{
-// 				pollFds.erase(it);
-// 				break;
-// 		}
-// 	}
-// 	std::cout << "Close client with: fd=" << clientFd << std::endl;
-// 	delete clients[clientFd];
-// 	clients.erase(clientFd);
-// 	close(clientFd);
-// }
+
 void Server::removeClient(int clientFd)
 {
     // 1. Encontrar el cliente
