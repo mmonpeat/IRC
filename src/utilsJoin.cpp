@@ -1,20 +1,8 @@
 #include "Server.hpp"
-int		Server::ptrLen(std::string *ptr) {
-	int	len = 0;
 
-
-	while (ptr[len] != "\0")
-	{
-		//std::cout << ">>>" << ptr[len] << "<<<<" << std::endl;
-		len++;
-	}
-	return len;
-}
-
-
-void	Server::prepareForJoin(std::string *params, Client *client)
+void	Server::prepareForJoin(std::vector<std::string> params, Client *client)
 {
-	int len = ptrLen(params);
+	int len = params.size();
 	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
 
