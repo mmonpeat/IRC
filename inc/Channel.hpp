@@ -15,11 +15,9 @@ class Channel
 {
 	private:
 		std::string					_name;
-		std::string					_topic;
-		bool						_topic_init;
 		std::vector<Client*>		_operators;
 		std::vector<Client*>		_clients;
-		time_t						_creationTime;
+		time_t						_channel_creation_time;
 
 	
 		// Mode control 
@@ -32,6 +30,12 @@ class Channel
 		int							_channel_limit;
 		std::vector<std::string>	_invited_clients;
 		std::string					_password;
+
+		// Topic related
+		std::string					_topic;
+		bool						_topic_init;
+		time_t						_topic_creation_time;
+		std::string					_who_set_topic;
 				
 	public:
 		Channel(std::string name, Client *client);
@@ -53,6 +57,8 @@ class Channel
 		bool						getTopicInit(void) const;
 		size_t 						getClientCount() const { return _clients.size(); }
 		std::string					getChannelCreationTime(void);
+		std::string					getTopicSetter(void);
+		std::string					getTopicSetTime(void);
 
 	
 		
@@ -73,7 +79,7 @@ class Channel
 		int			numberOfClients(void) const;
 		std::string	returnModes(std::string nick);
 
-		// Channel functions for ops
+		// Channel functions for command
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
 		void		kickUser(Client* kicker, Client* target);

@@ -8,7 +8,7 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
 	_topic_set = true;
 	_password_set = false;
 	_topic_init = false;
-	_creationTime = time(NULL);
+	_channel_creation_time = time(NULL);
     std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
     return;
 }
@@ -95,10 +95,22 @@ bool		Channel::getTopicInit(void) const {
 
 std::string	Channel::getChannelCreationTime(void) {
 	std::ostringstream oss;
-	oss << _creationTime;
+	oss << _channel_creation_time;
 	std::string time = oss.str(); 
 	return time;
 }
+
+std::string	Channel::getTopicSetter(void) {
+	return _who_set_topic;
+}
+
+std::string	Channel::getTopicSetTime(void) {
+	std::ostringstream	oss;
+	oss << _topic_creation_time;
+	std::string	time = oss.str();
+	return time;
+}
+
 //---------------------------------- Setters -------------------------------------------------
 
 void 	Channel::setPassword(const std::string& password)
@@ -373,12 +385,12 @@ bool Channel::isOperator(std::string nick) const {
 
 
 void Channel::changeTopic(const std::string new_topic, Client* client) {
-	if (isOperator(client->getNick()) || isTopicModeSet() == false) {
-		_topic = new_topic;
-		std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
-		broadcastMessage(message);
-		return;
-	}
+	_topic = new_topic;
+	_topic_init = true;
+	_topic_creation_time = time(NULL);
+	std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
+	broadcastMessage(message);
+
 	return;
 }
 

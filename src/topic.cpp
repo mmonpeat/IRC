@@ -18,24 +18,24 @@ void    Server::topic(std::string *params, Client *client){
             sendReply(client->getFd(), RPL_NOTOPIC(client->getNick(), channel->getChannelName()));
         else if (channel->getTopicInit()) {
             sendReply(client->getFd(), RPL_TOPIC(client->getNick(), channel->getChannelName(), channel->getTopic()));
-            //sendReply(client->getFd(), RPL_TOPICWHOTIME()); time and creator of the topic
+            sendReply(client->getFd(), RPL_TOPICWHOTIME(client->getNick(), channel->getChannelName(), channel->getTopicSetter(), channel->getTopicSetTime()));
         }
         return;
     }
+    //controlar el topic len
     if (len > 2) {
         if (channel->isTopicModeSet()) {
             if(channel->isOperator(client->getNick()))
-                // puede setear el topic, guargar tiempo y el nick, topic init = true
-            else {
-                //error_message not an operator
-            }
+                channel->changeTopic(params[2], client);
+            else
+                sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
             return;
         }
         else if (channel->isTopicModeSet() == false) {
             if(channel->isClientByNick(client->getNick()))
-                 // puede setear el topic, guargar tiempo y el nick, topic init = true
+               channel->changeTopic(params[2], client);
             else
-                //error_message not a client
+                sendReply(client->getFd(), errNotOnChannel(client->getNick(), channel->getChannelName()));
         }
     }
     return;
