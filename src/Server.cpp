@@ -328,7 +328,7 @@ int	Server::checkCommand(std::string parameter)
 	return (-1);
 }
 
-void	Server::ServerHandshake(std::string *params, Client *client, int command)
+void	Server::ServerHandshake(std::vector<std::string> params, Client *client, int command)
 {
 	switch(command)
 	{
@@ -355,7 +355,7 @@ void	Server::ServerHandshake(std::string *params, Client *client, int command)
 	return ;
 }
 
-void	Server::CommandCall(std::string *params, Client *client, int command)
+void	Server::CommandCall(std::vector<std::string> params, Client *client, int command)
 {
 	switch(command)
 	{
@@ -399,6 +399,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			break;
 		case 10:
 			quit(client); //add the message part?
+			break;
 		default:
       		sendReply(client->getFd(), errUnknownCommand(client->getNick(), params[0]));
 	}
@@ -406,7 +407,7 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 }
 
 //Returns an allocated array, delete after use
-std::string*	Server::returnParams(std::string msg)
+std::vector<std::string>	Server::returnParams(std::string msg)
 {
 	std::vector<std::string>	params;
 	std::stringstream			ss(msg);
@@ -422,7 +423,7 @@ std::string*	Server::returnParams(std::string msg)
 
 //------------------------------- Command Functions ------------------------------
 
-void	Server::pass(std::string *params, Client *client)
+void	Server::pass(std::vector<std::string> params, Client *client)
 {
 	if (client->getPass() == true)
 	{
@@ -447,7 +448,7 @@ void	Server::pass(std::string *params, Client *client)
 	return ;
 }
 
-void	Server::nick(std::string *params, Client *client)
+void	Server::nick(std::vector<std::string> params, Client *client)
 {
 	if (params[1].empty())
 	{
@@ -472,7 +473,7 @@ void	Server::nick(std::string *params, Client *client)
 	return ;
 }
 
-void	Server::user(std::string *params, Client *client)
+void	Server::user(std::vector<std::string> params, Client *client)
 {
 	if (params[2].empty())
 	{
@@ -493,7 +494,7 @@ void	Server::user(std::string *params, Client *client)
 	return ;
 }
 
-void	Server::privmsg(std::string *params, Client *client)
+void	Server::privmsg(std::vector<std::string> params, Client *client)
 {
 	if (params[1].empty())
 	{
