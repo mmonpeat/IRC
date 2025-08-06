@@ -25,7 +25,7 @@ void	Server::channelModes(std::string *params, Client *client) {
 	Channel*	channel;
 
 	if (len == 1) {
-		sendReply(client->getFd(), errNotEnoughParams(client->getNick()));
+		sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "MODE"));
 		return;
 	}
 
@@ -77,7 +77,7 @@ void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 				return;
 			}
 			else if (arg_i >= param_len) {
-				sendReply(client->getFd(),errNotEnoughParams(client->getNick())); // lack of parameter
+				sendReply(client->getFd(),errNotEnoughParams(client->getNick(), "MODE")); // lack of parameter, maybe the message is different?
 				return;
 			}
 			else 

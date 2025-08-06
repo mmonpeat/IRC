@@ -82,7 +82,7 @@ class Channel
 		// Channel functions for command
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
-		void		kickUser(Client* kicker, Client* target);
+		void		kickUser(std::string& target);
 
 		            //mode setters
 		void		setPassword(const std::string& password); // preguntar Maria si borrarlo

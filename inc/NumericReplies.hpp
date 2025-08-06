@@ -69,7 +69,7 @@ inline	std::string errPassMismatch(void){
 }
 
 
-// --------------------------------------- Mode Replies-------------------------------------------
+// --------------------------------------- Command Replies-------------------------------------------
 
 
 inline std::string	errNotOperator(const std::string& clientNick, const std::string& channelName) {
@@ -85,8 +85,8 @@ inline std::string	errUserNotInChannel(const std::string& clientNick, const std:
 	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel\r\n");
 }
 
-inline std::string	errNotEnoughParams(const std::string& clientNick) {
-	return (":localhost 461 " + clientNick + " MODE :Not enough parameters\r\n");
+inline std::string	errNotEnoughParams(const std::string& clientNick, const std::string& mode) {
+	return (":localhost 461 " + clientNick + " " + mode + " :Not enough parameters\r\n");
 }
 
 inline std::string	RPL_CHANNELMODEIS(const std::string& clientNick, const std::string& channelName, const std::string modes) {
@@ -101,7 +101,6 @@ inline std::string	errNotKnownMode(const std::string& clientNick, const char& mo
 	return (":localhost 472 " + clientNick + " " + modeChar + " :is unknown mode char to me\r\n");
 }
 
-// --------------------------------------- Topic Replies-------------------------------------------
 
 inline std::string	RPL_NOTOPIC(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 331 " + clientNick + " " + channelName + " :No topic is set\r\n");

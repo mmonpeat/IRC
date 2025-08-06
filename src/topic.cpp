@@ -1,6 +1,5 @@
 #include "Server.hpp"
 
-
 // control de topic -512
 
 void    Server::topic(std::string *params, Client *client){
@@ -8,7 +7,7 @@ void    Server::topic(std::string *params, Client *client){
 	Channel*	channel;
 
 	if (len == 1) {
-		sendReply(client->getFd(), errNotEnoughParams(client->getNick()));
+		sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "TOPIC"));
 		return;
 	}
 

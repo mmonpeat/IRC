@@ -381,10 +381,11 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 		case 5:
 			//privmsg(params, client);
 			break;
-		case 6:
+		case 6: {
 			std::cout << "KICK goes here" << std::endl;
-			//kick(params, client);
+			kick(params, client);
 			break;
+		}
 		case 7:
 			std::cout << "INVITE goes here" << std::endl;
 			//invite(params, client);
@@ -426,7 +427,7 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos + 1);
 		pos = msg.find(' ');
 	}
-	params[n+1] = "\0";
+	params[n] = "\0";
 	return (params) ;
 }
 

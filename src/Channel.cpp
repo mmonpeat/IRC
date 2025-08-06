@@ -395,12 +395,12 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 }
 
 //operators can kick other operators
-void	Channel::kickUser(Client* kicker, Client* target) {
-	if (isOperator(kicker->getNick()) == false) {
-		std::string message = " have no rights to kick users from this channel \r\n";
-		broadcastMessage(message);
-		return;
+void	Channel::kickUser(std::string& target) {
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), target)) {
+			removeClient(*it);
+			break;
+		}	
 	}
-	removeClient(target);
 	return;
 }
