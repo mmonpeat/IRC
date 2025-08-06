@@ -417,7 +417,7 @@ std::string*	Server::returnParams(std::string msg)
 		msg.erase(0, pos);
 		pos = msg.find(' ');
 	}
-	params[n] = "\0";
+	params[i] = "\0";
 	return (params) ;
 }
 

@@ -1,16 +1,4 @@
 #include "Server.hpp"
-int		Server::ptrLen(std::string *ptr) {
-	int	len = 0;
-
-
-	while (ptr[len] != "\0")
-	{
-		//std::cout << ">>>" << ptr[len] << "<<<<" << std::endl;
-		len++;
-	}
-	return len;
-}
-
 
 void	Server::prepareForJoin(std::string *params, Client *client)
 {
