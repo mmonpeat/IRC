@@ -323,6 +323,12 @@ void 		Channel::broadcastMessage(std::string message) const {
 	 }
 	return;
 }
+void	Channel::msgtoChannel(std::string msg, int sender) const {
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
+		if (*it && (*it)->getFd() != sender)
+			send((*it)->getFd(), msg.c_str(), msg.size(), 0);
+	 }
+}
 
 void		Channel::passwordSetBroadcast(Client* client) {
 std::string	client_message =  ":" + client->getNick() + " MODE " + _name + " +k\r\n";

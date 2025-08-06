@@ -35,7 +35,6 @@ class Server
 		std::vector<Channel*>			channels;
 		std::vector<struct pollfd> 		pollFds;
 
-		//ft_lookup()
 		void 	acceptNewConnection();
 		void	handleClientData(int clientFd);
 		void	removeClient(int clientFd);
@@ -65,6 +64,9 @@ class Server
 		void	nick(std::string *params, Client* client);		
 		void	user(std::string *params, Client* client);
 		void	privmsg(std::string *params, Client* client);
+		void	privmsg_channel(Client *sender, std::string target, std::string msg);
+		void	privmsg_user(Client *sender, std::string target, std::string msg);
+		void	quit(Client* client);
 
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
@@ -85,7 +87,9 @@ class Server
 		};
 
 		//other commands utils
-		bool	isNickValid(std::string nick);
+		bool		isNickValid(std::string nick);
+		int			findClient(std::string nick); //returns fd
+		Channel*	findChannel(std::string channel_name); //returns Channel
 
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);

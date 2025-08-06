@@ -6,15 +6,13 @@ bool Server::checkChannelNameRules(Client& client, const std::string& channelNam
 	// Comprovar longitud
     if (channelName.empty() || channelName.length() > 50) 
 	{
-		std::string err = "476 ERR_BADCHANMASK " + channelName + " :Bad Channel Mask\r\n";
-		sendReply(client.getFd(), err);
+		sendReply(client.getFd(), errBadChannelMask(channelName));
 		return (false);
     }
 	// Comprovar comenci amb #
 	if (channelName[0] != '#')
 	{
-		std::string err = "476 ERR_BADCHANMASK " + channelName + " :Bad Channel Mask\r\n";
-		sendReply(client.getFd(), err);
+		sendReply(client.getFd(), errBadChannelMask(channelName));
 		return (false);
 	}
 	//caracters prohibits
@@ -23,8 +21,7 @@ bool Server::checkChannelNameRules(Client& client, const std::string& channelNam
 		char c = channelName[j];
 		if (c == ' ' || c == ',' || c == 7 || c == '\0' || c == '\r' || c == '\n' || c == ':')
 		{
-			std::string err = "476 ERR_BADCHANMASK " + channelName + " :Bad Channel Mask\r\n";
-			sendReply(client.getFd(), err);
+			sendReply(client.getFd(), errBadChannelMask(channelName));
 			return (false);
 		}
 	}
@@ -62,8 +59,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			// Mode +i (invite-only)
 			if (channel->isInviteModeSet())
 			{
-				std::string err = "473 ERR_INVITEONLYCHAN " + channelName + " :Cannot join channel (+i)\r\n";
-				sendReply(client.getFd(), err);
+				sendReply(client.getFd(), errInviteOnlyChan(channelName));
 				canJoin = false;
 			}
 
@@ -72,33 +68,24 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			{
 				if (channelPass.empty())
 				{
-					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
-					sendReply(client.getFd(), err);
-					// std::cerr << "475 ERR_BADCHANNELKEY " << channelName << " :Cannot join channel (+k)" << std::endl;
-					//ns on haauria d'anar la dde que el passa ja esta setado?
-					//std::cerr << "467 ERR_KEYSET " << channelName << " :Channel key already set" << std::endl;
+					sendReply(client.getFd(), errBadChannelKey(channelName));
 					canJoin = false;
 				}
 				else if (!channel->isPasswordValidChannel(channelPass))
 				{
-					std::string err = "475 ERR_BADCHANNELKEY " + channelName + " :Cannot join channel (+k)\r\n";
-					sendReply(client.getFd(), err);
+					sendReply(client.getFd(), errBadChannelKey(channelName));
 					canJoin = false;
 				}
 			}
 
 			// Mode +l (limit)
-			//channel->setChannelLimit(3);
-			//si hi ha lloc i no esta ple +l (Ple: error: 471)
-			//std::cout << "LIMIT: getChannelLimit: " << channel->getChannelLimit() << " numberOfClients: " << channel->numberOfClients(channelsExistents, channelName) << std::endl;
 			if (channel->isLimitModeSet())
 			{
 				int limit = channel->getChannelLimit();
 				int current = channel->numberOfClients();
 				if (current >= limit)
 				{
-					std::string err = "471 ERR_CHANNELISFULL " + channelName + " :Cannot join channel (+l)\r\n";
-					sendReply(client.getFd(), err);
+					sendReply(client.getFd(), errChannelIsFull(channelName));
 					canJoin = false;
 				}
 			}
@@ -126,13 +113,13 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 
 				// Enviar información del canal (TOPIC)
 				if (!channel->getTopic().empty()) {
-					sendReply(client.getFd(), "332 " + client.getNick() + " " + channelName + " :" + channel->getTopic() + "\r\n");
+					sendReply(client.getFd(), rplTopicSet(client.getNick(), channelName, channel->getTopic()));
 				} else {
-					sendReply(client.getFd(), "331 " + client.getNick() + " " + channelName + " :No topic is set\r\n");
+					sendReply(client.getFd(), rplNoTopicSet(client.getNick(), channelName));
 				}
 
 				// 3. Llista d'usuaris (NAMREPLY)
-				std::string namesMsg = "353 " + client.getNick() + " = " + channelName + " :";
+				std::string namesMsg = ":localhost 353 " + client.getNick() + " = " + channelName + " :";
 				const std::vector<std::string>& nickList = channel->getClientNicks();
 				for (size_t i = 0; i < nickList.size(); ++i) {
 					if (i > 0) namesMsg += " ";
@@ -141,8 +128,8 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 					}
 					namesMsg += nickList[i];
 				}
-				sendReply(client.getFd(), namesMsg + "\r\n");
-				sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
+				sendReply(client.getFd(), rplNamesMsg(namesMsg));
+				sendReply(client.getFd(), rplEndNameList(client.getNick(), channelName));
 			}
 		}
 	}
@@ -155,19 +142,20 @@ void Server::createNewChannel(Client& client, std::vector<Channel*>& channelsExi
     newChannel->addOperator(&client);
     
     if (!channelPass.empty()) {
-        newChannel->setPassword(channelPass);
+        sendReply(client.getFd(), errNoSuchChannel(channelName));
     }
+
     channelsExistents.push_back(newChannel);
 	// Notificar al cliente que ha creado el canal
     std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
     sendReply(client.getFd(), joinMsg);
     
     // Enviar información del canal al creador
-    sendReply(client.getFd(), "331 " + client.getNick() + " " + channelName + " :No topic is set\r\n");
+    sendReply(client.getFd(), rplNoTopicSet(client.getNick(), channelName));
     
-    std::string namesMsg = "353 " + client.getNick() + " = " + channelName + " :@" + client.getNick() + "\r\n";
-    sendReply(client.getFd(), namesMsg);
-    sendReply(client.getFd(), "366 " + client.getNick() + " " + channelName + " :End of /NAMES list\r\n");
+    std::string namesMsg = ":localhost 353 " + client.getNick() + " = " + channelName + " :@" + client.getNick();
+    sendReply(client.getFd(), rplNamesMsg(namesMsg));
+    sendReply(client.getFd(), rplEndNameList(client.getNick(), channelName));
     
     // Notificar modo operador
     sendReply(client.getFd(), "MODE " + channelName + " +o " + client.getNick() + "\r\n");
@@ -182,23 +170,21 @@ int Server::join(Client& client, std::vector<Channel*>& channelsExistents, std::
 	int slotsLeft = MAX_CHANNELS_PER_CLIENT - currentCount;
 	//std::cout << "\nNumero de canals als ques es pot afexir/crear:" << currentCount << "\n";
 
-	if (slotsLeft <= 0) {
-		std::string err = "405 ERR_TOOMANYCHANNELS " + client.getNick() + " :You have joined too many channels\r\n";
-		sendReply(client.getFd(), err);
-        return -1;
-    }
 	int validChannelsProcessed = 0;
 	for (size_t i = 0; i < ChannelsNames.size() && slotsLeft > 0; i++)
 	{
 		std::string& channelName = ChannelsNames[i];
+		if (slotsLeft <= 0) {
+			sendReply(client.getFd(), errToManyChannels(client.getNick(), channelName));
+			return (-1);
+    	}
         if (!checkChannelNameRules(client, channelName)) {
             continue; // Saltar canals amb noms invàlids
         }
 		// Si arribem aquí, el channel és vàlid
         validChannelsProcessed++;
 		if (validChannelsProcessed > slotsLeft) {
-			std::string err = "405 ERR_TOOMANYCHANNELS " + client.getNick() + " " + channelName + " :You have joined too many channels\r\n";
-			sendReply(client.getFd(), err);
+			sendReply(client.getFd(), errToManyChannels(client.getNick(), channelName));
             continue;
 		}
 		
@@ -209,23 +195,12 @@ int Server::join(Client& client, std::vector<Channel*>& channelsExistents, std::
             if (channelPass.empty()) {
                 createNewChannel(client, channelsExistents, channelName, channelPass);
             } else {
-                sendReply(client.getFd(), "403 ERR_NOSUCHCHANNEL " + channelName + " :Channel must be created without key. Set +k via MODE after joining\r\n");
+                sendReply(client.getFd(), errNoSuchChannel(channelName));
             }
         } else {
             std::string actualName = getUniqueChannelName(channelName, channelsExistents);
             checkModeToAddClient(client, channelsExistents, actualName, channelPass);
         }
-		// if (isChannelNameUnique(channelName, channelsExistents) == true && channelPass.empty()) {
-		// 	//std::cout << "\nNO existeix el channel, crearem un nou: "<< channelName << " Password: " << channelPass << " :hauria de ser null " << std::endl;
-		// 	createNewChannel(client, channelsExistents, channelName, channelPass);
-		// } else if (isChannelNameUnique(channelName, channelsExistents) != true) {
-		// 	channelName = getUniqueChannelName(channelName, channelsExistents);
-		// 	checkModeToAddClient(client, channelsExistents, channelName, channelPass);
-		// } else {
-		// 	// No permetre crear canals amb password
-		// 	std::string err = "403 ERR_NOSUCHCHANNEL " + channelName + " :Channel must be created without key. Set +k via MODE after joining\r\n";
-		// 	sendReply(client.getFd(), err);
-		// }
 	}
 	ChannelsNames.clear();
 	ChannelsPasswords.clear();

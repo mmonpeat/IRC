@@ -76,6 +76,7 @@ class Channel
 		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
 		void		passwordSetBroadcast(Client* client);
+		void		msgtoChannel(std::string msg, int sender) const;
 		int			numberOfClients(void) const;
 		std::string	returnModes(std::string nick);
 
