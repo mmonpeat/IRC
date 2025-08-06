@@ -394,7 +394,7 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 	_topic = new_topic;
 	_topic_init = true;
 	_topic_creation_time = time(NULL);
-	std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
+	std::string message = ":" + client->getNick() + " TOPIC " + _name + " :" + _topic + "\r\n";
 	broadcastMessage(message);
 
 	return;

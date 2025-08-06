@@ -21,6 +21,7 @@ Channel*	Server::getChannelByName(std::string& name) {
 }
 
 void	Server::channelModes(std::string *params, Client *client) {
+	std::cout << "!!!!!!!!!!!! HE ENTRADO EN MODE !!!!!!!!!" << std::endl;
 	int 		len = ptrLen(params);
 	Channel*	channel;
 

@@ -408,11 +408,11 @@ std::string*	Server::returnParams(std::string msg)
 		if (msg[0] == ':')
 		{
 			params[i] = msg.substr(1, msg.length());
-		//	std::cout << "param " << i << " is " << params[i] << std::endl;
+			std::cout << "param " << i << " is " << params[i] << std::endl;
 			break ;
 		}
 		params[i++] = msg.substr(0, pos);
-		//std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
+		std::cout << "param " << i - 1 << " is " << params[i - 1] << std::endl;
 		while (msg[pos] == ' ')
 			pos++;
 		msg.erase(0, pos);
