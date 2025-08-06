@@ -1,25 +1,3 @@
-/* MODES EXPLAINED - DELETE LATER
-	[] - i – Invite-only channel, only users who have been invited can join. 
-		 We need to store a list of invited users (e.g., nicknames or fds)
-		 Default: off 
-	[] - t – Topic settable only by channel operators Prevents non-operators from changing the topic.
-		 Default: on (+t)
-	[] - k – Channel key (password) Users must provide a key (password) to join.  We need to store a std::string _key.
-		 +k <key> sets the key, -k removes it.
-		 Default: off
-	[] - o – Give/take operator privilege. Used to promote (+o) or demote (-o) a user to/from channel operator.
-		 You’ll be managing _operators (probably std::vector<Client*>)
-		 Note: This mode applies to a user, not globally.
-	[] - l – Set/remove user limit. Sets how many users can be in the channel.
-		You need an int _userLimit, active only when +l is set. +l <number> sets limit, -l removes it.
-		Default: off (no limit)
-*/
-
-/* Numeric replies for channel
-	403 - trying to change topic and not being an operator when mode is resctricted
-
-*/
-
 #include "Channel.hpp"
 
 //set modes to default
@@ -29,6 +7,8 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
 	_invite_set = false;
 	_topic_set = true;
 	_password_set = false;
+	_topic_init = false;
+	_channel_creation_time = time(NULL);
     std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
     return;
 }
@@ -76,7 +56,7 @@ bool	Channel::isPasswordValidChannel(std::string password) const {
 
 bool	Channel::isClientInvited(Client* client) const {
 	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
-		if (*it == client->getNick())
+		if (equalNicks(*it, client->getNick()) == true)
 			return true;
 	}
 	return false;
@@ -88,6 +68,7 @@ bool	Channel::isClientInvited(Client* client) const {
 std::string	Channel::getChannelName(void) const{
 	return this->_name;
 }
+
 std::vector<std::string> Channel::getClientNicks() const
 {
 	std::vector<std::string> nicks;
@@ -98,7 +79,7 @@ std::vector<std::string> Channel::getClientNicks() const
 	return nicks;
 }
 
-int 	Channel::getChannelLimit(void) const {
+int 		Channel::getChannelLimit(void) const {
     return this->_channel_limit;
 }
 
@@ -106,21 +87,109 @@ std::string	Channel::getTopic(void) const {
 	return this->_topic;
 }
 
-//---------------------------------- setters  ------------
-void	Channel::setChannelLimit(int limit) {
-	this->_channel_limit = limit;
-    this->_limit_set = true;
+bool		Channel::getTopicInit(void) const {
+	if (_topic_init == true)
+		return true;
+	return false;
 }
 
-void Channel::setPassword(const std::string& password)
+std::string	Channel::getChannelCreationTime(void) {
+	std::ostringstream oss;
+	oss << _channel_creation_time;
+	std::string time = oss.str(); 
+	return time;
+}
+
+std::string	Channel::getTopicSetter(void) {
+	return _who_set_topic;
+}
+
+std::string	Channel::getTopicSetTime(void) {
+	std::ostringstream	oss;
+	oss << _topic_creation_time;
+	std::string	time = oss.str();
+	return time;
+}
+
+//---------------------------------- Setters -------------------------------------------------
+
+void 	Channel::setPassword(const std::string& password)
 {
 	this->_password = password;
 	this->_password_set = true;
+	return;
 }
 
-void Channel::setPasswordMode(bool mode)
-{
-	this->_password_set = mode;
+void		Channel::setPasswordM(Client* op, const std::string& password) {
+	this->_password = password;
+	this->_password_set = true;
+	passwordSetBroadcast(op);
+	return;
+}
+
+void	Channel::setTopicMode(const std::string& op_nick) {
+	this->_topic_set = true;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + "+t\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::setLimitMode(int limit, const std::string& limit_str, const std::string& op_nick) {
+	this->_channel_limit = limit;
+    this->_limit_set = true;
+	
+	std::string message = ":" + op_nick + " MODE " + _name + " +l " + limit_str + "\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::setInviteMode(const std::string& op_nick) {
+	this->_invite_set = true;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " +i\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+
+
+
+//---------------------------------- Unsetters -----------------------------------------------
+
+void	Channel::unsetPasswordMode(const std::string& op_nick) {
+	this->_password.clear();
+	this->_password_set = false;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -k\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::unsetTopicMode(const std::string& op_nick) {
+	this->_topic_set = false;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -t\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::unsetLimitMode(const std::string& op_nick) {
+	this->_channel_limit = 0;
+	this->_limit_set = false;
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -l\r\n";
+	broadcastMessage(message);
+	return;
+}
+
+void	Channel::unsetInviteMode(const std::string& op_nick) {
+	this->_invite_set = false;
+	_invited_clients.clear();
+
+	std::string	message = ":" + op_nick + " MODE " + _name + " -i\r\n";
+	broadcastMessage(message);
+	return;
 }
 
 //---------------------------------- Class Functions -----------------------------------------
@@ -132,22 +201,6 @@ void	Channel::addClient(Client *client) {
 	}
 	return;
 }
-
-// void	Channel::removeClient(Client* client) {
-// 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		if ((*it)->getNick() == client->getNick()) {
-// 			if (isOperator(client->getNick()))
-// 				removeOperator(client);
-// 			_clients.erase(it);
-// 			break;
-// 		}
-// 	}
-// 	// check if it is empty and call break to not print the message
-// 	std::string	message = "deleted \r\n";
-// 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		send((*it)->getFd(), message.c_str(), message.size(), 0);
-// 	}
-// }
 
 bool Channel::isClientInChannel(Client* client) const
 {
@@ -179,13 +232,24 @@ void Channel::removeClient(Client* client)
 }
 
 void	Channel::removeOperator(Client *op) {
-	for (std::vector<Client*>::iterator it = _operators.begin(); it != _clients.end(); ++it) {
+	for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
 		if ((*it)->getNick() == op->getNick())
 		{
 			_operators.erase(it);
 			break;
 		}
 	}
+	return;
+}
+
+void	Channel::removeOperatorByNick(std::string& ex_op) {
+	for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); it++) {
+		if (equalNicks((*it)->getNick(), ex_op) == true) {
+			removeOperator(*it);
+			return;
+		}
+	}
+	return;
 }
 
 void	Channel::addOperator(Client *new_op) {
@@ -198,8 +262,18 @@ void	Channel::addOperator(Client *new_op) {
 	return;
 }
 
+void	Channel::addOperatorByNick(const std::string& new_op) {
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), new_op) == true) {
+			addOperator(*it);
+			return;
+		}
+	}
+	return;
+}
 
-bool	Channel::isClient(Client *client) {
+
+bool		Channel::isClient(Client *client) {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		if ((*it)->getNick() == client->getNick())
 			return true;
@@ -207,7 +281,17 @@ bool	Channel::isClient(Client *client) {
 	return false;
 }
 
-bool	Channel::isChannelEmpty(void) const {
+bool		Channel::isClientByNick(std::string nick){
+	if (nick.empty())
+		return false;
+	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
+		if ((*it)->getNick() == nick)
+			return true;
+	}
+	return false;
+}
+
+bool		Channel::isChannelEmpty(void) const {
 	bool	isEmpty = true;
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		isEmpty = false;
@@ -216,7 +300,7 @@ bool	Channel::isChannelEmpty(void) const {
 
 }
 
-void 	Channel::broadcastMessage(std::string message) const {
+void 		Channel::broadcastMessage(std::string message) const {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
 		if (*it)
 			send((*it)->getFd(), message.c_str(), message.size(), 0);
@@ -230,34 +314,73 @@ void	Channel::msgtoChannel(std::string msg, int sender) const {
 	 }
 }
 
-void	Channel::displayTopic(void) const {
+void		Channel::passwordSetBroadcast(Client* client) {
+std::string	client_message =  ":" + client->getNick() + " MODE " + _name + " +k\r\n";
+std::string	op_message = ":" + client->getNick() + " MODE " + _name + " +k "  + _password + "\r\n";
+
+for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
+		if (*it && (*it)->getNick() == client->getNick())
+			send((*it)->getFd(), op_message.c_str(), op_message.size(), 0);
+		else
+			send((*it)->getFd(), client_message.c_str(), client_message.size(), 0);
+	 }
+	return;
+}
+
+void		Channel::displayTopic(void) const {
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it ) {
 		send((*it)->getFd(), _topic.c_str(), _topic.size(), 0);
 	}
 	return;
 }
 
-int Channel::numberOfClients() const {
+int 		Channel::numberOfClients() const {
 	return static_cast<int>(_clients.size());
 }
+
+std::string	Channel::returnModes(std::string nick) {
+	std::string	modes;
+	std::string	args;
+	
+	if (isInviteModeSet())
+		modes += "i";
+	if (isTopicModeSet())
+		modes += "t";
+	if (isPasswordSet()) {
+		modes += "k";
+		args += " " + _password;
+	}
+	if (isLimitModeSet()) {
+		modes += "l";
+		std::ostringstream oss;
+		oss << _channel_limit;
+		args += " " + oss.str();
+	}
+	if (isClientByNick(nick) == false)
+		return modes.empty() ? "" : "+" + modes;
+	return "+" + modes + args;
+}
+
+
 //---------------------------------- OPs Functions -------------------------------------------
 
-bool    Channel::isOperator(std::string nick) const {
-	for (std::vector<Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it)
-	{
-		if (*it && (*it)->getNick() == nick)
+
+bool Channel::isOperator(std::string nick) const {
+	for (std::vector<Client*>::const_iterator it = _operators.begin(); it != _operators.end(); ++it) {
+		if (*it && equalNicks((*it)->getNick(), nick))
 			return true;
 	}
 	return false;
 }
 
+
 void Channel::changeTopic(const std::string new_topic, Client* client) {
-	if (isOperator(client->getNick()) || isTopicModeSet() == false) {
-		_topic = new_topic;
-		std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
-		broadcastMessage(message);
-		return;
-	}
+	_topic = new_topic;
+	_topic_init = true;
+	_topic_creation_time = time(NULL);
+	std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
+	broadcastMessage(message);
+
 	return;
 }
 

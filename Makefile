@@ -3,7 +3,7 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kkoval <kkoval@student.42.fr>              +#+  +:+       +#+         #
+#    By: kate <kate@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/02 13:22:55 by kkoval            #+#    #+#              #
 #    Updated: 2025/08/04 18:44:47 by amagnell         ###   ########.fr        #
@@ -13,7 +13,7 @@
 
 NAME = ircserv
 INC = inc/
-SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/join.cpp src/utilsJoin.cpp src/command_utils.cpp
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/join.cpp src/utilsJoin.cpp src/command_utils.cpp src/modes.cpp src/topic.cpp
 
 BUILD = .build
 OBJ = $(SRC:%.cpp=$(BUILD)/%.o)

@@ -377,12 +377,13 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			//invite(params, client);
 			break;
 		case 8:
+		{
 			std::cout << "TOPIC goes here" << std::endl;
-			//topic(params, client);
+			topic(params, client);
 			break;
+		}
 		case 9:
-			std::cout << "MODE goes here" << std::endl;
-			//mode(params, client);
+			channelModes(params, client);
 			break;
 		case 10:
 			quit(client); //add the message part?
@@ -399,7 +400,7 @@ std::string*	Server::returnParams(std::string msg)
 	unsigned long	n = countParams(msg);
 	std::string	*params;
 
-	params = new std::string[n + 1];
+	params = new std::string[n+1];
 	std::string::size_type	pos = msg.find(' ');
 	while (i < n)
 	{
@@ -616,7 +617,7 @@ Client*	Server::getClient(int clientFd)
 	return (it->second);
 }
 
-char Server::foldChar(char c) const {
+char	foldChar(char c) {
     if (c >= 'A' && c <= 'Z')
         return c + 32;
     if (c == '[') return '{';
@@ -626,7 +627,7 @@ char Server::foldChar(char c) const {
     return c;
 }
 
-bool	Server::equalNicks(std::string new_nick, std::string client) const {
+bool	equalNicks(std::string new_nick, std::string client) {
 	if (new_nick == client)
 		return true;
 	if (new_nick.size() != client.size())
