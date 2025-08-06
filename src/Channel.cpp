@@ -113,12 +113,12 @@ std::string	Channel::getTopicSetTime(void) {
 
 //---------------------------------- Setters -------------------------------------------------
 
-void 	Channel::setPassword(const std::string& password)
+/*void 	Channel::setPassword(const std::string& password)
 {
 	this->_password = password;
 	this->_password_set = true;
 	return;
-}
+}*/
 
 void		Channel::setPasswordM(Client* op, const std::string& password) {
 	this->_password = password;
@@ -400,8 +400,24 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 	return;
 }
 
-//operators can kick other operators
-void	Channel::kickUser(std::string& target) {
+
+void	Channel::kickUser(const std::string& kicker, const std::string& target) {
+	std::string message = "KICK " + kicker + " " + _name + " " + target + "\r\n";
+	broadcastMessage(message);
+
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), target)) {
+			removeClient(*it);
+			break;
+		}	
+	}
+	return;
+}
+
+void		Channel::kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment) {
+	std::string message = "KICK " + kicker + " " +  _name + " " + target + " :" + comment + "\r\n";
+	broadcastMessage(message);
+	
 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (equalNicks((*it)->getNick(), target)) {
 			removeClient(*it);

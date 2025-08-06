@@ -361,7 +361,6 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			break ;
 		case 4:
 		{
-			//ptrLen(params);
 			prepareForJoin(params, client);
 			break;
 		}

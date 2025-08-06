@@ -83,10 +83,11 @@ class Channel
 		// Channel functions for command
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
-		void		kickUser(std::string& target);
+		void		kickUser(const std::string& kicker, const std::string& target);
+		void		kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment);
 
 		            //mode setters
-		void		setPassword(const std::string& password); // preguntar Maria si borrarlo
+		//void		setPassword(const std::string& password); // preguntar Maria si borrarlo
 		void		setPasswordM(Client* op, const std::string& password);
 		void		setTopicMode(const std::string& op_nick);
 		void		setLimitMode(int limit, const std::string& limit_str, const std::string& op_nick);

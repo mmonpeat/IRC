@@ -1,8 +1,5 @@
 #include "Server.hpp"
 
-// KICK #42chat Bob :Spamming
-
-//check len  if there is a message
 
 //check that the comment is not too big
 
@@ -13,7 +10,7 @@ void    Server::kick(std::string *params, Client *client) {
     int 		len = ptrLen(params);
 	Channel*	channel;
 
-	if (len < 3) {
+	if (len == 1) {
 		sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "KICK"));
 		return;
 	}
@@ -23,8 +20,6 @@ void    Server::kick(std::string *params, Client *client) {
 		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
 		return;
 	}
-
-	//check the len of comment before and not execute, or execute and send error to the op
     if (len >= 3) {
     	if (channel->isOperator(client->getNick()) == false) {
 			sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
@@ -35,7 +30,13 @@ void    Server::kick(std::string *params, Client *client) {
 			return;
 		}
 		if (len == 3)
-			channel->kickUser(params[2]);
+			channel->kickUser(client->getNick(), params[2]);
+		if (len == 4) {
+			if (params[3].length() < 301)
+				channel->kickUserMsg(client->getNick(), params[2], params[3]);
+			else
+				sendReply(client->getFd(), ":localhost " + client->getNick() + " :Message exceeds 300 characters\r\n");
+		}
     }
 
 
