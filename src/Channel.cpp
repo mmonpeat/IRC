@@ -113,7 +113,7 @@ std::string	Channel::getTopicSetTime(void) {
 
 //---------------------------------- Setters -------------------------------------------------
 
-/*void 	Channel::setPassword(const std::string& password)
+/*void 	Channel::setPassword(const std::string& password) could be deleted
 {
 	this->_password = password;
 	this->_password_set = true;

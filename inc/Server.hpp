@@ -113,6 +113,9 @@ class Server
 		/*  KICK  */
 		void						kick(std::string *params, Client *client);
 
+		/*  KICK  */
+		void						invite(std::string *params, Client *client);
+
 
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);

@@ -368,17 +368,19 @@ void	Server::CommandCall(std::string *params, Client *client, int command)
 			privmsg(params, client);
 			break;
 		case 6: {
-			std::cout << "KICK goes here" << std::endl;
+			std::cout << "KICK goes here" << std::endl; //delete later
 			kick(params, client);
 			break;
 		}
-		case 7:
-			std::cout << "INVITE goes here" << std::endl;
-			//invite(params, client);
+		case 7: 
+		{
+			std::cout << "INVITE goes here" << std::endl; //delete later
+			invite(params, client);
 			break;
+		}
 		case 8:
 		{
-			std::cout << "TOPIC goes here" << std::endl;
+			std::cout << "TOPIC goes here" << std::endl; //delete later
 			topic(params, client);
 			break;
 		}

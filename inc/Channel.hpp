@@ -80,11 +80,12 @@ class Channel
 		int			numberOfClients(void) const;
 		std::string	returnModes(std::string nick);
 
-		// Channel functions for command
+		// Channel functions for commands
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
 		void		kickUser(const std::string& kicker, const std::string& target);
 		void		kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment);
+		//void		inviteUser() should it save *client or nick
 
 		            //mode setters
 		//void		setPassword(const std::string& password); // preguntar Maria si borrarlo
