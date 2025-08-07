@@ -1,8 +1,8 @@
 #include "Server.hpp"
 
-void	Server::prepareForJoin(std::string *params, Client *client)
+void	Server::prepareForJoin(std::vector<std::string> params, Client *client)
 {
-	int len = ptrLen(params);
+	int len = params.size();
 	std::vector<std::string> requestedChannels;
 	std::vector<std::string> passChannels;
 
