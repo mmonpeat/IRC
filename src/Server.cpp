@@ -404,8 +404,8 @@ std::vector<std::string>	Server::returnParams(std::string msg)
 	{
 		if (str[0] == ':')
 		{
-			std::string	last = msg.substr(msg.find(':'), msg.size());
-			params.push_back(str);
+			std::string	last = msg.substr(msg.find(':') + 1, msg.size());
+			params.push_back(last);
 			break ;
 		}	
 		if(!str.empty())
