@@ -16,14 +16,19 @@ void    Server::topic(std::vector<std::string> params, Client *client){
 		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
 		return;
 	}
-    if (paramCount == 2)
+    if (paramCount == 2) {
         showTopic(channel, client);
-    if (params[2].length() > 512) {
-        sendReply(client->getFd(), client->getNick() + " :Topic too long. Max length is 350 characters\r\n");
         return;
     }
-    if (paramCount == 3)
-        setTopic(channel, client, params[2]);
+
+    if (params[2].length() > 350) {
+        sendReply(client->getFd(), client->getNick() + " :Topic too long. Max length is 350 characters\r\n");
+        std::cout << params[2] << std::endl;
+        std::cout << "!!!! len es" << params[2].length() << std::endl;
+        return;
+    }
+   
+    setTopic(channel, client, params[2]);
     return;
 }
 
