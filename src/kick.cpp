@@ -6,11 +6,11 @@
 //Sender not in channel	442 ERR_NOTONCHANNEL
 
 
-void    Server::kick(std::string *params, Client *client) {
-    int 		len = ptrLen(params);
+void    Server::kick(std::vector<std::string> params, Client *client) {
+    int 		paramCount = params.size();
 	Channel*	channel;
 
-	if (len == 1) {
+	if (paramCount == 1) {
 		sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "KICK"));
 		return;
 	}
@@ -20,7 +20,7 @@ void    Server::kick(std::string *params, Client *client) {
 		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
 		return;
 	}
-    if (len >= 3) {
+    if (paramCount >= 3) {
     	if (channel->isOperator(client->getNick()) == false) {
 			sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
 			return;
@@ -29,9 +29,9 @@ void    Server::kick(std::string *params, Client *client) {
 			sendReply(client->getFd(), errUserNotInChannel(client->getNick(), channel->getChannelName()));
 			return;
 		}
-		if (len == 3)
+		if (paramCount == 3)
 			channel->kickUser(client->getNick(), params[2]);
-		if (len == 4) {
+		if (paramCount == 4) {
 			if (params[3].length() < 301)
 				channel->kickUserMsg(client->getNick(), params[2], params[3]);
 			else

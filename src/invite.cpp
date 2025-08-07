@@ -1,10 +1,10 @@
 #include "Server.hpp"
 
-void    Server::invite(std::string *params, Client *client){
-    int         len = ptrLen(params);
+void    Server::invite(std::vector<std::string> params, Client *client){
+    int         paramCount = params.size();
     Channel*    channel;
 
-    if (len < 3) {
+    if (paramCount < 3) {
         sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "INVITE"));
         return;
     }

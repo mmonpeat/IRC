@@ -2,11 +2,11 @@
 
 // control de topic -512
 
-void    Server::topic(std::string *params, Client *client){
-    int 		len = ptrLen(params);
+void    Server::topic(std::vector<std::string> params, Client *client){
+    int 		paramCount = params.size();
 	Channel*	channel;
 
-	if (len == 1) {
+	if (paramCount == 1) {
 		sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "TOPIC"));
 		return;
 	}
@@ -16,13 +16,13 @@ void    Server::topic(std::string *params, Client *client){
 		sendReply(client->getFd(), errChannelNotExist(client->getNick(), params[1]));
 		return;
 	}
-    if (len == 2)
+    if (paramCount == 2)
         showTopic(channel, client);
     if (params[2].length() > 512) {
         sendReply(client->getFd(), client->getNick() + " :Topic too long. Max length is 350 characters\r\n");
         return;
     }
-    if (len == 3)
+    if (paramCount == 3)
         setTopic(channel, client, params[2]);
     return;
 }

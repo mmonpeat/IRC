@@ -1,16 +1,5 @@
 #include "Server.hpp"
 
-int		Server::ptrLen(std::string *ptr) {
-	int	len = 0;
-
-
-	while (ptr[len] != "\0")
-	{
-		std::cout << ptr[len] << std::endl;
-		len++;
-	}
-	return len;
-}
 
 Channel*	Server::getChannelByName(std::string& name) {
 	for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); it++) {
@@ -20,12 +9,12 @@ Channel*	Server::getChannelByName(std::string& name) {
 	return NULL;
 }
 
-void	Server::channelModes(std::string *params, Client *client) {
+void	Server::channelModes(std::vector<std::string> params, Client *client) {
 	std::cout << "!!!!!!!!!!!! HE ENTRADO EN MODE !!!!!!!!!" << std::endl;
-	int 		len = ptrLen(params);
+	int 		paramCount = params.size();
 	Channel*	channel;
 
-	if (len == 1) {
+	if (paramCount == 1) {
 		sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "MODE"));
 		return;
 	}
@@ -36,7 +25,7 @@ void	Server::channelModes(std::string *params, Client *client) {
 		return;
 	}
 
-	if (len == 2) {
+	if (paramCount == 2) {
 		sendReply(client->getFd(), RPL_CHANNELMODEIS(client->getNick(), channel->getChannelName(), channel->returnModes(client->getNick())));
 		sendReply(client->getFd(), RPL_CREATIONTIME(client->getNick(), channel->getChannelName(), channel->getChannelCreationTime()));
 		return;
@@ -50,7 +39,7 @@ void	Server::channelModes(std::string *params, Client *client) {
 }
 
 
-void	Server::applyModes(std::string *params, Client *client, Channel* channel)
+void	Server::applyModes(std::vector<std::string> params, Client *client, Channel* channel)
 {
 	std::cout << "Modes parameters are: " << params[2] << std::endl; //delete later
 	
@@ -58,7 +47,7 @@ void	Server::applyModes(std::string *params, Client *client, Channel* channel)
 	size_t			found_param = 0;
 	char			currentSign = 0;
 	std::string 	validModes = "itkol";
-	int				param_len = ptrLen(params);
+	int				param_len = params.size();
 	int				arg_i = 3;
 
 	for (size_t i = 0; i < params[2].size(); ++i)

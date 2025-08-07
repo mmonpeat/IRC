@@ -92,12 +92,10 @@ class Server
 		Client* 	findClientByNick(const std::string& nick);
 
 		/*  MODE  */
-		void						channelModes(std::string *params, Client *client);
-		
-		int							ptrLen(std::string *ptr);
+		void						channelModes(std::vector<std::string> params, Client *client);
 		int							strToInt(std::string arg); 
 		bool						isLimitValid(const std::string& limit);
-		void						applyModes(std::string *params, Client *client, Channel* channel);
+		void						applyModes(std::vector<std::string> params, Client *client, Channel* channel);
 		void						execMode(char sign, char c, std::string param, Client* client, Channel *channel);
 		void						modeK(Channel *channel, std::string password, char sign, Client *client);
 		void						modeT(Channel *channel, char sign, Client *client);
@@ -106,16 +104,16 @@ class Server
 		void						modeI(Channel *channel, char sign, Client *client);
 
 		/*  TOPIC  */
-		Channel*	getChannelByName(std::string& name);
-		void						topic(std::string *params, Client *client);
+		Channel*					getChannelByName(std::string& name);
+		void						topic(std::vector<std::string> params, Client *client);
 		void						showTopic(Channel* channel, Client* client);
 		void						setTopic(Channel *channel, Client *client, const std::string& topic);
 
 		/*  KICK  */
-		void						kick(std::string *params, Client *client);
+		void						kick(std::vector<std::string> params, Client *client);
 
-		/*  KICK  */
-		void						invite(std::string *params, Client *client);
+		/*  INVITE  */
+		void						invite(std::vector<std::string> params, Client *client);
 
 
 		/*  JOIN  */
