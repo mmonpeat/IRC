@@ -52,18 +52,17 @@ class Server
 		void	start();
 
 		//parser msg functions
-		void			handleMsg(std::string msg, Client* client);
-		int				checkCommand(std::string param);
-		void			ServerHandshake(std::string *params, Client* client, int command);
-		void			CommandCall(std::string *params, Client* client, int command);
-		std::string*	returnParams(std::string msg);
-		int				countParams(std::string msg);
+		void						handleMsg(std::string msg, Client* client);
+		int							checkCommand(std::string param);
+		void						ServerHandshake(std::vector<std::string> params, Client* client, int command);
+		void						CommandCall(std::vector<std::string> params, Client* client, int command);
+		std::vector<std::string>	returnParams(std::string msg);
 	
 		//command functions
-		void	pass(std::string *params, Client* client);		
-		void	nick(std::string *params, Client* client);		
-		void	user(std::string *params, Client* client);
-		void	privmsg(std::string *params, Client* client);
+		void	pass(std::vector<std::string> params, Client* client);		
+		void	nick(std::vector<std::string> params, Client* client);		
+		void	user(std::vector<std::string> params, Client* client);
+		void	privmsg(std::vector<std::string> params, Client* client);
 		void	privmsg_channel(Client *sender, std::string target, std::string msg);
 		void	privmsg_user(Client *sender, std::string target, std::string msg);
 		void	quit(Client* client);
@@ -120,7 +119,7 @@ class Server
 		void						createNewChannel(Client& client, std::vector<Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass);
 		
 		//utils join
-		void						prepareForJoin(std::string *params, Client *client);
+		void						prepareForJoin(std::vector<std::string> params, Client *client);
 		std::vector<std::string> 	convertToVector(const std::string& line);
 		bool						equalChannels(std::string new_channel, std::string channel) const;
 		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
