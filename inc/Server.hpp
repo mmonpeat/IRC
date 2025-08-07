@@ -90,10 +90,11 @@ class Server
 		bool		isNickValid(std::string nick);
 		int			findClient(std::string nick); //returns fd
 		Channel*	findChannel(std::string channel_name); //returns Channel
+		Client* 	findClientByNick(const std::string& nick);
 
 		/*  MODE  */
 		void						channelModes(std::string *params, Client *client);
-		Channel*					getChannelByName(std::string& name);
+		
 		int							ptrLen(std::string *ptr);
 		int							strToInt(std::string arg); 
 		bool						isLimitValid(const std::string& limit);
@@ -106,6 +107,7 @@ class Server
 		void						modeI(Channel *channel, char sign, Client *client);
 
 		/*  TOPIC  */
+		Channel*	getChannelByName(std::string& name);
 		void						topic(std::string *params, Client *client);
 		void						showTopic(Channel* channel, Client* client);
 		void						setTopic(Channel *channel, Client *client, const std::string& topic);
