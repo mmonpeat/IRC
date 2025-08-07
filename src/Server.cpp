@@ -399,6 +399,12 @@ std::vector<std::string>	Server::returnParams(std::string msg)
 
 	while (std::getline(ss, str, ' '))
 	{
+		if (str[0] == ':')
+		{
+			std::string	last = msg.substr(msg.find(':'), msg.size());
+			params.push_back(str);
+			break ;
+		}	
 		if(!str.empty())
 			params.push_back(str);
 	}
