@@ -19,7 +19,6 @@ class Client
 		bool		_auth;
 		bool		_end_connection;
 		std::string	_inputBuffer; //what the server receives from the client
-		std::string	_outputBuffer; //what we send to the client
 
 	public:
 		Client(int fd);
