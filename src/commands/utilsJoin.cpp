@@ -62,25 +62,6 @@ std::string	Server::getUniqueChannelName(std::string& channelToCheck, const std:
     return (channelToCheck);
 }
 
-bool	Server::checkModeChannelPassword(Channel* channel, const std::string& pass, Client& client)
-{
-	(void)channel;
-	(void)client;
-	(void)pass;
-	return(false);
-}
-bool	Server::checkModeChannelLimit(Channel* channel, Client& client)
-{
-	(void)channel;
-	(void)client;
-	return(false);
-}
-bool	Server::checkModeInvite(Channel* channel, Client& client)
-{
-	(void)channel;
-	(void)client;
-	return(false);
-}
 void	Server::replayMsgBecauseClientAddedToChannel(Channel* channel, Client& client, std::string channelName)
 {
 	// Mensaje JOIN para TODOS incluyendo al nuevo cliente

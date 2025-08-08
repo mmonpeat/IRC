@@ -56,11 +56,6 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 			bool canJoin = true;
 
-			/*
-				if (!checkModeChannelPassword(channel, channelPass, client)) break;
-				if (!checkModeChannelLimit(channel, client)) break;
-				if (!checkModeInvite(channel, client)) break;
-			*/
 			// Mode +k (password)
 			if (channel->isPasswordSet())
 			{
@@ -77,12 +72,12 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 
 			// Mode +l (limit)
-			std::cout << "cha lim:" <<  channel->getChannelLimit()<< "num client in cha" << channel->numberOfClients() << std::endl;
+			//std::cout << "cha lim:" <<  channel->getChannelLimit()<< "num client in cha" << channel->numberOfClients() << std::endl;
 			if (channel->isLimitModeSet())
 			{
 				int limit = channel->getChannelLimit();
 				int current = channel->numberOfClients();
-				std::cout << "hola imprimeix limit" << std::endl;
+				//std::cout << "hola imprimeix limit" << std::endl;
   				if (current >= limit)
 				{
 					sendReply(client.getFd(), errChannelIsFull(channelName));
@@ -91,7 +86,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 			
 			// Mode +i (invite-only)
-			if (channel->isInviteModeSet() == true)
+			if (channel->isInviteModeSet() == true && canJoin == false)
 			{
 				if (channel->isClientInvited(&client) == false) {
 					sendReply(client.getFd(), errInviteOnlyChan(channelName));
