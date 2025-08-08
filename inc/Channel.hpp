@@ -68,6 +68,7 @@ class Channel
 		void		addOperatorByNick(const std::string& new_op);
 		void		removeOperator(Client *op);
 		void		removeOperatorByNick(std::string& ex_op);
+		void		removeInvited(Client* client);
 		bool		isClient(Client* client);
 		bool		isClientByNick(std::string nick);
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick

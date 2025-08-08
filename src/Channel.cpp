@@ -114,13 +114,6 @@ std::string	Channel::getTopicSetTime(void) {
 
 //---------------------------------- Setters -------------------------------------------------
 
-/*void 	Channel::setPassword(const std::string& password) could be deleted
-{
-	this->_password = password;
-	this->_password_set = true;
-	return;
-}*/
-
 void		Channel::setPasswordM(Client* op, const std::string& password) {
 	this->_password = password;
 	this->_password_set = true;
@@ -203,22 +196,6 @@ void	Channel::addClient(Client *client) {
 	return;
 }
 
-// void	Channel::removeClient(Client* client) {
-// 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		if ((*it)->getNick() == client->getNick()) {
-// 			if (isOperator(client->getNick()))
-// 				removeOperator(client);
-// 			_clients.erase(it);
-// 			break;
-// 		}
-// 	}
-// 	// check if it is empty and call break to not print the message
-// 	std::string	message = "deleted \r\n";
-// 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		send((*it)->getFd(), message.c_str(), message.size(), 0);
-// 	}
-// }
-
 bool Channel::isClientInChannel(Client* client) const
 {
     for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -267,6 +244,15 @@ void	Channel::removeOperatorByNick(std::string& ex_op) {
 		}
 	}
 	return;
+}
+
+void	Channel::removeInvited(Client* client) {
+	for (std::vector<Client*>::iterator it = _invited_clients.begin(); it != _invited_clients.end(); it++) {
+		if (*it == client) {
+			_invited_clients.erase(it);
+			break;
+		}
+	}
 }
 
 void	Channel::addOperator(Client *new_op) {

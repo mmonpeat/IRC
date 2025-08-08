@@ -175,8 +175,8 @@ inline	std::string errChannelIsFull(std::string channelName){
 	return (":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n");
 }
 
-inline	std::string errInviteOnlyChan(std::string channelName){
-	return (":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n");
+inline	std::string errInviteOnlyChan(std::string channelName){ 
+	return (":localhost 473 " + channelName + " :Cannot join channel (+i)\r\n");
 }
 
 inline	std::string errBadChannelKey(std::string channelName){
