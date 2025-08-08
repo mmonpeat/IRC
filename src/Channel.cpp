@@ -54,9 +54,10 @@ bool	Channel::isPasswordValidChannel(std::string password) const {
 	return false;
 }
 
+//change the invite function
 bool	Channel::isClientInvited(Client* client) const {
-	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
-		if (equalNicks(*it, client->getNick()) == true)
+	for (std::vector<Client*>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
+		if (*it == client)
 			return true;
 	}
 	return false;
@@ -424,5 +425,10 @@ void		Channel::kickUserMsg(const std::string& kicker, const std::string& target,
 			break;
 		}	
 	}
+	return;
+}
+
+void		Channel::inviteUser(Client *invited_client) {
+	_invited_clients.push_back(invited_client);
 	return;
 }

@@ -6,14 +6,14 @@
 #    By: kate <kate@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/02 13:22:55 by kkoval            #+#    #+#              #
-#    Updated: 2025/08/07 01:04:29 by kate             ###   ########.fr        #
+#    Updated: 2025/08/07 23:05:32 by kate             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 NAME = ircserv
 INC = inc/
-SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/join.cpp src/utilsJoin.cpp src/command_utils.cpp src/modes.cpp src/topic.cpp  src/kick.cpp src/invite.cpp
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/commands/join.cpp src/commands/utilsJoin.cpp src/command_utils.cpp src/commands/modes.cpp src/commands/topic.cpp  src/commands/kick.cpp src/commands/invite.cpp
 
 BUILD = .build
 OBJ = $(SRC:%.cpp=$(BUILD)/%.o)

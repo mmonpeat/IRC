@@ -3,6 +3,7 @@
 void    Server::invite(std::vector<std::string> params, Client *client){
     int         paramCount = params.size();
     Channel*    channel;
+    Client*     invited;
 
     if (paramCount < 3) {
         sendReply(client->getFd(), errNotEnoughParams(client->getNick(), "INVITE"));
@@ -15,20 +16,34 @@ void    Server::invite(std::vector<std::string> params, Client *client){
 		return;
 	}
 
-    if (channel->isOperator(client->getNick()) == false) {
+    if (channel->isInviteModeSet() == true && channel->isOperator(client->getNick()) == false) {
 		sendReply(client->getFd(), errNotOperator(client->getNick(), channel->getChannelName()));
 		return;
 	}
 
-    Client* invited = findClientByNick(params[2]);
+    if (channel->isClient(client) == false)
+    {
+        sendReply(client->getFd(), errNotOnChannel(client->getNick(), channel->getChannelName()));
+        return;
+    }
+
+    invited = findClientByNick(params[2]);
     if (invited == NULL) {
         sendReply(client->getFd(), params[2] + " is not on this server\r\n");
         return;
     }
-
-    // enviar mensaje al invitado
-    //añadir a la lista de los invitados
-
+    if (channel->isClient(invited)) {
+        //maybe send a message
+        return;
+    }
+    if (channel->isClientInvited(invited)) { //this person was already invited before 
+        sendReply(client->getFd(), errUserOnChannel(client->getNick(), channel->getChannelName(), invited->getNick()));
+        return;
+    }
+        
+    channel->inviteUser(invited);
+    sendReply(client->getFd(), RPL_INVITING(client->getNick(), channel->getChannelName(), invited->getNick()));
+    sendReply(invited->getFd(), client->getPrefix() + " INVITE " + invited->getNick() + " :" + channel->getChannelName() + "\r\n");
     return;
 }
 

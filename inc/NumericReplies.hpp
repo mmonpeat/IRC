@@ -122,7 +122,6 @@ inline std::string	errNotOperator(const std::string& clientNick, const std::stri
 	return (":localhost 482 "  + clientNick + " " + channelName + " :You're not channel operator\r\n");
 }
 
-
 inline std::string	errChannelNotExist(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel\r\n");
 }
@@ -162,6 +161,14 @@ inline std::string RPL_TOPICWHOTIME(const std::string& clientNick, const std::st
 
 inline std::string	errNotOnChannel(const std::string& clientNick, const std::string& channelName) {
 	return (":localhost 442 " + clientNick + " " + channelName + " :You're not on that channel\r\n");
+}
+
+inline std::string	errUserOnChannel(const std::string& clientNick, const std::string& channelName, const std::string& invited_client) {
+	return (":localhost 443 " + clientNick + " " + invited_client + " " + channelName + " :is already on channel\r\n");
+}
+
+inline	std::string RPL_INVITING(const std::string& inviter, const std::string& channelName, const std::string& invited){
+	return (":localhost 341 " + inviter + " " + invited + " " + channelName + "\r\n");
 }
 
 inline	std::string errChannelIsFull(std::string channelName){
