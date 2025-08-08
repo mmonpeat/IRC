@@ -56,13 +56,6 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 			bool canJoin = true;
 
-			// Mode +i (invite-only)
-			if (channel->isInviteModeSet())
-			{
-				sendReply(client.getFd(), errInviteOnlyChan(channelName));
-				canJoin = false;
-			}
-
 			// Mode +k (password)
 			if (channel->isPasswordSet())
 			{
@@ -90,6 +83,19 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 				}
 			}
 			
+			// Mode +i (invite-only)
+			if (channel->isInviteModeSet() == true)
+			{
+				if (channel->isClientInvited(&client) == false) {
+					sendReply(client.getFd(), errInviteOnlyChan(channelName));
+					canJoin = false;
+				} else if (channel->isClientInvited(&client) == true) {
+					channel->removeInvited(&client);
+				}
+			} else if (channel->isClientInvited(&client) == true){
+				channel->removeInvited(&client);
+			}
+
 			if (canJoin)
 			{
 				// Afegir client al canal

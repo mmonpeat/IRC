@@ -60,6 +60,11 @@ std::string	Client::getRealName(void) const {
 	return (this->_real_name);
 }
 
+std::string	Client::getPrefix(void) const {
+	std::string prefix = ":" + this->getNick() + "!" + this->getUserName() + "@" + "localhost";
+	return prefix;
+}
+
 int			Client::getFd(void) const {
 	return (this->_fd);
 }

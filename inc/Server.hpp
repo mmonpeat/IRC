@@ -69,6 +69,7 @@ class Server
 
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
+		void	ServerBroadcast(std::string msg);
 	
 		//handling client
 		bool	clientIsRegistered(int clientFd);
@@ -76,8 +77,6 @@ class Server
 		void	addClient(int clientFd);
 		Client*	getClient(int clientFd);
 
-		char	foldChar(char c) const;
-		bool	equalNicks(std::string new_nick, std::string client) const;
 		bool 	isNickUnique(std::string nickName) const; // if there are two with the same nickName 433 ERR_NICKNAMEINUSE
 
 		/* Exeptions Classes */
@@ -91,6 +90,32 @@ class Server
 		bool		isNickValid(std::string nick);
 		int			findClient(std::string nick); //returns fd
 		Channel*	findChannel(std::string channel_name); //returns Channel
+		Client* 	findClientByNick(const std::string& nick);
+
+		/*  MODE  */
+		void						channelModes(std::vector<std::string> params, Client *client);
+		int							strToInt(std::string arg); 
+		bool						isLimitValid(const std::string& limit);
+		void						applyModes(std::vector<std::string> params, Client *client, Channel* channel);
+		void						execMode(char sign, char c, std::string param, Client* client, Channel *channel);
+		void						modeK(Channel *channel, std::string password, char sign, Client *client);
+		void						modeT(Channel *channel, char sign, Client *client);
+		void						modeL(Channel *channel, std::string arg, char sign, Client *client);
+		void						modeO(Channel *channel, std::string arg, char sign, Client *client);
+		void						modeI(Channel *channel, char sign, Client *client);
+
+		/*  TOPIC  */
+		Channel*					getChannelByName(std::string& name);
+		void						topic(std::vector<std::string> params, Client *client);
+		void						showTopic(Channel* channel, Client* client);
+		void						setTopic(Channel *channel, Client *client, const std::string& topic);
+
+		/*  KICK  */
+		void						kick(std::vector<std::string> params, Client *client);
+
+		/*  INVITE  */
+		void						invite(std::vector<std::string> params, Client *client);
+
 
 		/*  JOIN  */
 		int 						join(Client& client, std::vector<Channel*>&channelsExistents, std::vector<std::string> CheckChannels, std::vector<std::string> ChannelsPasswords);
@@ -109,5 +134,8 @@ class Server
 		void 	mostrarChannels(void);
 		
 };
+
+char	foldChar(char c);
+bool	equalNicks(std::string new_nick, std::string client);
 
 #endif

@@ -352,34 +352,38 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
 			pass(params, client);
 			break ;
 		case 2:
+			nick(params, client);
 			break ;
 		case 3:
 			user(params, client);
 			break ;
 		case 4:
 		{
-			//ptrLen(params);
 			prepareForJoin(params, client);
 			break;
 		}
 		case 5:
 			privmsg(params, client);
 			break;
-		case 6:
-			std::cout << "KICK goes here" << std::endl;
-			//kick(params, client);
+		case 6: {
+			std::cout << "KICK goes here" << std::endl; //delete later
+			kick(params, client);
 			break;
-		case 7:
-			std::cout << "INVITE goes here" << std::endl;
-			//invite(params, client);
+		}
+		case 7: 
+		{
+			std::cout << "INVITE goes here" << std::endl; //delete later
+			invite(params, client);
 			break;
+		}
 		case 8:
-			std::cout << "TOPIC goes here" << std::endl;
-			//topic(params, client);
+		{
+			std::cout << "TOPIC goes here" << std::endl; //delete later
+			topic(params, client);
 			break;
+		}
 		case 9:
-			std::cout << "MODE goes here" << std::endl;
-			//mode(params, client);
+			channelModes(params, client);
 			break;
 		case 10:
 			quit(client); //add the message part?
@@ -401,8 +405,8 @@ std::vector<std::string>	Server::returnParams(std::string msg)
 	{
 		if (str[0] == ':')
 		{
-			std::string	last = msg.substr(msg.find(':'), msg.size());
-			params.push_back(str);
+			std::string	last = msg.substr(msg.find(':') + 1, msg.size());
+			params.push_back(last);
 			break ;
 		}	
 		if(!str.empty())
@@ -453,6 +457,11 @@ void	Server::nick(std::vector<std::string> params, Client *client)
 	}
 	if (isNickValid(params[1]) == true)
 	{
+		if (!client->getNick().empty())
+		{
+			std::string msg = client->getPrefix() + " " + params[0] + " :" + params[1] + "\r\n";
+			ServerBroadcast(msg);
+		}
 		client->setNick(params[1]);
 	}
 	else
@@ -497,13 +506,13 @@ void	Server::privmsg(std::vector<std::string> params, Client *client)
 		return ;
 	}
 	std::cout << params[2] << std::endl;
-	std::string	premsg = ":" + client->getNick() + " " + params[0] + " ";
+	std::string	premsg = client->getPrefix() + " " + params[0] + " ";
 	std::vector<std::string>	targets = convertToVector(params[1]);
 	
 	size_t	i = 0;
 	while (i < targets.size())
 	{
-		std::string	msg = premsg + targets[i] + " : " + params[2] + "\r\n";
+		std::string	msg = premsg + targets[i] + " :" + params[2] + "\r\n";
 	//	std::cout << "GONNA SEND: " << msg << std::endl;
 		if (targets[i][0] == '#')
 			privmsg_channel(client, targets[i], msg);
@@ -554,6 +563,15 @@ void	Server::sendReply(int client_fd, std::string reply)
 	return ;
 }
 
+void	Server::ServerBroadcast(std::string msg)
+{
+	for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); it++)
+	{
+		if (it->first != -1)
+			send(it->second->getFd(), msg.c_str(), msg.size(), 0);
+	}
+}
+
 //------------------------------- Client Functions -------------------------------
   
 bool Server::clientIsRegistered(int clientFd) {
@@ -588,7 +606,7 @@ Client*	Server::getClient(int clientFd)
 	return (it->second);
 }
 
-char Server::foldChar(char c) const {
+char	foldChar(char c) {
     if (c >= 'A' && c <= 'Z')
         return c + 32;
     if (c == '[') return '{';
@@ -598,7 +616,7 @@ char Server::foldChar(char c) const {
     return c;
 }
 
-bool	Server::equalNicks(std::string new_nick, std::string client) const {
+bool	equalNicks(std::string new_nick, std::string client) {
 	if (new_nick == client)
 		return true;
 	if (new_nick.size() != client.size())

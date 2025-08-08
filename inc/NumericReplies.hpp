@@ -114,12 +114,69 @@ inline	std::string errPassMismatch(void){
 	return ("localhost 464 :Password incorrect\r\n");
 }
 
+
+// --------------------------------------- Command Replies-------------------------------------------
+
+
+inline std::string	errNotOperator(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 482 "  + clientNick + " " + channelName + " :You're not channel operator\r\n");
+}
+
+inline std::string	errChannelNotExist(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel\r\n");
+}
+
+inline std::string	errUserNotInChannel(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel!!!!!!!\r\n");
+}
+
+inline std::string	errNotEnoughParams(const std::string& clientNick, const std::string& mode) {
+	return (":localhost 461 " + clientNick + " " + mode + " :Not enough parameters\r\n");
+}
+
+inline std::string	RPL_CHANNELMODEIS(const std::string& clientNick, const std::string& channelName, const std::string modes) {
+	return (":localhost 324 " + clientNick + " " + channelName + " " + modes + "\r\n");
+}
+
+inline std::string	RPL_CREATIONTIME(const std::string& clientNick, const std::string& channelName, const std::string& timeStamp) {
+	return (":localhost 329 " + clientNick + " " + channelName + " " + timeStamp + "\r\n" );
+}
+
+inline std::string	errNotKnownMode(const std::string& clientNick, const char& modeChar) {
+	return (":localhost 472 " + clientNick + " " + modeChar + " :is unknown mode char to me\r\n");
+}
+
+
+inline std::string	RPL_NOTOPIC(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 331 " + clientNick + " " + channelName + " :No topic is set\r\n");
+}
+
+inline std::string	RPL_TOPIC(const std::string& clientNick, const std::string& channelName, const std::string& topic) {
+	return (":localhost 332 " + clientNick + " " + channelName + " :" + topic + "\r\n");
+}
+
+inline std::string RPL_TOPICWHOTIME(const std::string& clientNick, const std::string& channelName, const std::string& topicSetter, std::string topicSetTime) {
+	return (":localhost 333 " + clientNick + " " + channelName + " " + topicSetter + " " + topicSetTime + "\r\n");
+}
+
+inline std::string	errNotOnChannel(const std::string& clientNick, const std::string& channelName) {
+	return (":localhost 442 " + clientNick + " " + channelName + " :You're not on that channel\r\n");
+}
+
+inline std::string	errUserOnChannel(const std::string& clientNick, const std::string& channelName, const std::string& invited_client) {
+	return (":localhost 443 " + clientNick + " " + invited_client + " " + channelName + " :is already on channel\r\n");
+}
+
+inline	std::string RPL_INVITING(const std::string& inviter, const std::string& channelName, const std::string& invited){
+	return (":localhost 341 " + inviter + " " + invited + " " + channelName + "\r\n");
+}
+
 inline	std::string errChannelIsFull(std::string channelName){
 	return (":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n");
 }
 
-inline	std::string errInviteOnlyChan(std::string channelName){
-	return (":localhost 471 " + channelName + " :Cannot join channel (+l)\r\n");
+inline	std::string errInviteOnlyChan(std::string channelName){ 
+	return (":localhost 473 " + channelName + " :Cannot join channel (+i)\r\n");
 }
 
 inline	std::string errBadChannelKey(std::string channelName){
