@@ -130,9 +130,7 @@ class Server
 		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
 		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
 		
-		bool 						checkModeChannelPassword(Channel* channel, const std::string& pass, Client& client);
-		bool						checkModeChannelLimit(Channel* channel, Client& client);
-		bool 						checkModeInvite(Channel* channel, Client& client);
+
 		void 						replayMsgBecauseClientAddedToChannel(Channel* channel, Client& client, std::string channelName);
 
 		//per mostrar borrar
