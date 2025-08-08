@@ -506,7 +506,7 @@ void	Server::privmsg(std::vector<std::string> params, Client *client)
 		return ;
 	}
 	std::cout << params[2] << std::endl;
-	std::string	premsg = ":" + client->getNick() + " " + params[0] + " ";
+	std::string	premsg = client->getPrefix() + " " + params[0] + " ";
 	std::vector<std::string>	targets = convertToVector(params[1]);
 	
 	size_t	i = 0;
