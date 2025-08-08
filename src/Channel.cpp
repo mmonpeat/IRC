@@ -208,21 +208,19 @@ bool Channel::isClientInChannel(Client* client) const
 
 void Channel::removeClient(Client* client)
 {
-    // Eliminar de clientes normales
     for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if ((*it)->getFd() == client->getFd()) {
             _clients.erase(it);
             break;
         }
     }
-    
-    // Eliminar de operadores si lo era
     for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
         if ((*it)->getFd() == client->getFd()) {
             _operators.erase(it);
             break;
         }
     }
+	removeInvited(client);
 }
 
 void	Channel::removeOperator(Client *op) {
@@ -388,12 +386,13 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 }
 
 
-void	Channel::kickUser(const std::string& kicker, const std::string& target) {
-	std::string message = "KICK " + kicker + " " + _name + " " + target + "\r\n";
+void	Channel::kickUser(const std::string& kicker_prefix, const std::string& target) {
+	std::string message = kicker_prefix +  " KICK " + _name + ' ' + target + "\r\n";
+	//std::string message = "KICK " + kicker + " " + _name + " " + target + "\r\n";
 	broadcastMessage(message);
 
 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-		if (equalNicks((*it)->getNick(), target)) {
+		if (equalNicks((*it)->getNick(), target) == true) {
 			removeClient(*it);
 			break;
 		}	
@@ -401,8 +400,9 @@ void	Channel::kickUser(const std::string& kicker, const std::string& target) {
 	return;
 }
 
-void		Channel::kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment) {
-	std::string message = "KICK " + kicker + " " +  _name + " " + target + " :" + comment + "\r\n";
+void		Channel::kickUserMsg(const std::string& kicker_prefix, const std::string& target, const std::string& comment) {
+	std::string message = kicker_prefix +  " KICK " + _name + ' ' + target + " :" + comment + "\r\n";
+	//std::string message = "KICK " + kicker + " " +  _name + " " + target + " :" + comment + "\r\n";
 	broadcastMessage(message);
 	
 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {

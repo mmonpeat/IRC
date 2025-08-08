@@ -127,7 +127,7 @@ inline std::string	errChannelNotExist(const std::string& clientNick, const std::
 }
 
 inline std::string	errUserNotInChannel(const std::string& clientNick, const std::string& channelName) {
-	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel\r\n");
+	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel!!!!!!!\r\n");
 }
 
 inline std::string	errNotEnoughParams(const std::string& clientNick, const std::string& mode) {
