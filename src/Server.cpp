@@ -458,6 +458,8 @@ void	Server::nick(std::vector<std::string> params, Client *client)
 	if (isNickValid(params[1]) == true)
 	{
 		client->setNick(params[1]);
+		std::string msg = client->getPrefix() +;	
+		//serverbroadcast
 	}
 	else
 	{
