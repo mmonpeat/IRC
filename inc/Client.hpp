@@ -36,6 +36,7 @@ class Client
 		std::string	getNick(void) const;
 		std::string	getRealName(void) const;
 		std::string	getUserName(void) const;
+		std::string	getPrefix(void) const;
 		int			getFd(void) const;
 		bool		getAuth(void) const;
 		bool		getPass(void) const;

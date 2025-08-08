@@ -54,9 +54,10 @@ bool	Channel::isPasswordValidChannel(std::string password) const {
 	return false;
 }
 
+//change the invite function
 bool	Channel::isClientInvited(Client* client) const {
-	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
-		if (equalNicks(*it, client->getNick()) == true)
+	for (std::vector<Client*>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
+		if (*it == client)
 			return true;
 	}
 	return false;
@@ -112,13 +113,6 @@ std::string	Channel::getTopicSetTime(void) {
 }
 
 //---------------------------------- Setters -------------------------------------------------
-
-void 	Channel::setPassword(const std::string& password)
-{
-	this->_password = password;
-	this->_password_set = true;
-	return;
-}
 
 void		Channel::setPasswordM(Client* op, const std::string& password) {
 	this->_password = password;
@@ -252,6 +246,15 @@ void	Channel::removeOperatorByNick(std::string& ex_op) {
 	return;
 }
 
+void	Channel::removeInvited(Client* client) {
+	for (std::vector<Client*>::iterator it = _invited_clients.begin(); it != _invited_clients.end(); it++) {
+		if (*it == client) {
+			_invited_clients.erase(it);
+			break;
+		}
+	}
+}
+
 void	Channel::addOperator(Client *new_op) {
 	this->_operators.push_back(new_op);
 	std::string	message = new_op->getNick() + " (" + new_op->getRealName() + ") has become operator \r\n"; //falta decir en que grup
@@ -378,19 +381,40 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 	_topic = new_topic;
 	_topic_init = true;
 	_topic_creation_time = time(NULL);
-	std::string message = ":" + client->getNick() + " TOPIC #" + _name + " :" + _topic + "\r\n";
+	std::string message = ":" + client->getNick() + " TOPIC " + _name + " :" + _topic + "\r\n";
 	broadcastMessage(message);
 
 	return;
 }
 
-//operators can kick other operators
-void	Channel::kickUser(Client* kicker, Client* target) {
-	if (isOperator(kicker->getNick()) == false) {
-		std::string message = " have no rights to kick users from this channel \r\n";
-		broadcastMessage(message);
-		return;
+
+void	Channel::kickUser(const std::string& kicker, const std::string& target) {
+	std::string message = "KICK " + kicker + " " + _name + " " + target + "\r\n";
+	broadcastMessage(message);
+
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), target)) {
+			removeClient(*it);
+			break;
+		}	
 	}
-	removeClient(target);
+	return;
+}
+
+void		Channel::kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment) {
+	std::string message = "KICK " + kicker + " " +  _name + " " + target + " :" + comment + "\r\n";
+	broadcastMessage(message);
+	
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), target)) {
+			removeClient(*it);
+			break;
+		}	
+	}
+	return;
+}
+
+void		Channel::inviteUser(Client *invited_client) {
+	_invited_clients.push_back(invited_client);
 	return;
 }

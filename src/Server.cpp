@@ -358,25 +358,27 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
 			break ;
 		case 4:
 		{
-			//ptrLen(params);
 			prepareForJoin(params, client);
 			break;
 		}
 		case 5:
 			privmsg(params, client);
 			break;
-		case 6:
-			std::cout << "KICK goes here" << std::endl;
-			//kick(params, client);
+		case 6: {
+			std::cout << "KICK goes here" << std::endl; //delete later
+			kick(params, client);
 			break;
-		case 7:
-			std::cout << "INVITE goes here" << std::endl;
-			//invite(params, client);
+		}
+		case 7: 
+		{
+			std::cout << "INVITE goes here" << std::endl; //delete later
+			invite(params, client);
 			break;
+		}
 		case 8:
 		{
-			std::cout << "TOPIC goes here" << std::endl;
-			//topic(params, client);
+			std::cout << "TOPIC goes here" << std::endl; //delete later
+			topic(params, client);
 			break;
 		}
 		case 9:
@@ -400,6 +402,12 @@ std::vector<std::string>	Server::returnParams(std::string msg)
 
 	while (std::getline(ss, str, ' '))
 	{
+		if (str[0] == ':')
+		{
+			std::string	last = msg.substr(msg.find(':') + 1, msg.size());
+			params.push_back(last);
+			break ;
+		}	
 		if(!str.empty())
 			params.push_back(str);
 	}

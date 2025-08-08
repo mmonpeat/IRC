@@ -14,28 +14,27 @@ class Client;
 class Channel
 {
 	private:
-		std::string					_name;
-		std::vector<Client*>		_operators;
-		std::vector<Client*>		_clients;
-		time_t						_channel_creation_time;
+		std::string				_name;
+		std::vector<Client*>	_operators;
+		std::vector<Client*>	_clients;
+		time_t					_channel_creation_time;
 
-	
 		// Mode control 
-		bool						_limit_set;
-		bool						_invite_set;
-		bool						_topic_set;
-		bool						_password_set;
+		bool					_limit_set;
+		bool					_invite_set;
+		bool					_topic_set;
+		bool					_password_set;
 
-		// Mode variables -- solo activos si el modo esta seteado
-		int							_channel_limit;
-		std::vector<std::string>	_invited_clients;
-		std::string					_password;
+		// Mode variables -- only actives if the mode is set
+		int						_channel_limit;
+		std::vector<Client*>	_invited_clients;
+		std::string				_password;
 
-		// Topic related
-		std::string					_topic;
-		bool						_topic_init;
-		time_t						_topic_creation_time;
-		std::string					_who_set_topic;
+		// Topic variables
+		std::string				_topic;
+		bool					_topic_init;
+		time_t					_topic_creation_time;
+		std::string				_who_set_topic;
 				
 	public:
 		Channel(std::string name, Client *client);
@@ -47,7 +46,7 @@ class Channel
 		bool		isTopicModeSet(void) const;
 		bool		isPasswordSet(void) const;
 		bool		isPasswordValidChannel(std::string password) const;
-		bool		isClientInvited(Client* client) const; //puede ser nick
+		bool		isClientInvited(Client* client) const;
 
 		// Variable getters
 		std::string					getChannelName(void) const;
@@ -61,7 +60,6 @@ class Channel
 		std::string					getTopicSetTime(void);
 
 	
-		
 		// Channel functions
 		void		addClient(Client *client);
 		bool 		isClientInChannel(Client* client) const;
@@ -70,23 +68,25 @@ class Channel
 		void		addOperatorByNick(const std::string& new_op);
 		void		removeOperator(Client *op);
 		void		removeOperatorByNick(std::string& ex_op);
+		void		removeInvited(Client* client);
 		bool		isClient(Client* client);
 		bool		isClientByNick(std::string nick);
 		bool		isChannelEmpty(void) const; //llamar cada vez que alguien haga quit or kick
-		void		displayTopic(void) const;
 		void 		broadcastMessage(std::string message) const;
-		void		msgtoChannel(std::string msg, int sender) const;
 		void		passwordSetBroadcast(Client* client);
+		void		msgtoChannel(std::string msg, int sender) const;
 		int			numberOfClients(void) const;
 		std::string	returnModes(std::string nick);
 
-		// Channel functions for command
+		// Channel functions for commands
 		bool		isOperator(std::string nick) const;
 		void		changeTopic(std::string topic, Client* client);
-		void		kickUser(Client* kicker, Client* target);
+		void		displayTopic(void) const;
+		void		kickUser(const std::string& kicker, const std::string& target);
+		void		kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment);
+		void		inviteUser(Client *invited_clien);
 
 		            //mode setters
-		void		setPassword(const std::string& password); // preguntar Maria si borrarlo
 		void		setPasswordM(Client* op, const std::string& password);
 		void		setTopicMode(const std::string& op_nick);
 		void		setLimitMode(int limit, const std::string& limit_str, const std::string& op_nick);

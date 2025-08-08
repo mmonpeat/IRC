@@ -13,7 +13,7 @@
 
 NAME = ircserv
 INC = inc/
-SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/join.cpp src/utilsJoin.cpp src/command_utils.cpp src/modes.cpp src/topic.cpp
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/commands/join.cpp src/commands/utilsJoin.cpp src/command_utils.cpp src/commands/modes.cpp src/commands/topic.cpp  src/commands/kick.cpp src/commands/invite.cpp
 
 BUILD = .build
 OBJ = $(SRC:%.cpp=$(BUILD)/%.o)
