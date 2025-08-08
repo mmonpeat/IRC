@@ -382,7 +382,7 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
 			break;
 		}
 		case 9:
-			//channelModes(params, client);
+			channelModes(params, client);
 			break;
 		case 10:
 			quit(client); //add the message part?

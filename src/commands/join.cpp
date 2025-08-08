@@ -56,6 +56,11 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 			bool canJoin = true;
 
+			/*
+				if (!checkModeChannelPassword(channel, channelPass, client)) break;
+				if (!checkModeChannelLimit(channel, client)) break;
+				if (!checkModeInvite(channel, client)) break;
+			*/
 			// Mode +k (password)
 			if (channel->isPasswordSet())
 			{
@@ -72,11 +77,13 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			}
 
 			// Mode +l (limit)
+			std::cout << "cha lim:" <<  channel->getChannelLimit()<< "num client in cha" << channel->numberOfClients() << std::endl;
 			if (channel->isLimitModeSet())
 			{
 				int limit = channel->getChannelLimit();
 				int current = channel->numberOfClients();
-				if (current >= limit)
+				std::cout << "hola imprimeix limit" << std::endl;
+  				if (current >= limit)
 				{
 					sendReply(client.getFd(), errChannelIsFull(channelName));
 					canJoin = false;
@@ -100,42 +107,7 @@ void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channel
 			{
 				// Afegir client al canal
 				channel->addClient(&client);
-
-				// Mensaje JOIN para TODOS incluyendo al nuevo cliente
-				std::string joinMsg = ":" + client.getNick() + "!" + client.getUserName() + "@localhost JOIN " + channelName + "\r\n";
-				channel->broadcastMessage(joinMsg);
-				
-				// 1. JOIN a tots els del canal
-				sendReply(client.getFd(), joinMsg);
-
-				// 2.1 TOPIC Si es el primer usuario, hacerlo operador
-				if (channel->getClientCount() == 1) {
-					channel->addOperator(&client);
-					sendReply(client.getFd(), "MODE " + channelName + " +o " + client.getNick() + "\r\n");
-					
-					// Notificar a todos que es operador
-					channel->broadcastMessage(":" + client.getNick() + "!" + client.getUserName() + "@localhost MODE " + channelName + " +o " + client.getNick() + "\r\n");
-				}
-
-				// Enviar información del canal (TOPIC)
-				if (!channel->getTopic().empty()) {
-					sendReply(client.getFd(), rplTopicSet(client.getNick(), channelName, channel->getTopic()));
-				} else {
-					sendReply(client.getFd(), rplNoTopicSet(client.getNick(), channelName));
-				}
-
-				// 3. Llista d'usuaris (NAMREPLY)
-				std::string namesMsg = ":localhost 353 " + client.getNick() + " = " + channelName + " :";
-				const std::vector<std::string>& nickList = channel->getClientNicks();
-				for (size_t i = 0; i < nickList.size(); ++i) {
-					if (i > 0) namesMsg += " ";
-					if (channel->isOperator(nickList[i])) {
-						namesMsg += "@";
-					}
-					namesMsg += nickList[i];
-				}
-				sendReply(client.getFd(), rplNamesMsg(namesMsg));
-				sendReply(client.getFd(), rplEndNameList(client.getNick(), channelName));
+				replayMsgBecauseClientAddedToChannel(channel, client, channelName);
 			}
 		}
 	}
