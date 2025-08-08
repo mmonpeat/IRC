@@ -69,6 +69,7 @@ class Server
 
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
+		void	ServerBroadcast(std::string msg);
 	
 		//handling client
 		bool	clientIsRegistered(int clientFd);

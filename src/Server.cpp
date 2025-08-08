@@ -352,6 +352,7 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
 			pass(params, client);
 			break ;
 		case 2:
+			nick(params, client);
 			break ;
 		case 3:
 			user(params, client);
@@ -555,6 +556,15 @@ void	Server::sendReply(int client_fd, std::string reply)
 {
 	send(client_fd, reply.c_str(), reply.length(), 0);
 	return ;
+}
+
+void	Server::ServerBroadcast(std::string msg)
+{
+	for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); it++)
+	{
+		if (it->first != -1)
+			send(it->second->getFd(), msg.c_str(), msg.size(), 0);
+	}
 }
 
 //------------------------------- Client Functions -------------------------------
