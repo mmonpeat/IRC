@@ -10,7 +10,7 @@ Channel*	Server::getChannelByName(std::string& name) {
 }
 
 void	Server::channelModes(std::vector<std::string> params, Client *client) {
-	std::cout << "!!!!!!!!!!!! HE ENTRADO EN MODE !!!!!!!!!" << std::endl;
+	std::cout << "!!!!!!!!!!!! HE ENTRADO EN MODE !!!!!!!!!" << std::endl; //delete later
 	int 		paramCount = params.size();
 	Channel*	channel;
 
