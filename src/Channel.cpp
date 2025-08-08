@@ -54,9 +54,10 @@ bool	Channel::isPasswordValidChannel(std::string password) const {
 	return false;
 }
 
+//change the invite function
 bool	Channel::isClientInvited(Client* client) const {
-	for (std::vector<std::string>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
-		if (equalNicks(*it, client->getNick()) == true)
+	for (std::vector<Client*>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
+		if (*it == client)
 			return true;
 	}
 	return false;
@@ -112,13 +113,6 @@ std::string	Channel::getTopicSetTime(void) {
 }
 
 //---------------------------------- Setters -------------------------------------------------
-
-/*void 	Channel::setPassword(const std::string& password) could be deleted
-{
-	this->_password = password;
-	this->_password_set = true;
-	return;
-}*/
 
 void		Channel::setPasswordM(Client* op, const std::string& password) {
 	this->_password = password;
@@ -202,22 +196,6 @@ void	Channel::addClient(Client *client) {
 	return;
 }
 
-// void	Channel::removeClient(Client* client) {
-// 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		if ((*it)->getNick() == client->getNick()) {
-// 			if (isOperator(client->getNick()))
-// 				removeOperator(client);
-// 			_clients.erase(it);
-// 			break;
-// 		}
-// 	}
-// 	// check if it is empty and call break to not print the message
-// 	std::string	message = "deleted \r\n";
-// 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		send((*it)->getFd(), message.c_str(), message.size(), 0);
-// 	}
-// }
-
 bool Channel::isClientInChannel(Client* client) const
 {
     for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -230,21 +208,19 @@ bool Channel::isClientInChannel(Client* client) const
 
 void Channel::removeClient(Client* client)
 {
-    // Eliminar de clientes normales
     for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
         if ((*it)->getFd() == client->getFd()) {
             _clients.erase(it);
             break;
         }
     }
-    
-    // Eliminar de operadores si lo era
     for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
         if ((*it)->getFd() == client->getFd()) {
             _operators.erase(it);
             break;
         }
     }
+	removeInvited(client);
 }
 
 void	Channel::removeOperator(Client *op) {
@@ -266,6 +242,15 @@ void	Channel::removeOperatorByNick(std::string& ex_op) {
 		}
 	}
 	return;
+}
+
+void	Channel::removeInvited(Client* client) {
+	for (std::vector<Client*>::iterator it = _invited_clients.begin(); it != _invited_clients.end(); it++) {
+		if (*it == client) {
+			_invited_clients.erase(it);
+			break;
+		}
+	}
 }
 
 void	Channel::addOperator(Client *new_op) {
@@ -401,10 +386,25 @@ void Channel::changeTopic(const std::string new_topic, Client* client) {
 }
 
 
-void	Channel::kickUser(const std::string& kicker, const std::string& target) {
-	std::string message = "KICK " + kicker + " " + _name + " " + target + "\r\n";
+void	Channel::kickUser(const std::string& kicker_prefix, const std::string& target) {
+	std::string message = kicker_prefix +  " KICK " + _name + ' ' + target + "\r\n";
+	//std::string message = "KICK " + kicker + " " + _name + " " + target + "\r\n";
 	broadcastMessage(message);
 
+	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (equalNicks((*it)->getNick(), target) == true) {
+			removeClient(*it);
+			break;
+		}	
+	}
+	return;
+}
+
+void		Channel::kickUserMsg(const std::string& kicker_prefix, const std::string& target, const std::string& comment) {
+	std::string message = kicker_prefix +  " KICK " + _name + ' ' + target + " :" + comment + "\r\n";
+	//std::string message = "KICK " + kicker + " " +  _name + " " + target + " :" + comment + "\r\n";
+	broadcastMessage(message);
+	
 	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (equalNicks((*it)->getNick(), target)) {
 			removeClient(*it);
@@ -414,15 +414,7 @@ void	Channel::kickUser(const std::string& kicker, const std::string& target) {
 	return;
 }
 
-void		Channel::kickUserMsg(const std::string& kicker, const std::string& target, const std::string& comment) {
-	std::string message = "KICK " + kicker + " " +  _name + " " + target + " :" + comment + "\r\n";
-	broadcastMessage(message);
-	
-	for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-		if (equalNicks((*it)->getNick(), target)) {
-			removeClient(*it);
-			break;
-		}	
-	}
+void		Channel::inviteUser(Client *invited_client) {
+	_invited_clients.push_back(invited_client);
 	return;
 }
