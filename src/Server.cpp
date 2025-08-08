@@ -512,7 +512,7 @@ void	Server::privmsg(std::vector<std::string> params, Client *client)
 	size_t	i = 0;
 	while (i < targets.size())
 	{
-		std::string	msg = premsg + targets[i] + " : " + params[2] + "\r\n";
+		std::string	msg = premsg + targets[i] + " :" + params[2] + "\r\n";
 	//	std::cout << "GONNA SEND: " << msg << std::endl;
 		if (targets[i][0] == '#')
 			privmsg_channel(client, targets[i], msg);
