@@ -3,7 +3,7 @@
 //------------------------------ Constructor / Destructors------------------------
 
 Client::Client(int fd): _fd(fd) {
-	std::cout << "Client constructor called" << std::endl;
+	//std::cout << "Client constructor called" << std::endl;
 	_pass = false;
 	_auth = false; // hasta que el cliente tenga todos los campos registrados
 	_end_connection = false; //flag raised to end connection

@@ -10,7 +10,6 @@ Channel*	Server::getChannelByName(std::string& name) {
 }
 
 void	Server::channelModes(std::vector<std::string> params, Client *client) {
-	std::cout << "!!!!!!!!!!!! HE ENTRADO EN MODE !!!!!!!!!" << std::endl; //delete later
 	int 		paramCount = params.size();
 	Channel*	channel;
 
@@ -41,8 +40,6 @@ void	Server::channelModes(std::vector<std::string> params, Client *client) {
 
 void	Server::applyModes(std::vector<std::string> params, Client *client, Channel* channel)
 {
-	std::cout << "Modes parameters are: " << params[2] << std::endl; //delete later
-	
 	const size_t	max_param_num = 3;
 	size_t			found_param = 0;
 	char			currentSign = 0;
@@ -50,12 +47,15 @@ void	Server::applyModes(std::vector<std::string> params, Client *client, Channel
 	int				param_len = params.size();
 	int				arg_i = 3;
 
+	
+
 	for (size_t i = 0; i < params[2].size(); ++i)
 	{
 		char c = params[2][i];
 
-		if (c == '+' || c == '-')
+		if (c == '+' || c == '-') {
 			currentSign = c;
+		}
 		else if (validModes.find(c) == std::string::npos || currentSign == 0)
 			sendReply(client->getFd(), errNotKnownMode(client->getNick(), c));
 		else if (((c == 'k' || c == 'l') && currentSign == '+') || c == 'o')
@@ -179,9 +179,9 @@ void	Server::modeO(Channel *channel, std::string arg, char sign, Client *client)
 }
 
 void	Server::modeI(Channel *channel, char sign, Client *client) {
-	if (sign == '+') // add checker is +i is already on optional
+	if (sign == '+' && channel->isInviteModeSet() == false)
 		channel->setInviteMode(client->getNick());
-	else if (sign == '-') //add checker if -i is already on optional
+	else if (sign == '-' && channel->isInviteModeSet() == true)
 		channel->unsetInviteMode(client->getNick());
 	return;
 }

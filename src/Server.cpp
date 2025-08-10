@@ -366,19 +366,31 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
 			privmsg(params, client);
 			break;
 		case 6: {
-			std::cout << "KICK goes here" << std::endl; //delete later
 			kick(params, client);
+		/*kick(params, client);
+		if (params.size() > 1) {
+    		Channel* channel = getChannelByName(params[1]);
+    		if (channel !=  NULL) {
+        	if (channel->isChannelEmpty()) {
+            for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it) {
+                if (*it == channel) {
+                    delete *it;
+                    it = channels.erase(it); // erase returns next iterator
+                    break; // channel found and deleted, no need to continue loop
+                }
+            }
+        }
+    }
+	}*/
 			break;
 		}
 		case 7: 
 		{
-			std::cout << "INVITE goes here" << std::endl; //delete later
 			invite(params, client);
 			break;
 		}
 		case 8:
 		{
-			std::cout << "TOPIC goes here" << std::endl; //delete later
 			topic(params, client);
 			break;
 		}

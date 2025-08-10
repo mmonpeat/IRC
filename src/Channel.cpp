@@ -9,14 +9,13 @@ Channel::Channel(std::string name, Client* client) : _name(name), _topic("No top
 	_password_set = false;
 	_topic_init = false;
 	_channel_creation_time = time(NULL);
-    std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
+    //std::cout << "Channel " << this->_name << " constructor without password has been called" << std::endl;
     return;
 }
 
 
 Channel::~Channel(void) {
-    // check if there are allocated memory and delete it before destruction!!!
-    std::cout << "Channel " << this->_name << " destructor has been called" << std::endl;
+    //std::cout << "Channel " << this->_name << " destructor has been called" << std::endl;
     return;
 }
 
@@ -54,7 +53,6 @@ bool	Channel::isPasswordValidChannel(std::string password) const {
 	return false;
 }
 
-//change the invite function
 bool	Channel::isClientInvited(Client* client) const {
 	for (std::vector<Client*>::const_iterator it = _invited_clients.begin(); it != _invited_clients.end(); ++it) {
 		if (*it == client)
@@ -62,7 +60,6 @@ bool	Channel::isClientInvited(Client* client) const {
 	}
 	return false;
 }
-
 
 //---------------------------------- Vriables getters -----------------------------------
 
@@ -187,6 +184,7 @@ void	Channel::unsetInviteMode(const std::string& op_nick) {
 }
 
 //---------------------------------- Class Functions -----------------------------------------
+
 void	Channel::addClient(Client *client) {
 	this->_clients.push_back(client);
 	std::string	message = client->getNick() + " (" + client->getRealName() + ") has joined \r\n";
@@ -209,13 +207,13 @@ bool Channel::isClientInChannel(Client* client) const
 void Channel::removeClient(Client* client)
 {
     for (std::vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-        if ((*it)->getFd() == client->getFd()) {
+        if (*it == client) {
             _clients.erase(it);
             break;
         }
     }
     for (std::vector<Client*>::iterator it = _operators.begin(); it != _operators.end(); ++it) {
-        if ((*it)->getFd() == client->getFd()) {
+        if (*it == client) {
             _operators.erase(it);
             break;
         }
@@ -255,7 +253,7 @@ void	Channel::removeInvited(Client* client) {
 
 void	Channel::addOperator(Client *new_op) {
 	this->_operators.push_back(new_op);
-	std::string	message = new_op->getNick() + " (" + new_op->getRealName() + ") has become operator \r\n"; //falta decir en que grup
+	std::string	message = new_op->getNick() + " (" + new_op->getRealName() + ") has become operator \r\n";
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		send((*it)->getFd(), message.c_str(), message.size(), 0);
@@ -286,7 +284,7 @@ bool		Channel::isClientByNick(std::string nick){
 	if (nick.empty())
 		return false;
 	for (std::vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it) {
-		if ((*it)->getNick() == nick)
+		if (equalNicks((*it)->getNick(), nick) == true)
 			return true;
 	}
 	return false;

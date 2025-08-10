@@ -24,11 +24,11 @@ void    Server::kick(std::vector<std::string> params, Client *client) {
 		//std::cout << "!!!!!!!!!!!!!!!!!!!!  0" << params[0] << std::endl;
 		//std::cout << "!!!!!!!!!!!!!!!!!!!!  1" << params[1] << std::endl;
 		//std::cout << "!!!!!!!!!!!!!!!!!!!!  2" << params[2] << std::endl;
-		//if (paramCount == 4)
-			//std::cout << "!!!!!!!!!!!!!!!!!!!!  3" << params[3] << std::endl;
+		if (paramCount == 4)
+			std::cout << "!!!!!!!!!!!!!!!!!!!!  3" << params[3] << std::endl;
 
 		if (channel->isClientByNick(params[2]) == false) {
-			//std::cout << "!!!!!!!!!!!!!!!!!!!!" << params[2] << std::endl;
+			std::cout << "!!!!!!!!!!!!!!!!!!!!" << params[2] << std::endl;
 			sendReply(client->getFd(), errUserNotInChannel(client->getNick(), channel->getChannelName()));
 			return;
 		}

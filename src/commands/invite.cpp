@@ -32,12 +32,12 @@ void    Server::invite(std::vector<std::string> params, Client *client){
         sendReply(client->getFd(), params[2] + " is not on this server\r\n");
         return;
     }
-    if (channel->isClient(invited)) {
-        //maybe send a message
+    if (channel->isClient(invited)) { // this person is already on the channel
+        sendReply(client->getFd(), errUserOnChannel(client->getNick(), channel->getChannelName(), invited->getNick()));
         return;
     }
     if (channel->isClientInvited(invited)) { //this person was already invited before 
-        sendReply(client->getFd(), errUserOnChannel(client->getNick(), channel->getChannelName(), invited->getNick()));
+        sendReply(client->getFd(), ":localhost NOTICE " + client->getNick() + " :Bob is already invited to " + channel->getChannelName() + "\r\n");
         return;
     }
         

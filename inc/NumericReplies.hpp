@@ -124,11 +124,11 @@ inline std::string	errNotOperator(const std::string& clientNick, const std::stri
 }
 
 inline std::string	errChannelNotExist(const std::string& clientNick, const std::string& channelName) {
-	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel\r\n");
+	return (":localhost 403 " + clientNick + " " + channelName + " :No such channel!!!!!!!!!!!!\r\n");
 }
 
 inline std::string	errUserNotInChannel(const std::string& clientNick, const std::string& channelName) {
-	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel!!!!!!!\r\n");
+	return (":localhost 401 " + clientNick + " " + channelName + " :They aren't on that channel!\r\n");
 }
 
 inline std::string	errNotEnoughParams(const std::string& clientNick, const std::string& mode) {
@@ -144,7 +144,7 @@ inline std::string	RPL_CREATIONTIME(const std::string& clientNick, const std::st
 }
 
 inline std::string	errNotKnownMode(const std::string& clientNick, const char& modeChar) {
-	return (":localhost 472 " + clientNick + " " + modeChar + " :is unknown mode char to me\r\n");
+	return (":localhost 472 " + clientNick + " " + std::string(1, modeChar) + " :is unknown mode char to me\r\n");
 }
 
 
