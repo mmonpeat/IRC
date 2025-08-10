@@ -335,7 +335,7 @@ void		Channel::displayTopic(void) const {
 	return;
 }
 
-int 		Channel::numberOfClients() const {
+int 		Channel::numberOfClients(void) const {
 	return static_cast<int>(_clients.size());
 }
 

@@ -69,6 +69,7 @@ class Server
 
 		//reply functions
 		void	sendReply(int client_fd, std::string reply);
+		void	ServerBroadcast(std::string msg);
 	
 		//handling client
 		bool	clientIsRegistered(int clientFd);
@@ -129,6 +130,10 @@ class Server
 		bool						equalChannels(std::string new_channel, std::string channel) const;
 		bool						isChannelNameUnique(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
 		std::string					getUniqueChannelName(std::string& channelToCheck, const std::vector<Channel*>& channelsExistents) const;
+		
+
+		void 						replayMsgBecauseClientAddedToChannel(Channel* channel, Client& client, std::string channelName);
+
 		//per mostrar borrar
 		void 	mostrarChannels(void);
 		

@@ -8,8 +8,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-//int	g_status = 0;
-
 int	set_port(char *argv)
 {
 	std::string	port_av = argv;
@@ -87,9 +85,26 @@ int	start_signals()
 	return (EXIT_SUCCESS);
 }
 
+int	ignore_signal()
+{
+	struct sigaction	sa;
+	sa.sa_flags = SA_RESTART;
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	
+	if (sigaction(SIGPIPE, &sa, NULL) == -1)
+	{
+		perror("Sigaction failure\n");
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
 	if (start_signals() == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	if (ignore_signal() == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	if (check_args(argc, argv) == EXIT_FAILURE) {std::cerr << "Usage: " << argv[0] << " <port>" << std::endl; std::cerr << "User pass: " << argv[1] << " <password>" << std::endl; return (EXIT_FAILURE);}
 	int	port = set_port(argv[1]);
