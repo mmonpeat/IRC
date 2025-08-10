@@ -366,8 +366,7 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
 			privmsg(params, client);
 			break;
 		case 6: {
-			kick(params, client);
-		/*kick(params, client);
+		kick(params, client);
 		if (params.size() > 1) {
     		Channel* channel = getChannelByName(params[1]);
     		if (channel !=  NULL) {
@@ -381,7 +380,7 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
             }
         }
     }
-	}*/
+	}
 			break;
 		}
 		case 7: 

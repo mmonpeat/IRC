@@ -44,68 +44,56 @@ int Server::countClientChannels(Client& client, const std::vector<Channel*>& cha
     return count;
 }
 
-void Server::checkModeToAddClient(Client& client, std::vector<Channel*>& channelsExistents, std::string& channelName, std::string& channelPass)
+void Server::checkModeToAddClient(Client& client, std::string& channelName, std::string& channelPass)
 {
-	for (std::vector<Channel*>::iterator it = channelsExistents.begin(); it != channelsExistents.end(); ++it) {
-        Channel* channel = *it;
-		if (equalChannels(channel->getChannelName(), channelName)) 
-		{
-			// Verificación crítica que evita segfaults
-			if (channel->getChannelName() != channelName) {
-				return;
-			}
-			bool canJoin = true;
+	Channel* channel = getChannelByName(channelName);
+	
 
-			// Mode +k (password)
-			if (channel->isPasswordSet())
-			{
-				if (channelPass.empty())
-				{
-					sendReply(client.getFd(), errBadChannelKey(channelName));
-					canJoin = false;
-				}
-				else if (!channel->isPasswordValidChannel(channelPass))
-				{
-					sendReply(client.getFd(), errBadChannelKey(channelName));
-					canJoin = false;
-				}
-			}
+	// Mode +k (password)
+	if (channel->isPasswordSet())
+	{
+		if (channelPass.empty())
+		{
+			sendReply(client.getFd(), errBadChannelKey(channelName));
+			return ;
+		}
+		else if (!channel->isPasswordValidChannel(channelPass))
+		{
+			sendReply(client.getFd(), errBadChannelKey(channelName));
+			return ;
+		}
+	}
 
 			// Mode +l (limit)
 			//std::cout << "cha lim:" <<  channel->getChannelLimit()<< "num client in cha" << channel->numberOfClients() << std::endl;
-			if (channel->isLimitModeSet())
-			{
-				int limit = channel->getChannelLimit();
-				int current = channel->numberOfClients();
-				//std::cout << "hola imprimeix limit" << std::endl;
-  				if (current >= limit)
-				{
-					sendReply(client.getFd(), errChannelIsFull(channelName));
-					canJoin = false;
-				}
-			}
-			
-			// Mode +i (invite-only)
-			if (channel->isInviteModeSet() == true && canJoin == false)
-			{
-				if (channel->isClientInvited(&client) == false) {
-					sendReply(client.getFd(), errInviteOnlyChan(channelName));
-					canJoin = false;
-				} else if (channel->isClientInvited(&client) == true) {
-					channel->removeInvited(&client);
-				}
-			} else if (channel->isClientInvited(&client) == true){
-				channel->removeInvited(&client);
-			}
-
-			if (canJoin)
-			{
-				// Afegir client al canal
-				channel->addClient(&client);
-				replayMsgBecauseClientAddedToChannel(channel, client, channelName);
-			}
+	if (channel->isLimitModeSet())
+	{
+		int limit = channel->getChannelLimit();
+		int current = channel->numberOfClients();
+		//std::cout << "hola imprimeix limit" << std::endl;
+  		if (current >= limit)
+		{
+			sendReply(client.getFd(), errChannelIsFull(channelName));
+			return ;
 		}
 	}
+			
+	// Mode +i (invite-only)
+	if (channel->isInviteModeSet() == true)
+	{
+		if (channel->isClientInvited(&client) == false) {
+			sendReply(client.getFd(), errInviteOnlyChan(channelName));
+			return ;
+		} else if (channel->isClientInvited(&client) == true) {
+					channel->removeInvited(&client);
+		}
+	} else if (channel->isClientInvited(&client) == true){
+		channel->removeInvited(&client);
+	}
+
+			// Afegir client al canal
+	channel->addClient(&client);
+	replayMsgBecauseClientAddedToChannel(channel, client, channelName);
 }
 
 void Server::createNewChannel(Client& client, std::vector<Channel*>& channelsExistents, const std::string& channelName, const std::string& channelPass)
@@ -172,7 +160,7 @@ int Server::join(Client& client, std::vector<Channel*>& channelsExistents, std::
             }
         } else {
             std::string actualName = getUniqueChannelName(channelName, channelsExistents);
-            checkModeToAddClient(client, channelsExistents, actualName, channelPass);
+            checkModeToAddClient(client, actualName, channelPass);
         }
 	}
 	ChannelsNames.clear();
