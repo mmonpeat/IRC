@@ -173,12 +173,14 @@ void Server::handleClientData(int clientFd)
 			while (clients[clientFd]->readBuffer(&msg))
 			{
 				handleMsg(msg, clients[clientFd]);
-				mostrarChannels();
+				//mostrarChannels();
 					}
 			if (clients[clientFd]->getEnd() == true)
 				removeClient(clientFd);
 		}
 }
+
+
 void Server::mostrarChannels(void)
 {
     int i = 1;
