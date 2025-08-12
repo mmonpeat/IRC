@@ -372,11 +372,11 @@ void	Server::CommandCall(std::vector<std::string> params, Client *client, int co
     		Channel* channel = getChannelByName(params[1]);
     		if (channel !=  NULL) {
         	if (channel->isChannelEmpty()) {
-            for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it) {
-                if (*it == channel) {
-                    delete *it;
-                    it = channels.erase(it); // erase returns next iterator
-                    break; // channel found and deleted, no need to continue loop
+            	for (std::vector<Channel*>::iterator it = channels.begin(); it != channels.end(); ++it) {
+                	if (*it == channel) {
+                    	delete *it;
+                    	it = channels.erase(it); // erase returns next iterator
+                    	break; // channel found and deleted, no need to continue loop
                 }
             }
         }
